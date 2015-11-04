@@ -7,7 +7,7 @@ from subprocess import Popen as run, PIPE
 api = Api(app)
 
 
-class IdAccessAPI(Resource):
+class QueryAPI(Resource):
 
     def get(self, query):
         cmd = ['./hmmer/binaries/esl-afetch', 'Pfam-A.full', query]
@@ -17,4 +17,4 @@ class IdAccessAPI(Resource):
                 'output': output}
 
 
-api.add_resource(IdAccessAPI, '/api/by_id/<string:query>', endpoint = 'by_id')
+api.add_resource(QueryAPI, '/api/query/<string:query>', endpoint = 'query')
