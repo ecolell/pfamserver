@@ -42,7 +42,7 @@ show-version:
 	@ $(SOURCE_ACTIVATE) $(PYTHON) --version
 
 run:
-	$(SOURCE_ACTIVATE) $(PYTHON) pfamserver/run.py
+	$(SOURCE_ACTIVATE) $(PYTHON) pfamserver
 
 test:
 	$(SOURCE_ACTIVATE) $(PYTHON) tests

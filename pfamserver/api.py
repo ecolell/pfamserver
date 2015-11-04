@@ -2,13 +2,15 @@ from application import app
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
+from distutils.sysconfig import get_python_lib
 
 
 api = Api(app)
+fetch = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(get_python_lib())
 
 
 def db(query):
-    cmd = ['./hmmer/binaries/esl-afetch', 'Pfam-A.full', query]
+    cmd = [fetch, 'Pfam-A.full', query]
     return run(cmd, stdout=PIPE).communicate()[0]
 
 
