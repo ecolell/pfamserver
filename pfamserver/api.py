@@ -3,14 +3,15 @@ from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
 from distutils.sysconfig import get_python_lib
+from autoupdate import lib_path, db_path
 
 
 api = Api(app)
-fetch = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(get_python_lib())
+fetch = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(lib_path)
 
 
 def db(query):
-    cmd = [fetch, 'Pfam-A.full', query]
+    cmd = [fetch, db_path, query]
     return run(cmd, stdout=PIPE).communicate()[0]
 
 

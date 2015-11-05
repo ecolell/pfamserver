@@ -34,6 +34,14 @@ Example
 =======
 
 
+Thanks to
+=========
+
+This service uses the next packages:
+
+    homura  --  Copyright (c) 2014 Shichao An
+
+
 About
 =====
 
