@@ -64,12 +64,13 @@ def get_versions(config):
     return config['version'], remote
 
 
-def download_gziped(remote, destiny):
+def download_gziped(remote):
     origin = '{0[proto]}{0[url]}{0[path]}Pfam{1}/{2}.gz'.format(ftp,
                                                                 remote,
                                                                 filename)
     destiny = '{:s}.gz'.format(db_path)
     download(url=origin, path=destiny)
+    return destiny
 
 
 def export(destiny):
@@ -88,7 +89,7 @@ def update():
     local, remote = get_versions(config)
     if local < remote:
         print("->\tPFam: Update from {:.1f} to {:.1f}".format(local, remote))
-        download_gziped(remote, destiny)
+        destiny = download_gziped(remote)
         export(destiny)
         reindex()
         config['version'] = remote
