@@ -11,7 +11,7 @@ If you want to deploy this service on any GNU/Linux or OSX system you just need 
 
     $ pip install pfamserver
 
-If you want to improve this library, you should download the [gitlab repository](https://github.com/ecolell/pfamserver) and execute:
+If you want to improve this library, you should download the [github repository](https://github.com/ecolell/pfamserver) and execute:
 
     $ make deploy
 
@@ -27,7 +27,7 @@ To test all the project you should use the command:
 
     $ make test
 
-If you want to help us or report an issue join to us through the [GitLab issue tracker](https://github.com/ecolell/pfamserver/issues).
+If you want to help us or report an issue join to us through the [Github issue tracker](https://github.com/ecolell/pfamserver/issues).
 
 
 Running
