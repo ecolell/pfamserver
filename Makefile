@@ -12,7 +12,7 @@ unattended:
 	@ (sudo ls 2>&1) >> tracking.log
 
 ubuntu:
-	@ sudo apt-get -y install zlibc libssl0.9.8 libbz2-dev libxslt1-dev libxml2-dev python-gevent
+	@ sudo apt-get -y install zlibc libssl0.9.8 libbz2-dev libxslt1-dev libxml2-dev python-gevent libcurl4-openssl-dev
 	@ echo "[ assume       ] ubuntu distribution"
 
 osx:
