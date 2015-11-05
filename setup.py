@@ -154,7 +154,7 @@ class Builder(object):
             spacer = '-' * len(title)
             print('+{:s}+\n|{:s}|\n+{:s}+'.format(spacer, title, spacer))
             import multiprocessing
-            self.call('sudo rm {:s}'.format(filename))
+            self.call('rm {:s}'.format(filename))
             path = self.local_unpacked
             config = self.lib['compile']['config']
             ncores = multiprocessing.cpu_count()
