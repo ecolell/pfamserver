@@ -1,5 +1,5 @@
 from __future__ import print_function
-from ftplib import FTP
+import urllib2
 from distutils.sysconfig import get_python_lib
 import json
 import socket
@@ -24,13 +24,9 @@ def silent_remove(filename):
 
 
 def get_max_version():
-    conn = FTP(ftp['url'])
-    conn.login()
-    path = ftp['path']
-    versions = conn.nlst(path)
-    version = max(map(lambda f: float(f[len(path)+4:]), versions))
-    conn.close()
-    return version
+    conn = urllib2.urlopen('{0[proto]}{0[url]}{0[path]}'.format(ftp))
+    versions = map(lambda l: float(l.split(' ')[-1][4:-2]), conn.readlines())
+    return max(versions)
 
 
 def get_available(config):
