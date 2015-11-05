@@ -30,19 +30,34 @@ To test all the project you should use the command:
 If you want to help us or report an issue join to us through the [GitLab issue tracker](https://github.com/ecolell/pfamserver/issues).
 
 
+Running
+=======
+
+To run the server you need to execute:
+
+    $ python -m pfamserver
+
+Before the start, the server it is going to update (when it is outdated) to the last version of the file Pfam-A.full.gz (approximately 13GB), so be patient it can take a while.
+
+
 Example
 =======
 
+You can make requests to [http://localhost:5001](http://localhost:5001), like:
 
-Thanks to
-=========
 
-This service uses the next packages:
-
-    homura  --  Copyright (c) 2014 Shichao An
+    [http://localhost:5001/api/query/piwi](http://localhost:5001/api/query/piwi)
 
 
 About
 =====
 
 This software is developed by [LELOIR](http://leloir.org.ar/). You can contact us to [eloy.colell@gmail.com](mailto:eloy.colell@gmail.com).
+
+
+Thanks
+======
+
+This service uses some packages with copyright:
+
+    homura  --  Copyright (c) 2014 Shichao An
