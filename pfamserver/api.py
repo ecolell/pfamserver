@@ -18,7 +18,7 @@ def db(query):
 class QueryAPI(Resource):
 
     def get(self, query):
-        queries = [query, query.capitalize(), query.upper(), query.lower()]
+        queries = [query, query.upper(), query.capitalize(), query.lower()]
 
         for q in queries:
             output = db(q)
