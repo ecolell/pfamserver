@@ -53,11 +53,3 @@ About
 =====
 
 This software is developed by [LELOIR](http://leloir.org.ar/). You can contact us to [eloy.colell@gmail.com](mailto:eloy.colell@gmail.com).
-
-
-Thanks
-======
-
-This service uses some packages with copyright:
-
-    homura  --  Copyright (c) 2014 Shichao An

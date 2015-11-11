@@ -1,12 +1,13 @@
 from __future__ import print_function
-import urllib2
 from distutils.sysconfig import get_python_lib
 import json
 import socket
 import os
-from homura import download
+from aquire import aquire
 import gzip
 import shutil
+from urllib import urlopen
+from contextlib import closing
 
 
 lib_path = get_python_lib()
@@ -24,8 +25,10 @@ def silent_remove(filename):
 
 
 def get_max_version():
-    conn = urllib2.urlopen('{0[proto]}{0[url]}{0[path]}'.format(ftp))
-    versions = map(lambda l: float(l.split(' ')[-1][4:-2]), conn.readlines())
+    url = '{0[proto]}{0[url]}{0[path]}'.format(ftp)
+    with closing(urlopen(url)) as conn:
+        versions = map(lambda l: float(l.split(' ')[-1][4:-2]),
+                       conn.readlines())
     return max(versions)
 
 
@@ -74,10 +77,15 @@ def download_gziped(remote, config):
         silent_remove(destiny)
         config['status'].append('downloading')
         save_local_config(config)
-    if not 'downloaded' in config['status']:
-        download(url=origin, path=destiny)
-        config['status'].append('downloaded')
-        save_local_config(config)
+    while not 'downloaded' in config['status']:
+        try:
+            aquire(origin, destiny, 512)
+            config['status'].append('downloaded')
+            save_local_config(config)
+        except Exception, e:
+            print(e)
+            print("Retrying again...")
+
     return destiny
 
 
