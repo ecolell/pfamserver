@@ -179,7 +179,7 @@ setup(
     version=VERSION_GIT,
     author=u'Eloy Adonis Colell',
     author_email='eloy.colell@gmail.com',
-    packages=['pfamserver'],
+    packages=['pfamserver', 'pfamserver.templates'],
     url='https://github.com/ecolell/pfamserver',
     license='MIT',
     description=('A python service to query the PFAM database through a '

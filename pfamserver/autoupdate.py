@@ -83,12 +83,16 @@ def download_gziped(remote, config):
 
 def export(destiny, config):
     if not 'exported' in config['status']:
-        print("->\tPFam: Extracting database")
-        silent_remove(db_path)
-        with open(db_path, 'wb') as f_out, gzip.open(destiny, 'rb') as f_in:
-            shutil.copyfileobj(f_in, f_out)
-        config['status'].append('exported')
-        save_local_config(config)
+        try:
+            print("->\tPFam: Extracting database")
+            silent_remove(db_path)
+            with open(db_path, 'wb') as f_out, gzip.open(destiny, 'rb') as f_in:
+                shutil.copyfileobj(f_in, f_out)
+            config['status'].append('exported')
+            save_local_config(config)
+            return True
+        except Exception:
+            return False
 
 
 def reindex(config):
@@ -107,8 +111,10 @@ def update():
     local, remote = get_versions(config)
     if local < remote:
         print("->\tPFam: Update from {:.1f} to {:.1f}".format(local, remote))
-        destiny = download_gziped(remote, config)
-        export(destiny, config)
+        exported = False
+        while not exported:
+            destiny = download_gziped(remote, config)
+            exported = export(destiny, config)
         reindex(config)
         config = {'version': remote, 'status': []}
         save_local_config(config)
