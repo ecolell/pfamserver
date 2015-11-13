@@ -19,6 +19,8 @@ On Ubuntu Desktop there are some other libraries not installed by default (zlibc
 
     $ make ubuntu deploy
 
+Also, you need to have the **wget** package installed.
+
 
 Testing
 =======

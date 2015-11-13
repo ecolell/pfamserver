@@ -1,13 +1,14 @@
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 from distutils.sysconfig import get_python_lib
 import json
 import socket
 import os
-from aquire import aquire
 import gzip
 import shutil
 from urllib import urlopen
 from contextlib import closing
+import subprocess
 
 
 lib_path = get_python_lib()
@@ -79,7 +80,9 @@ def download_gziped(remote, config):
         save_local_config(config)
     while not 'downloaded' in config['status']:
         try:
-            aquire(origin, destiny, 512)
+            result = subprocess.call("wget -c {} -O {}".format(origin, destiny).split(" "))
+            if result:
+                raise Exception("Connection error.")
             config['status'].append('downloaded')
             save_local_config(config)
         except Exception, e:
@@ -99,7 +102,8 @@ def export(destiny, config):
             config['status'].append('exported')
             save_local_config(config)
             return True
-        except Exception:
+        except Exception, e:
+            print(e)
             return False
 
 
