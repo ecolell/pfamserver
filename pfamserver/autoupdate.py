@@ -9,6 +9,8 @@ import shutil
 from urllib import urlopen
 from contextlib import closing
 import subprocess
+from progressbar import ProgressBar, ETA, Percentage, RotatingMarker, Bar
+import re
 
 
 lib_path = get_python_lib()
@@ -101,10 +103,30 @@ def export(destiny, config):
                 shutil.copyfileobj(f_in, f_out)
             config['status'].append('exported')
             save_local_config(config)
-            return True
         except Exception, e:
             print(e)
             return False
+    return True
+
+
+def clean_accession_numbers(config):
+    if not 'cleaned_accessions' in config['status']:
+        print("->\tPFam: Spliting Pfam IDs and Pfam revision")
+        temp_file = db_path + ".tmp"
+        fsize = lambda f: os.stat(f).st_size
+        with open(temp_file, 'wb') as f_out, open(db_path,"r") as f_in:
+            widgets = [Percentage(), ' ', Bar(marker='#'), ' ', ETA()]
+            with ProgressBar(widgets=widgets,
+                             max_value=fsize(db_path) * 1.10) as progress:
+                for line in f_in:
+                    new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
+                                      r'\1\n#=GF DC   Revision: \2', line)
+                    f_out.write(new_line)
+                    progress.update(fsize(temp_file))
+        print("->\tPFam: Updating Pfam IDs")
+        shutil.move(temp_file, db_path)
+        config['status'].append('cleaned_accessions')
+        save_local_config(config)
 
 
 def reindex(config):
@@ -127,6 +149,7 @@ def update():
         while not exported:
             destiny = download_gziped(remote, config)
             exported = export(destiny, config)
+        clean_accession_numbers(config)
         reindex(config)
         config = {'version': remote, 'status': []}
         save_local_config(config)
