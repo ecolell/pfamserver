@@ -15,9 +15,10 @@ import re
 
 lib_path = get_python_lib()
 db_path = '{:s}/pfam_data/Pfam-A.full'.format(lib_path)
-ftp = {'proto': 'ftp://',
-       'path': '/pub/databases/Pfam/releases/',
-       'url': 'ftp.ebi.ac.uk'}
+server = {'path': '/pub/databases/Pfam/releases/',
+          'url': 'ftp.ebi.ac.uk'}
+proto = ['ftp://', 'http://']
+select_proto = None
 filename = 'Pfam-A.full'
 config_file = '{:s}/pfam_data/PfamA_version.json'.format(lib_path)
 
@@ -27,24 +28,33 @@ def silent_remove(filename):
         os.remove(filename)
 
 
-def get_max_version():
-    url = '{0[proto]}{0[url]}{0[path]}'.format(ftp)
+def get_max_version(protocol):
+    url = '{0}{1[url]}{1[path]}'.format(protocol, server)
     with closing(urlopen(url)) as conn:
-        versions = map(lambda l: float(l.split(' ')[-1][4:-2]),
-                       conn.readlines())
+        if "ftp" in protocol:
+            versions = map(lambda l: float(l.split(' ')[-1][4:-2]),
+                           conn.readlines())
+        elif "http" in protocol:
+            hrefs = filter(lambda l: "href=\"Pfam" in l, conn.readlines())
+            versions = map(lambda l: float(re.sub('^.+href="Pfam([0-9\.]+).+$',
+                                              r'\1',l)), hrefs)
     return max(versions)
 
 
 def get_available(config):
     available = None
-    print("->\tPFam: Get availables versions from {:s}".format(ftp['url']))
-    while not available:
+    print("->\tPFam: Get availables versions from {:s}".format(server['url']))
+    for p in proto:
         try:
-            available = get_max_version()
+            available = get_max_version(p)
+            select_proto = p
+            break
         except socket.error:
-            print("Failed")
+            print("{:s} failed.".format(p))
             # If the server is offline assume there is no new version.
-            available = config['version']
+    if not available:
+        print("Discarded new version search.")
+        available = config['version']
     return available
 
 
@@ -72,9 +82,10 @@ def get_versions(config):
 
 
 def download_gziped(remote, config):
-    origin = '{0[proto]}{0[url]}{0[path]}Pfam{1}/{2}.gz'.format(ftp,
-                                                                remote,
-                                                                filename)
+    origin = '{0}{1[url]}{1[path]}Pfam{2}/{3}.gz'.format(select_proto,
+                                                         server,
+                                                         remote,
+                                                         filename)
     destiny = '{:s}.gz'.format(db_path)
     if not 'downloading' in config['status']:
         silent_remove(destiny)
