@@ -42,6 +42,7 @@ def get_max_version(protocol):
 
 
 def get_available(config):
+    global select_proto
     available = None
     print("->\tPFam: Get availables versions from {:s}".format(server['url']))
     for p in proto:
