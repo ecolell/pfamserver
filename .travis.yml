@@ -1,3 +1,15 @@
+sudo: false
+addons:
+  apt:
+    packages:
+    - zlibc
+    - libssl0.9.8
+    - libbz2-dev 
+    - libxslt1-dev
+    - libxml2-dev
+    - python-gevent
+    - libcurl4-openssl-dev
+    - wget
 language: python
 python:
   - "2.6"
@@ -5,6 +17,11 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
+  - "3.5"
+  - "3.5-dev"
+  - "nightly"
+  - "pypy"
+  - "pypy3"
 # command to install dependencies
 install:
   - "make deploy"
