@@ -9,6 +9,7 @@ import subprocess
 from urllib import urlretrieve
 from datetime import datetime
 import sys
+import re
 
 
 def parse_requirements(filename):
@@ -44,10 +45,12 @@ OS_NAME = p.system()
 BINARIES = {
     'hmmer': {
         'version': '3.1b2',
-        'name': 'hmmer-{:s}',
-        'url': 'http://selab.janelia.org/software/hmmer3/{:s}',
+        'name': 'hmmer-{version}',
+        'url': 'http://selab.janelia.org/software/hmmer3/{version}',
+        'extracted': '{name}',
         'compile': {
             'depends': [],
+            'path': '',
             'config': {
                 'pre': ('LDFLAGS=-L/usr/local/lib '
                         'CPPFLAGS=-I/usr/local/include '
@@ -55,6 +58,18 @@ BINARIES = {
                 'post': (' --prefix=/usr/local'),
             }
         }
+    },
+    'muscle': {
+        'version': '3.8.31',
+        'name': 'muscle{version}_src',
+        'url': 'http://www.drive5.com/muscle/downloads{version}',
+        'extracted': 'muscle{version}',
+        'compile': {
+            'depends': [],
+            'path': '/src',
+            'config': {}
+        }
+
     }
 }
 
@@ -63,12 +78,14 @@ SYSTEMS = {
         'update_shared_libs': '',
         'libs': {
             'hmmer': TMP_PATH + 'hmmer/easel/miniapps/esl-afetch',
+            'muscle': TMP_PATH + 'muscle/src/muscle',
         },
     },
     'Darwin': {
         'update_shared_libs': '',
         'libs': {
             'hmmer': TMP_PATH + 'hmmer/easel/miniapps/esl-afetch',
+            'muscle': TMP_PATH + 'muscle/src/muscle',
         },
     },
 }
@@ -96,8 +113,9 @@ class Builder(object):
     def __init__(self, lib):
         self.lib_key = lib
         self.lib = BINARIES[lib]
-        self.name = self.lib['name'].format(self.lib['version'])
-        self.local_extracted = '{:s}{:s}'.format(TMP_PATH, self.name)
+        self.name = self.lib['name'] = self.lib['name'].format(**self.lib)
+        self.lib['extracted'] = self.lib['extracted'].format(**self.lib)
+        self.local_extracted = '{:s}{:s}'.format(TMP_PATH, self.lib['extracted'])
         self.local_unpacked = '{:s}{:s}'.format(TMP_PATH, lib)
         self.local_filename = ''
 
@@ -106,8 +124,8 @@ class Builder(object):
 
     def download(self):
         url = self.lib['url']
-        if url.find('{:s}') > 0:
-            url = url.format(self.lib['version'])
+        if re.findall(r'\{.*\}', url):
+            url = self.lib['url'] = url.format(**self.lib)
         filename = '{:s}.tar.gz'.format(self.name)
         self.local_filename = '{:s}{:s}'.format(TMP_PATH, filename)
         if not os.path.isfile(self.local_filename):
@@ -154,12 +172,14 @@ class Builder(object):
             spacer = '-' * len(title)
             print('+{:s}+\n|{:s}|\n+{:s}+'.format(spacer, title, spacer))
             import multiprocessing
-            self.call('rm {:s}'.format(filename))
-            path = self.local_unpacked
+            self.call('rm -f {:s}'.format(filename))
+            path = "{:s}{path}".format(self.local_unpacked, **self.lib['compile'])
             config = self.lib['compile']['config']
+            configurate = ('{pre} ./configure {post};'.format(**config)
+                           if config else '')
             ncores = multiprocessing.cpu_count()
-            self.call(('cd {:s}; {:s} ./configure {:s}; make -j {:d}').format(
-                           path, config['pre'], config['post'], ncores))
+            self.call(('cd {:s}; {:s} make -j {:d}').format(
+                           path, configurate, ncores))
             update_shared_libs = SYSTEMS[OS_NAME]['update_shared_libs']
             if update_shared_libs:
                 self.call(update_shared_libs)

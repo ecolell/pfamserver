@@ -2,7 +2,10 @@ from application import app
 import config
 import api
 import web
+import os
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    host = os.getenv('IP', '0.0.0.0')
+    port = os.getenv('PORT', 5001)
+    app.run(host=host, port=port, threaded=True)
