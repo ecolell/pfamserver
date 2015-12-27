@@ -20,7 +20,7 @@ server = {'path': '/pub/databases/Pfam/releases/',
 proto = ['ftp://', 'http://']
 select_proto = None
 filename = 'Pfam-A.full'
-config_file = '{:s}/pfam_data/PfamA_version.json'.format(lib_path)
+config_file = '{:s}/pfam_data/version.json'.format(lib_path)
 
 
 def silent_remove(filename):
