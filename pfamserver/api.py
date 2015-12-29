@@ -15,7 +15,7 @@ from itertools import chain
 
 api = Api(app)
 fetch = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(lib_path)
-muscle = '{:s}/muscle/src/muscle -maxiters 1 -diags -quiet'.format(lib_path)
+muscle = '{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv -distance1 kbit20_3'.format(lib_path)
 
 
 def get_register(query):
