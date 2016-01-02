@@ -47,6 +47,7 @@ BINARIES = {
         'version': '3.1b2',
         'name': 'hmmer-{version}',
         'url': 'http://selab.janelia.org/software/hmmer3/{version}',
+        'extension': 'tar.gz',
         'extracted': '{name}',
         'compile': {
             'depends': [],
@@ -63,6 +64,7 @@ BINARIES = {
         'version': '3.8.31',
         'name': 'muscle{version}_src',
         'url': 'http://www.drive5.com/muscle/downloads{version}',
+        'extension': 'tar.gz',
         'extracted': 'muscle{version}',
         'compile': {
             'depends': [],
@@ -70,7 +72,19 @@ BINARIES = {
             'config': {}
         }
 
-    }
+    },
+    'mafft': {
+        'version': '7.270-without-extensions',
+        'name': 'mafft-{version}-src',
+        'url': 'http://mafft.cbrc.jp/alignment/software',
+        'extension': 'tgz',
+        'extracted': 'mafft-{version}',
+        'compile': {
+            'depends': [],
+            'path': '/core',
+            'config': {}
+        }
+    },
 }
 
 SYSTEMS = {
@@ -79,6 +93,7 @@ SYSTEMS = {
         'libs': {
             'hmmer': TMP_PATH + 'hmmer/easel/miniapps/esl-afetch',
             'muscle': TMP_PATH + 'muscle/src/muscle',
+            'mafft': TMP_PATH + 'mafft/core/mafft'
         },
     },
     'Darwin': {
@@ -86,6 +101,7 @@ SYSTEMS = {
         'libs': {
             'hmmer': TMP_PATH + 'hmmer/easel/miniapps/esl-afetch',
             'muscle': TMP_PATH + 'muscle/src/muscle',
+            'mafft': TMP_PATH + 'mafft/core/mafft'
         },
     },
 }
@@ -126,7 +142,7 @@ class Builder(object):
         url = self.lib['url']
         if re.findall(r'\{.*\}', url):
             url = self.lib['url'] = url.format(**self.lib)
-        filename = '{:s}.tar.gz'.format(self.name)
+        filename = '{name}.{extension}'.format(**self.lib)
         self.local_filename = '{:s}{:s}'.format(TMP_PATH, filename)
         if not os.path.isfile(self.local_filename):
             begin = datetime.now()
@@ -180,6 +196,7 @@ class Builder(object):
             ncores = multiprocessing.cpu_count()
             self.call(('cd {:s}; {:s} make -j {:d}').format(
                            path, configurate, ncores))
+            self.call("chmod u+x {:}/*".format(path))
             update_shared_libs = SYSTEMS[OS_NAME]['update_shared_libs']
             if update_shared_libs:
                 self.call(update_shared_libs)
