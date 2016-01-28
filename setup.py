@@ -234,7 +234,7 @@ setup(
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
     ],
-    cmdclass={
-        'build': build_wrapper,
-    },
+    #cmdclass={
+    #    'build': build_wrapper,
+    #},
 )

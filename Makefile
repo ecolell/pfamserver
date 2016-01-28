@@ -1,5 +1,5 @@
 PYPREFIX_PATH=/usr
-PYTHONLIBS=LD_LIBRARY_PATH=/usr/lib
+PYTHONLIBS=LD_LIBRARY_PATH=/usr/lib PATH=/usr/local/mysql/bin/:$(PATH)
 PYTHONPATH=$(PYPREFIX_PATH)/bin/python
 FIRST_EASYINSTALL=$(PYTHONLIBS) easy_install
 PIP=pip
@@ -12,11 +12,11 @@ unattended:
 	@ (sudo ls 2>&1) >> tracking.log
 
 ubuntu:
-	@ sudo apt-get -y install zlibc libssl0.9.8 libbz2-dev libxslt1-dev libxml2-dev python-gevent libcurl4-openssl-dev wget
+	@ sudo apt-get -y install zlibc libssl0.9.8 libbz2-dev libxslt1-dev libxml2-dev python-gevent libcurl4-openssl-dev wget mysql-server
 	@ echo "[ assume       ] ubuntu distribution"
 
 osx:
-	@ sudo port install libevent
+	@ sudo port install libevent mysql-server
 	@ echo "[ assume       ] osx system"
 
 virtualenv:

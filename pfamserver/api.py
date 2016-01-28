@@ -13,6 +13,7 @@ from Bio.Seq import Seq
 from itertools import chain
 import random
 import multiprocessing
+from models.version import Version
 
 
 thread_count = multiprocessing.cpu_count() * 2
