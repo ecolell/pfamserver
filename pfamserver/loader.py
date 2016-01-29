@@ -44,10 +44,15 @@ def load_sql(table_name):
 @decompress
 def load_txt(table_name):
     backup_filename = '{:}{:}.txt'.format(backup_path, table_name)
-    cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} "
+    cmd = (lambda local: "LOAD DATA {:} INFILE '{:}' INTO TABLE {:} "
            "COLUMNS TERMINATED BY '\t' LINES TERMINATED BY '\n'"
-           .format(backup_filename, table_name))
-    execute(cmd)
+           .format('LOCAL' if local else '', backup_filename, table_name))
+    try:
+        execute(cmd(False))
+    except Exception:
+        execute(cmd(True))
+
+
 
 
 def init_db():
