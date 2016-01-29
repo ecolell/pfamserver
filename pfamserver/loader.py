@@ -37,6 +37,7 @@ def load_sql(table_name):
     with app.open_resource('{:}{:}.sql'.format(backup_path, table_name),
                            mode='r') as f:
         cmds = f.read().decode('unicode_escape').encode('ascii', 'ignore')
+        cmds = cmds.replace('NOT NULL', '')
         cmds = map(lambda c: c.split(';')[0], sqlparse.split(cmds))
         map(execute, cmds)
 
@@ -51,8 +52,6 @@ def load_txt(table_name):
         execute(cmd(False))
     except Exception:
         execute(cmd(True))
-
-
 
 
 def init_db():
