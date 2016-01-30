@@ -57,7 +57,7 @@ def init_db():
     tables += ['pfamA_reg_seed', 'uniprot_reg_full', 'pfamA_reg_full_significant', 'pfamA_reg_full_insignificant']
     tables += ['pfam_annseq', 'secondary_pfamseq_acc', 'evidence']
     tables += ['markup_key', 'pfamseq_disulphide', 'other_reg', 'pfamseq_markup']
-    tables += ['architecture' 'pfamA_architecture']
+    tables += ['architecture', 'pfamA_architecture']
     tables += ['literature_reference', 'gene_ontology', 'pfamA_database_links', 'interpro', 'pfamA_literature_reference', 'pfamA_interactions']
     tables += ['clan_alignment_and_relationship', 'clan', 'clan_database_links', 'clan_membership', 'clan_lit_ref', 'clan_architecture']
     tables += ['dead_family', 'dead_clan']
