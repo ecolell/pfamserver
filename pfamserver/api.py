@@ -1,4 +1,15 @@
 from application import app
+from database import scoped_db
+from flask.ext.restless import APIManager
+from models import classes
+
+
+manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
+
+for cls in classes:
+    manager.create_api(cls, methods=['GET'])
+
+
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
@@ -13,7 +24,6 @@ from Bio.Seq import Seq
 from itertools import chain
 import random
 import multiprocessing
-from models.version import Version
 
 
 thread_count = multiprocessing.cpu_count() * 2
