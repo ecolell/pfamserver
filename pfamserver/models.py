@@ -19,7 +19,8 @@ Base.query = db.query_property()
 Base.prepare(engine, reflect=True)
 
 
-(   Version, PfamA, PfamSeq, Uniprot,
+(
+    Version, PfamA, PfamSeq, Uniprot,
     PfamARegSeed, UniprotRegFull, PfamARegFullSignificant, PfamARegFullInsignificant,
     PfamAnnSeq, SecondaryPfamSeqAcc, Evidence,
     MarkupKey, PfamSeqDisulphide, OtherReg, PfamSeqMarkup,
