@@ -2,28 +2,24 @@ from application import app
 from database import scoped_db
 from flask.ext.restless import APIManager
 from models import classes
+from models import Uniprot, UniprotRegFull, PfamA
+from flask.ext.restful import Api, Resource
+import os
+from subprocess import Popen as run, PIPE
+from autoupdate import lib_path, db_path
+from StringIO import StringIO
+from contextlib import closing
+from Bio import AlignIO
+from Bio.Align import MultipleSeqAlignment
+from itertools import chain
+import random
+import multiprocessing
 
 
 manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
 
 for cls in classes:
     manager.create_api(cls, methods=['GET'])
-
-
-from flask.ext.restful import Api, Resource
-import os
-from subprocess import Popen as run, PIPE
-from distutils.sysconfig import get_python_lib
-from autoupdate import lib_path, db_path
-from StringIO import StringIO
-from contextlib import closing
-from Bio import AlignIO
-from Bio.Align.Applications import MuscleCommandline
-from Bio.Align import MultipleSeqAlignment
-from Bio.Seq import Seq
-from itertools import chain
-import random
-import multiprocessing
 
 
 thread_count = multiprocessing.cpu_count() * 2
@@ -47,7 +43,7 @@ def fill(seqrecord, length):
 
 def merge(registers):
     pfams = map(lambda reg: StringIO(reg), registers)
-    i_msa =  map(lambda pfam: AlignIO.read(pfam, "stockholm"), pfams)
+    i_msa = map(lambda pfam: AlignIO.read(pfam, "stockholm"), pfams)
     length = max(map(lambda pfam: pfam.get_alignment_length(), i_msa))
     t_msa = map(lambda msa:
                 map(lambda sr: fill(sr, length), msa),
@@ -99,8 +95,7 @@ def db(query):
     return registers[0] if len(registers) == 1 else realign(merge(registers), "mafft")
 
 
-
-class QueryAPI(Resource):
+class StockholmFromPfamAPI(Resource):
 
     def get(self, query):
         queries = [query, query.upper(), query.capitalize(), query.lower()]
@@ -112,4 +107,35 @@ class QueryAPI(Resource):
         return {'query': query, 'output': output}
 
 
-api.add_resource(QueryAPI, '/api/query/<string:query>', endpoint = 'query')
+class PfamFromUniprotAPI(Resource):
+
+    def query(self, query):
+        join = (scoped_db.query(Uniprot, UniprotRegFull, PfamA).
+                filter(Uniprot.uniprot_id==query).
+                filter(UniprotRegFull.uniprot_acc==Uniprot.uniprot_acc).
+                filter(PfamA.pfamA_acc==UniprotRegFull.pfamA_acc)).all()
+        return join
+
+    def serialize(self, element):
+        return {
+            'pfamA_acc': element.UniprotRegFull.pfamA_acc,
+            'description': element.PfamA.description,
+            'seq_start': element.UniprotRegFull.seq_start,
+            'seq_end': element.UniprotRegFull.seq_end,
+            'num_full': element.PfamA.num_full
+        }
+
+    def get(self, query):
+        output = self.query(query)
+        if output:
+            return {'query': output[0].Uniprot.uniprot_id,
+                    'output': map(self.serialize, output)}
+        return {'query': query, 'output': output}
+
+
+api.add_resource(StockholmFromPfamAPI,
+                 '/api/query/stockholm_pfam/<string:query>',
+                 endpoint='stockholm_pfam')
+api.add_resource(PfamFromUniprotAPI,
+                 '/api/query/pfam_uniprot/<string:query>',
+                 endpoint='pfam_uniprot')
