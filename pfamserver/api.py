@@ -30,11 +30,6 @@ muscle_call = '{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv -distance1 
 mafft_call = 'MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 --thread {1} --quiet'.format(lib_path + '/mafft/core', thread_count)
 
 
-def get_register(query):
-    cmd = [fetch_call, db_path, query]
-    return run(cmd, stdout=PIPE).communicate()[0]
-
-
 def fill(seqrecord, length):
     seq = seqrecord.seq.__dict__
     seq["_data"] = seq["_data"].ljust(length, '-')
@@ -89,19 +84,17 @@ def realign(msa, algorithm):
     return msa
 
 
-def db(query):
-    queries = query.split(',')
-    registers = map(get_register, queries)
-    return registers[0] if len(registers) == 1 else realign(merge(registers), "mafft")
-
-
 class StockholmFromPfamAPI(Resource):
+
+    def query(self, query):
+        cmd = [fetch_call, db_path, query]
+        return run(cmd, stdout=PIPE).communicate()[0]
 
     def get(self, query):
         queries = [query, query.upper(), query.capitalize(), query.lower()]
 
         for q in queries:
-            output = db(q)
+            output = self.query(q)
             if output:
                 return {'query': q, 'output': output}
         return {'query': query, 'output': output}

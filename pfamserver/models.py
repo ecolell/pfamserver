@@ -1,5 +1,5 @@
 # from application import app
-from database import engine, scoped_db as db, Session
+from database import engine, scoped_db as db
 from sqlalchemy.ext.automap import automap_base
 # from sqlalchemy import MetaData
 import loader
