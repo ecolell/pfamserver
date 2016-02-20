@@ -1,4 +1,3 @@
-[![Beerpay](http://test.beerpay.io/ecolell/pfamserver/badge.svg?style=flat-square)](http://test.beerpay.io/ecolell/pfamserver)
 pfamserver
 ==========
 
