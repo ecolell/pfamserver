@@ -16,7 +16,7 @@ ubuntu:
 	@ echo "[ assume       ] ubuntu distribution"
 
 osx:
-	@ sudo port install libevent mysql-server
+	@ sudo port install libevent mysql56-server
 	@ echo "[ assume       ] osx system"
 
 virtualenv:
