@@ -14,6 +14,7 @@ from Bio.Align import MultipleSeqAlignment
 from itertools import chain
 import random
 import multiprocessing
+from zlib import compress
 
 
 manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
@@ -96,8 +97,8 @@ class StockholmFromPfamAPI(Resource):
         for q in queries:
             output = self.query(q)
             if output:
-                return {'query': q, 'output': output}
-        return {'query': query, 'output': output}
+                return {'query': q, 'output': compress(output)}
+        return {'query': query}
 
 
 class PfamFromUniprotAPI(Resource):
