@@ -15,6 +15,7 @@ from itertools import chain
 import random
 import multiprocessing
 from zlib import compress
+from base64 import b64encode
 
 
 manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
@@ -97,7 +98,7 @@ class StockholmFromPfamAPI(Resource):
         for q in queries:
             output = self.query(q)
             if output:
-                return {'query': q, 'output': compress(output)}
+                return {'query': q, 'output': b64encode(compress(output))}
         return {'query': query}
 
 
