@@ -19,9 +19,6 @@ app.secret_key = config['SECRET_KEY']
 app.json_encoder = ExtendedEncoder
 
 
-import admin
-import api
-import web
 from flask import send_from_directory
 
 
