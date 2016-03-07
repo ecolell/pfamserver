@@ -10,11 +10,12 @@ if __name__ == '__main__':
         #TODO: It download in a parallel process. And when reboot it
         #should install.
         pass
-        init_db()
+        # init_db()
         # update()
-        import admin
-        import api
-        import web
+        print "Loading"
+    import api
+    import admin
+    import web
     host = os.getenv('HOST', '0.0.0.0')
     port = os.getenv('PORT', 5001)
     app.run(host=host, port=port, threaded=True)
