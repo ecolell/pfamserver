@@ -48,7 +48,10 @@ Example
 You can make requests to [http://localhost:5001](http://localhost:5001), like:
 
 
-    [http://localhost:5001/api/query/piwi](http://localhost:5001/api/query/piwi)
+    [http://localhost:5001/api/query/stockholm_pfam/piwi](http://localhost:5001/api/query/stockholm_pfam/piwi)
+
+
+The response is a javascript dictionary with the "query" and "output" keys. The output value is zip compressed and then base 64 encoded, to optimize transport over the network.
 
 
 About
