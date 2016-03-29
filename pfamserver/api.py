@@ -111,13 +111,17 @@ class PdbFromUniprotPfamAPI(Resource):
 
     def query(self, query):
         uniprot_id, pfamA_acc = query.split(',')
-        join = (scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb).
-                filter(Uniprot.uniprot_id == uniprot_id).
+        results = scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb)
+        if uniprot_id:
+            results = results.filter(Uniprot.uniprot_id == uniprot_id)
+        join = (results.
                 filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
                 filter(UniprotRegFull.pfamA_acc == pfamA_acc).
                 filter(UniprotRegFull.auto_uniprot_reg_full ==
                        PdbPfamAReg.auto_uniprot_reg_full).
-                filter(PdbPfamAReg.pdb_id == Pdb.pdb_id)
+                filter(PdbPfamAReg.pdb_id == Pdb.pdb_id).
+                order_by(PdbPfamAReg.pdb_id).
+                order_by(PdbPfamAReg.chain)
                 ).all()
         return join
 
@@ -140,7 +144,7 @@ class PdbFromUniprotPfamAPI(Resource):
         output = self.query(query)
         if output:
             query = "{:},{:}".format(
-                output[0].Uniprot.uniprot_id,
+                output[0].Uniprot.uniprot_id if query.split(',')[0] else '',
                 output[0].UniprotRegFull.pfamA_acc)
             return {'query': query,
                     'output': map(self.serialize, output)}
