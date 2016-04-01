@@ -3,7 +3,7 @@ from database import scoped_db
 from flask.ext.restless import APIManager
 from models import classes
 if classes:
-    from models import Uniprot, UniprotRegFull, PfamA
+    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
@@ -30,8 +30,11 @@ api = Api(app)
 lib_path = app.config['LIB_PATH']
 root_path = app.config['ROOT_PATH']
 fetch_call = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(lib_path)
-muscle_call = '{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv -distance1 kbit20_3'.format(lib_path)
-mafft_call = 'MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 --thread {1} --quiet'.format(lib_path + '/mafft/core', thread_count)
+muscle_call = ('{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv '
+               '-distance1 kbit20_3').format(lib_path)
+mafft_call = ('MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 '
+              '--thread {1} --quiet').format(lib_path + '/mafft/core',
+                                             thread_count)
 
 
 def fill(seqrecord, length):
@@ -54,7 +57,9 @@ def merge(registers):
 
 
 def muscle(msa):
-    return run(muscle_call.split(' '), stdin=PIPE, stdout=PIPE).communicate(input=msa)[0]
+    return run(muscle_call.split(' '),
+               stdin=PIPE,
+               stdout=PIPE).communicate(input=msa)[0]
 
 
 def mafft(msa):
@@ -104,13 +109,57 @@ class StockholmFromPfamAPI(Resource):
         return {'query': query}
 
 
+class PdbFromUniprotPfamAPI(Resource):
+
+    def query(self, query):
+        uniprot_id, pfamA_acc = query.split(',')
+        results = scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb)
+        if uniprot_id:
+            results = results.filter(Uniprot.uniprot_id == uniprot_id)
+        join = (results.
+                filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
+                filter(UniprotRegFull.pfamA_acc == pfamA_acc).
+                filter(UniprotRegFull.auto_uniprot_reg_full ==
+                       PdbPfamAReg.auto_uniprot_reg_full).
+                filter(PdbPfamAReg.pdb_id == Pdb.pdb_id).
+                order_by(PdbPfamAReg.pdb_id).
+                order_by(PdbPfamAReg.chain)
+                ).all()
+        return join
+
+    def serialize(self, element):
+        authors = element.Pdb.author.split(',')
+        return {
+            'pdb_id': element.PdbPfamAReg.pdb_id,
+            'chain': element.PdbPfamAReg.chain,
+            'pdb_res_start': element.PdbPfamAReg.pdb_res_start,
+            'pdb_res_end': element.PdbPfamAReg.pdb_res_end,
+            'title': element.Pdb.title,
+            'resolution': float(element.Pdb.resolution),
+            'method': element.Pdb.method,
+            'author': (authors[0] + ' et. al.'
+                       if len(authors) > 2 else ''),
+            'date': element.Pdb.date
+        }
+
+    def get(self, query):
+        output = self.query(query)
+        if output:
+            query = "{:},{:}".format(
+                output[0].Uniprot.uniprot_id if query.split(',')[0] else '',
+                output[0].UniprotRegFull.pfamA_acc)
+            return {'query': query,
+                    'output': map(self.serialize, output)}
+        return {'query': query, 'output': output}
+
+
 class PfamFromUniprotAPI(Resource):
 
     def query(self, query):
         join = (scoped_db.query(Uniprot, UniprotRegFull, PfamA).
-                filter(Uniprot.uniprot_id==query).
-                filter(UniprotRegFull.uniprot_acc==Uniprot.uniprot_acc).
-                filter(PfamA.pfamA_acc==UniprotRegFull.pfamA_acc)).all()
+                filter(Uniprot.uniprot_id == query).
+                filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
+                filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc)).all()
         return join
 
     def serialize(self, element):
@@ -136,3 +185,6 @@ api.add_resource(StockholmFromPfamAPI,
 api.add_resource(PfamFromUniprotAPI,
                  '/api/query/pfam_uniprot/<string:query>',
                  endpoint='pfam_uniprot')
+api.add_resource(PdbFromUniprotPfamAPI,
+                 '/api/query/pdb_uniprotpfam/<string:query>',
+                 endpoint='pdb_uniprotpfam')
