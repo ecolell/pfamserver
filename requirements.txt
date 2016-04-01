@@ -1,5 +1,7 @@
+schedule==0.3.2
 flask==0.10.1
 flask-sqlalchemy==2.0
+sqlalchemy-utils==0.32.0
 pymysql==0.7.1
 sqlparse==0.1.18
 odo==0.4.0

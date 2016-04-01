@@ -18,6 +18,9 @@ app.config.update(config)
 app.secret_key = config['SECRET_KEY']
 app.json_encoder = ExtendedEncoder
 
+from autoupdate import scheduler
+scheduler.init_app(app)
+
 
 from flask import send_from_directory
 

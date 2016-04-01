@@ -2,11 +2,11 @@ from application import app
 from database import scoped_db
 from flask.ext.restless import APIManager
 from models import classes
-from models import Uniprot, UniprotRegFull, PfamA
+if classes:
+    from models import Uniprot, UniprotRegFull, PfamA
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
-from autoupdate import lib_path, db_path
 from StringIO import StringIO
 from contextlib import closing
 from Bio import AlignIO
@@ -27,6 +27,8 @@ for cls in classes:
 thread_count = multiprocessing.cpu_count() * 2
 print("Working with {:} threads.".format(thread_count))
 api = Api(app)
+lib_path = app.config['LIB_PATH']
+root_path = app.config['ROOT_PATH']
 fetch_call = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(lib_path)
 muscle_call = '{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv -distance1 kbit20_3'.format(lib_path)
 mafft_call = 'MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 --thread {1} --quiet'.format(lib_path + '/mafft/core', thread_count)
@@ -89,7 +91,7 @@ def realign(msa, algorithm):
 class StockholmFromPfamAPI(Resource):
 
     def query(self, query):
-        cmd = [fetch_call, db_path, query]
+        cmd = [fetch_call, root_path, query]
         return run(cmd, stdout=PIPE).communicate()[0]
 
     def get(self, query):

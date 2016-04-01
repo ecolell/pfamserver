@@ -1,36 +1,29 @@
 from sqlalchemy import text
 from application import app
-from database import engine
+from sqlalchemy import create_engine
+from sqlalchemy_utils import database_exists, create_database
 import sqlparse
 import os
 import gzip
 import shutil
-
-
-backup_path = os.path.dirname(os.path.abspath(__file__))
-backup_path += '/database_files/'
+from core import Manager
 
 
 def decompress(function):
     extension = function.__name__[len('load_'):]
 
-    def wrapper(table_name):
-        destiny = backup_path + '{:}.{:}'.format(table_name, extension)
+    def wrapper(*args, **kwargs):
+        constructor = args[0]
+        table_name = args[1]
+        destiny = constructor.backup_path + '{:}.{:}'.format(table_name, extension)
         source = destiny + '.gz'
         with gzip.open(source, 'rb') as f_in:
             with open(destiny, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-        result = function(table_name)
+        result = function(*args, **kwargs)
         os.remove(destiny)
         return result
     return wrapper
-
-
-def execute(command):
-    #try:
-    engine.execute(text(command))
-    #except Exception, e:
-    #    print e
 
 
 patched_tables = {
@@ -60,37 +53,6 @@ patched_tables = {
 }
 
 
-@decompress
-def load_sql(table_name):
-    with app.open_resource('{:}{:}.sql'.format(backup_path, table_name),
-                           mode='r') as f:
-        # TODO: If not primary_key it should use a dictionary to modify the
-        # files.
-        cmds = f.read().decode('unicode_escape').encode('ascii', 'ignore')
-        cmds = cmds.replace('NOT NULL', '')
-        cmds = ''.join(filter(lambda c: c and c[0] not in ['/', '-'],
-                              cmds.split('\n')))
-        if 'PRIMARY KEY' not in cmds:
-            if table_name in patched_tables:
-                keys = patched_tables[table_name].split(',')
-                keys = map(lambda k: "`" + k + "`", keys)
-                cmds = cmds.replace(') ENGINE',
-                                    ', PRIMARY KEY ({:})) ENGINE'.format(
-                                        ','.join(keys)))
-        cmds = sqlparse.split(cmds)
-        map(execute, cmds)
-
-
-@decompress
-def load_txt(table_name):
-    backup_filename = '{:}{:}.txt'.format(backup_path, table_name)
-
-    cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} COLUMNS TERMINATED BY '\t' "
-           "LINES TERMINATED BY '\n'")
-    cmd = cmd.format(backup_filename, table_name)
-    execute(cmd)
-
-
 tables = ['version', 'pfamA', 'pfamseq', 'uniprot']
 tables += ['pfamA_reg_seed', 'uniprot_reg_full', 'pfamA_reg_full_significant',
            'pfamA_reg_full_insignificant']
@@ -110,6 +72,61 @@ tables += ['pfamA2pfamA_scoop', 'pfamA2pfamA_hhsearch']
 tables += ['pfamA_HMM', 'alignment_and_tree']
 
 
-def init_db():
-    map(load_sql, tables)
-    map(load_txt, tables)
+class DatabaseConstructor(object):
+
+    def __init__(self, version):
+        self.version = version
+        self.manager = version.manager
+        self.backup_path = self.version.path + '/database_files/'
+        self.url = app.config['SQLALCHEMY_DATABASE_URI'] + version.version
+        if not database_exists(self.url):
+            create_database(self.url)
+        self.engine = create_engine(self.url,
+                                    pool_size=20,
+                                    max_overflow=100)
+
+    def construct(self):
+        map(self.load_sql, tables)
+        map(self.load_txt, tables)
+
+    def execute(self, command):
+        #try:
+        self.engine.execute(text(command))
+        #except Exception, e:
+        #    print e
+
+    @Manager.milestone
+    @decompress
+    def load_sql(self, table_name):
+        filename = '{:}{:}.sql'.format(self.backup_path, table_name)
+        with app.open_resource(filename, mode='r') as f:
+            # TODO: If not primary_key it should use a dictionary to modify the
+            # files.
+            cmds = f.read().decode('unicode_escape').encode('ascii', 'ignore')
+            cmds = cmds.replace('NOT NULL', '')
+            cmds = ''.join(filter(lambda c: c and c[0] not in ['/', '-'],
+                                  cmds.split('\n')))
+            if 'PRIMARY KEY' not in cmds:
+                if table_name in patched_tables:
+                    keys = patched_tables[table_name].split(',')
+                    keys = map(lambda k: "`" + k + "`", keys)
+                    cmds = cmds.replace(') ENGINE',
+                                        ', PRIMARY KEY ({:})) ENGINE'.format(
+                                            ','.join(keys)))
+            cmds = sqlparse.split(cmds)
+        map(self.execute, cmds)
+
+    @Manager.milestone
+    @decompress
+    def load_txt(self, table_name):
+        backup_filename = '{:}{:}.txt'.format(self.backup_path, table_name)
+
+        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} COLUMNS TERMINATED BY '\t' "
+               "LINES TERMINATED BY '\n'")
+        cmd = cmd.format(backup_filename, table_name)
+        self.execute(cmd)
+
+
+def init_db(version):
+    constructor = DatabaseConstructor(version)
+    constructor.construct()
