@@ -46,7 +46,7 @@ BINARIES = {
     'hmmer': {
         'version': '3.1b2',
         'name': 'hmmer-{version}',
-        'url': 'http://selab.janelia.org/software/hmmer3/{version}',
+        'url': 'http://eddylab.org/software/hmmer3/{version}',
         'extension': 'tar.gz',
         'extracted': '{name}',
         'compile': {
@@ -160,6 +160,7 @@ class Builder(object):
                           filename, progress, speed), end=' ')
                 sys.stdout.flush()
             source = '{:s}/{:s}'.format(url, filename)
+            print(source)
             destiny = '{:s}{:s}'.format(TMP_PATH, filename)
             self.local_filename, _ = urlretrieve(source, destiny,
                                                  reporthook=dl_progress)
@@ -234,7 +235,7 @@ setup(
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
     ],
-    #cmdclass={
-    #    'build': build_wrapper,
-    #},
+    cmdclass={
+        'build': build_wrapper,
+    },
 )
