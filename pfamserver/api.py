@@ -3,7 +3,7 @@ from database import scoped_db
 from flask.ext.restless import APIManager
 from models import classes
 if classes:
-    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb
+    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
@@ -160,14 +160,24 @@ class PdbFromSequenceDescriptionAPI(Resource):
         return response
 
 
+class PdbImageFromPdbAPI(Resource):
+
+    def query(self, query):
+        return (scoped_db.query(PdbImage).filter(PdbImage.pdb_id == query.upper())).all()
+
+    def serialize(self, element):
+        return {
+            'pdb_id': element.pdb_id,
+            'pdb_image_sml': b64encode(element.pdb_image_sml)
+        }
+
+    def get(self, query):
         output = self.query(query)
         if output:
-            query = "{:},{:}".format(
-                output[0].Uniprot.uniprot_id if query.split(',')[0] else '',
-                output[0].UniprotRegFull.pfamA_acc)
-            return {'query': query,
+            return {'query': output[0].pdb_id,
                     'output': map(self.serialize, output)}
         return {'query': query, 'output': output}
+
 
 
 class PfamFromUniprotAPI(Resource):
@@ -176,7 +186,8 @@ class PfamFromUniprotAPI(Resource):
         join = (scoped_db.query(Uniprot, UniprotRegFull, PfamA).
                 filter(Uniprot.uniprot_id == query).
                 filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
-                filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc)).all()
+                filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc).
+                order_by(UniprotRegFull.seq_start)).all()
         return join
 
     def serialize(self, element):
@@ -205,3 +216,6 @@ api.add_resource(PfamFromUniprotAPI,
 api.add_resource(PdbFromSequenceDescriptionAPI,
                  '/api/query/pdb_sequencedescription/<string:query>',
                  endpoint='pdb_sequencedescription')
+api.add_resource(PdbImageFromPdbAPI,
+                 '/api/query/pdbimage_pdb/<string:query>',
+                 endpoint='pdbimage_pdb')
