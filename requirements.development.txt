@@ -3,3 +3,4 @@ ipython==2.0.0
 ipdb==0.8
 vim-debug==1.5.4
 isort==3.9.0
+pyandoc==0.2.0

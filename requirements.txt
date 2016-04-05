@@ -4,7 +4,6 @@ flask-sqlalchemy==2.0
 sqlalchemy-utils==0.32.0
 pymysql==0.7.1
 sqlparse==0.1.18
-odo==0.4.0
 flask-restless==0.17.0
 flask-restful==0.3.5
 inflect==0.2.5
