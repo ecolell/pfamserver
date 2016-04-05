@@ -16,6 +16,7 @@ import random
 import multiprocessing
 from zlib import compress
 from base64 import b64encode
+from autoupdate.core import Manager
 
 
 manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
@@ -28,7 +29,7 @@ thread_count = multiprocessing.cpu_count() * 2
 print("Working with {:} threads.".format(thread_count))
 api = Api(app)
 lib_path = app.config['LIB_PATH']
-root_path = app.config['ROOT_PATH']
+root_path = Manager().actual_version_path()
 fetch_call = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(lib_path)
 muscle_call = ('{:s}/muscle/src/muscle -maxiters 1 -diags1 -quiet -sv '
                '-distance1 kbit20_3').format(lib_path)
@@ -96,16 +97,21 @@ def realign(msa, algorithm):
 class StockholmFromPfamAPI(Resource):
 
     def query(self, query):
-        cmd = [fetch_call, root_path, query]
+        cmd = [fetch_call, root_path + "Pfam-A.full", query]
         return run(cmd, stdout=PIPE).communicate()[0]
+
+    def to_pfam_acc(self, pfam_id):
+        quest = scoped_db.query(PfamA).filter(PfamA.pfamA_id == pfam_id).all()
+        return quest[0].pfamA_acc if len(quest) else pfam_id
 
     def get(self, query):
         queries = [query, query.upper(), query.capitalize(), query.lower()]
 
         for q in queries:
-            output = self.query(q)
+            q_aux = self.to_pfam_acc(q)
+            output = self.query(q_aux)
             if output:
-                return {'query': q, 'output': b64encode(compress(output))}
+                return {'query': q_aux, 'output': b64encode(compress(output))}
         return {'query': query}
 
 

@@ -105,6 +105,9 @@ class Manager(object):
             available = config['actual_version']
         return available
 
+    def actual_version_path(self):
+        return self.version_path(Version(self.config['actual_version'], self))
+
     def get_versions(self):
         config = self.config
         remote = self.get_available(config)
