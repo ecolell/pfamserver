@@ -115,16 +115,14 @@ class StockholmFromPfamAPI(Resource):
         return {'query': query}
 
 
-class PdbFromUniprotPfamAPI(Resource):
+class PdbFromSequenceDescriptionAPI(Resource):
 
-    def query(self, query):
-        uniprot_id, pfamA_acc = query.split(',')
-        results = scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb)
-        if uniprot_id:
-            results = results.filter(Uniprot.uniprot_id == uniprot_id)
-        join = (results.
+    def query(self, uniprot_id, seq_start, seq_end):
+        join = (scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb).
+                filter(Uniprot.uniprot_id == uniprot_id).
+                filter(UniprotRegFull.seq_start == seq_start).
+                filter(UniprotRegFull.seq_end == seq_end).
                 filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
-                filter(UniprotRegFull.pfamA_acc == pfamA_acc).
                 filter(UniprotRegFull.auto_uniprot_reg_full ==
                        PdbPfamAReg.auto_uniprot_reg_full).
                 filter(PdbPfamAReg.pdb_id == Pdb.pdb_id).
@@ -140,6 +138,7 @@ class PdbFromUniprotPfamAPI(Resource):
             'chain': element.PdbPfamAReg.chain,
             'pdb_res_start': element.PdbPfamAReg.pdb_res_start,
             'pdb_res_end': element.PdbPfamAReg.pdb_res_end,
+            'pfamA_acc': element.UniprotRegFull.pfamA_acc,
             'title': element.Pdb.title,
             'resolution': float(element.Pdb.resolution),
             'method': element.Pdb.method,
@@ -149,6 +148,18 @@ class PdbFromUniprotPfamAPI(Resource):
         }
 
     def get(self, query):
+        uniprot_id, seq_start, seq_end = query.split(',')
+        response = {
+            'query': {
+                'uniprot_id': uniprot_id,
+                'seq_start': seq_start,
+                'seq_end': seq_end}}
+        output = self.query(uniprot_id, seq_start, seq_end)
+        if output:
+            response['output'] = map(self.serialize, output)
+        return response
+
+
         output = self.query(query)
         if output:
             query = "{:},{:}".format(
@@ -191,6 +202,6 @@ api.add_resource(StockholmFromPfamAPI,
 api.add_resource(PfamFromUniprotAPI,
                  '/api/query/pfam_uniprot/<string:query>',
                  endpoint='pfam_uniprot')
-api.add_resource(PdbFromUniprotPfamAPI,
-                 '/api/query/pdb_uniprotpfam/<string:query>',
-                 endpoint='pdb_uniprotpfam')
+api.add_resource(PdbFromSequenceDescriptionAPI,
+                 '/api/query/pdb_sequencedescription/<string:query>',
+                 endpoint='pdb_sequencedescription')
