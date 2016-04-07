@@ -10,5 +10,5 @@ if __name__ == '__main__':
         import admin
         import web
     host = os.getenv('HOST', '0.0.0.0')
-    port = os.getenv('PORT', 5001)
+    port = int(os.getenv('PORT', '5001'))
     app.run(host=host, port=port, threaded=True)

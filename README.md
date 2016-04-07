@@ -38,7 +38,7 @@ Running
 
 To run the server you need to execute:
 
-    $ DEBUG=True DB=root:root@localhost:3306/pfamserver python -m pfamserver
+    $ DEBUG=True DB=root:root@localhost:3306/pfamserver HOST=0.0.0.0 PORT=5001 python -m pfamserver
 
 After start, the server it is going to check for new updates at night in background. The update is composed of the download and deployment of the last version of the file *Pfam-A.full.gz* (approximately 13GB) and download and deployment of all the files inside the *database_files* folder (approximately 77GB), so be patient it can take a while.
 
@@ -48,21 +48,19 @@ At midnight, when the deploy of the last update is ready (because was runned on 
 Example
 =======
 
-You can make requests to [http://localhost:5001](http://localhost:5001), like:
+A json API is available through [http://localhost:5001/api/](http://localhost:5001/api/), or use the graphical interface to discover some pfams database tables and apply some filters (access to [http://localhost:5001/admin](http://localhost:5001/admin)).
 
+There are some **special queries** that join multiple tables and accept some specific parameters. This queries respond with a json dictionary with the "query" and "output" keys.
 
-    [http://localhost:5001/api/query/stockholm_pfam/piwi](http://localhost:5001/api/query/stockholm_pfam/piwi)
+First, it is posible to obtain a list of **pfamA** registers from a **uniprot_id** (eg. [http://localhost:5001/api/query/pfam_uniprot/egfr_human](http://localhost:5001/api/query/pfam_uniprot/egfr_human)).
 
+Also, it is available a way to recover a list of **PDB** registers from a "**sequence description**" (eq. [http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168](http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168)) where the 3 parameters are a **uniprot_id**, a **seq_start** and **seq_end** inside that uniprot register.
 
-The response is a javascript dictionary with the "query" and "output" keys. The output value is zip compressed and then base 64 encoded, to optimize transport over the network.
+Then, it is accesible an alternative to obtain a **small PDB image** (base 64 enconded after compressed) from an specific **pdb_id** (eg. [http://localhost:5001/api/query/pdbimage_pdb/1IVO](http://localhost:5001/api/query/pdbimage_pdb/1IVO)). 
 
-Also there is a graphical interface without password to discover some pfams database tables at:
+Last, you can obtain an MSA in stockholm format through a pfamA_acc or pfamA_id (eg. [http://localhost:5001/api/query/stockholm_pfam/piwi](http://localhost:5001/api/query/stockholm_pfam/piwi)). The **output** value is *zip compressed* and then *base 64 encoded*, to optimize transport over the network.
 
-
-    [http://localhost:5001/admin](http://localhost:5001/admin)
-
-
-Last, you should check the [http://localhost:5001/](http://localhost:5001/) for some examples.
+Please, check [http://localhost:5001/](http://localhost:5001/) for more updated examples.
 
 
 About
