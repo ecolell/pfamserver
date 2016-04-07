@@ -3,7 +3,7 @@ from os import getenv
 
 
 config = {}
-config['DEBUG'] = getenv('DEBUG', True)
+config['DEBUG'] = eval(getenv('DEBUG', 'True'))
 config['SECRET_KEY'] = 'some_secret_key!'
 config['LIB_PATH'] = get_python_lib()
 config['ROOT_PATH'] = "{:s}/pfam_data/".format(config['LIB_PATH'])

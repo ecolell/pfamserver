@@ -20,7 +20,7 @@ On Ubuntu Desktop there are some other libraries not installed by default (zlibc
 
     $ make ubuntu deploy
 
-Also, you need to have the **wget** package installed.
+Also, you need to have the **wget** package installed and access (username and password) of a mysql database.
 
 
 Testing
@@ -38,9 +38,11 @@ Running
 
 To run the server you need to execute:
 
-    $ python -m pfamserver
+    $ DEBUG=True DB=root:root@localhost:3306/pfamserver python -m pfamserver
 
-Before the start, the server it is going to update (when it is outdated) to the last version of the file Pfam-A.full.gz (approximately 13GB), so be patient it can take a while.
+After start, the server it is going to check for new updates at night in background. The update is composed of the download and deployment of the last version of the file *Pfam-A.full.gz* (approximately 13GB) and download and deployment of all the files inside the *database_files* folder (approximately 77GB), so be patient it can take a while.
+
+At midnight, when the deploy of the last update is ready (because was runned on background) it should restart the machine. You should ensure the previous command is executed after the server boots up so it should stay update automatically without any human intervention.
 
 
 Example
@@ -53,6 +55,14 @@ You can make requests to [http://localhost:5001](http://localhost:5001), like:
 
 
 The response is a javascript dictionary with the "query" and "output" keys. The output value is zip compressed and then base 64 encoded, to optimize transport over the network.
+
+Also there is a graphical interface without password to discover some pfams database tables at:
+
+
+    [http://localhost:5001/admin](http://localhost:5001/admin)
+
+
+Last, you should check the [http://localhost:5001/](http://localhost:5001/) for some examples.
 
 
 About
