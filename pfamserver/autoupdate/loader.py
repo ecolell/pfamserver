@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 from sqlalchemy import text
 from application import app
 from sqlalchemy import create_engine
@@ -89,11 +91,8 @@ class DatabaseConstructor(object):
                                     max_overflow=100)
 
     def construct(self):
-        print "before"
         map(self.load_sql, tables)
-        print "between"
         map(self.load_txt, tables)
-        print "last"
 
     def execute(self, command):
         self.engine.execute(text(command))
@@ -102,10 +101,8 @@ class DatabaseConstructor(object):
     @decompress
     def load_sql(self, table_name):
         filename = '{:}{:}.sql'.format(self.backup_path, table_name)
-        print "structure ->", table_name
+        print("\t\tCreating {:} structure into the database.".format(table_name))
         with app.open_resource(filename, mode='r') as f:
-            # TODO: If not primary_key it should use a dictionary to modify the
-            # files.
             cmds = f.read().decode('unicode_escape').encode('ascii', 'ignore')
             cmds = cmds.replace('NOT NULL', '').split('\n')
             keys = []
@@ -130,18 +127,19 @@ class DatabaseConstructor(object):
             cmds = sqlparse.split(cmds)
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', 'unknown table')
-                warnings.filterwarnings('ignore', 'Duplicate index', append=True)
+                warnings.filterwarnings('ignore', 'Duplicate index',
+                                        append=True)
                 map(self.execute, cmds)
             return True
 
     @Manager.milestone
     @decompress
     def load_txt(self, table_name):
-        print "loading ->", table_name
+        print("\t\tLoading {:} data to the database.".format(table_name))
         backup_filename = '{:}{:}.txt'.format(self.backup_path, table_name)
 
-        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} CHARACTER SET latin1 COLUMNS TERMINATED BY '\t' "
-               "LINES TERMINATED BY '\n'")
+        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} CHARACTER SET latin1 "
+               "COLUMNS TERMINATED BY '\t' LINES TERMINATED BY '\n'")
         cmd = cmd.format(backup_filename, table_name)
         self.execute("SET SESSION sql_mode='ALLOW_INVALID_DATES'")
         with warnings.catch_warnings():

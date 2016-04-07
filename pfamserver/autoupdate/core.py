@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 import json
 from application import app
 import socket
@@ -67,7 +69,7 @@ class Manager(object):
                 try:
                     ready = function(*args)
                 except Exception, e:
-                    print "*---->", e
+                    print("*---->", e)
                     return False
                 if ready:
                     version['status'].append(name)

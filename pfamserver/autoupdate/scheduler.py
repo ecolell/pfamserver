@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 import schedule
 from threading import Thread
 from multiprocessing import Process
@@ -16,8 +18,8 @@ def run_schedule():
 def run_every(moment="day", hour="00:00"):
 
     def real_decorator(function):
-        print " * --> Schedule {:} to execute every {:} at {:}".format(
-            function.__name__, moment, hour)
+        print(" * --> Schedule {:} to execute every {:} at {:}".
+              format(function.__name__, moment, hour))
         getattr(schedule.every(), moment).at(hour).do(function)
 
         def wrapper(*args, **kwargs):
