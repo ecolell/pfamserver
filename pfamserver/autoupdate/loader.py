@@ -7,12 +7,15 @@ import os
 import gzip
 import shutil
 from core import Manager
+import re
+import warnings
+import json
 
 
 def decompress(function):
     extension = function.__name__[len('load_'):]
 
-    def wrapper(*args, **kwargs):
+    def gz_wrapper(*args, **kwargs):
         constructor = args[0]
         table_name = args[1]
         destiny = constructor.backup_path + '{:}.{:}'.format(table_name, extension)
@@ -23,10 +26,10 @@ def decompress(function):
         result = function(*args, **kwargs)
         os.remove(destiny)
         return result
-    return wrapper
+    return gz_wrapper, extension
 
 
-patched_tables = {
+patched_pk = {
     "version": "number_families",
     "pfamA_reg_seed": "pfamA_acc,pfamseq_acc,seq_version,source,seq_start",
     "secondary_pfamseq_acc": "pfamseq_acc,secondary_acc",
@@ -75,10 +78,10 @@ tables += ['pfamA_HMM', 'alignment_and_tree']
 class DatabaseConstructor(object):
 
     def __init__(self, version):
-        self.version = version
+        self.version = version.version
         self.manager = version.manager
-        self.backup_path = self.version.path + '/database_files/'
-        self.url = app.config['SQLALCHEMY_DATABASE_URI'] + version.version
+        self.backup_path = version.path + '/database_files/'
+        self.url = app.config['SQLALCHEMY_DATABASE_URI'] + self.version
         if not database_exists(self.url):
             create_database(self.url)
         self.engine = create_engine(self.url,
@@ -86,45 +89,67 @@ class DatabaseConstructor(object):
                                     max_overflow=100)
 
     def construct(self):
+        print "before"
         map(self.load_sql, tables)
+        print "between"
         map(self.load_txt, tables)
+        print "last"
 
     def execute(self, command):
-        #try:
         self.engine.execute(text(command))
-        #except Exception, e:
-        #    print e
 
     @Manager.milestone
     @decompress
     def load_sql(self, table_name):
         filename = '{:}{:}.sql'.format(self.backup_path, table_name)
+        print "structure ->", table_name
         with app.open_resource(filename, mode='r') as f:
             # TODO: If not primary_key it should use a dictionary to modify the
             # files.
             cmds = f.read().decode('unicode_escape').encode('ascii', 'ignore')
-            cmds = cmds.replace('NOT NULL', '')
-            cmds = ''.join(filter(lambda c: c and c[0] not in ['/', '-'],
-                                  cmds.split('\n')))
+            cmds = cmds.replace('NOT NULL', '').split('\n')
+            keys = []
+            if table_name in patched_pk:
+                keys = patched_pk[table_name].split(',')
+                field_name = lambda r: any(map(lambda e: e in keys,
+                                               re.findall('`[^`]*`', r)))
+                cmds = map(lambda r: r if field_name(r) else
+                           r.replace('DEFAULT NULL', ''),
+                           cmds)
+            cmds = filter(lambda c: c and c[0] not in ['/', '-'],
+                                  cmds)
+            cmds = ''.join(cmds)
+            cmds = cmds.replace("`created` datetime DEFAULT NULL",
+                                "`created` datetime NULL DEFAULT NULL")
             if 'PRIMARY KEY' not in cmds:
-                if table_name in patched_tables:
-                    keys = patched_tables[table_name].split(',')
+                if table_name in patched_pk:
                     keys = map(lambda k: "`" + k + "`", keys)
                     cmds = cmds.replace(') ENGINE',
                                         ', PRIMARY KEY ({:})) ENGINE'.format(
                                             ','.join(keys)))
             cmds = sqlparse.split(cmds)
-        map(self.execute, cmds)
+            with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', 'unknown table')
+                warnings.filterwarnings('ignore', 'Duplicate index', append=True)
+                map(self.execute, cmds)
+            return True
 
     @Manager.milestone
     @decompress
     def load_txt(self, table_name):
+        print "loading ->", table_name
         backup_filename = '{:}{:}.txt'.format(self.backup_path, table_name)
 
-        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} COLUMNS TERMINATED BY '\t' "
+        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} CHARACTER SET latin1 COLUMNS TERMINATED BY '\t' "
                "LINES TERMINATED BY '\n'")
         cmd = cmd.format(backup_filename, table_name)
-        self.execute(cmd)
+        self.execute("SET SESSION sql_mode='ALLOW_INVALID_DATES'")
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', 'Incorrect integer')
+            warnings.filterwarnings('ignore', 'Incorrect decimal', append=True)
+            warnings.filterwarnings('ignore', 'Data truncated', append=True)
+            self.execute(cmd)
+        return True
 
 
 def init_db(version):

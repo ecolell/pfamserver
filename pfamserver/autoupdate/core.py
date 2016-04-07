@@ -17,7 +17,7 @@ select_proto = None
 
 class Manager(object):
     root_path = app.config['ROOT_PATH']
-    config_file = '{:s}/version.json'.format(root_path)
+    config_file = '{:s}version.json'.format(root_path)
 
     def __init__(self):
         self.server = {'path': '/pub/databases/Pfam/releases/',
@@ -48,6 +48,9 @@ class Manager(object):
 
     @staticmethod
     def milestone(function):
+        extension = ''
+        if isinstance(function, tuple):
+            function, extension = function
         manager = Manager()
         def wrapper(*args):
             self = args[0]
@@ -57,7 +60,7 @@ class Manager(object):
             params = ''
             if len(args) > 1:
                 params = '-' + '_'.join(args[1:])
-            name = function.__name__ + params
+            name = function.__name__ + extension + params
             pending = name not in version['status']
             ready = False
             if pending:
