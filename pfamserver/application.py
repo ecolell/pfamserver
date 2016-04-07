@@ -3,6 +3,7 @@ from config import config
 import os
 from flask.json import JSONEncoder
 from decimal import Decimal
+from flask import send_from_directory
 
 
 class ExtendedEncoder(JSONEncoder):
@@ -17,12 +18,6 @@ app = Flask(__name__)
 app.config.update(config)
 app.secret_key = config['SECRET_KEY']
 app.json_encoder = ExtendedEncoder
-
-from autoupdate import scheduler
-scheduler.init_app(app)
-
-
-from flask import send_from_directory
 
 
 @app.route('/favicon.png')
