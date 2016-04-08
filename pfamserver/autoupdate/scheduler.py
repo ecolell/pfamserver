@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import schedule
-from threading import Thread
-from multiprocessing import Process
+from threading import Thread, Event
 import time
 import os
 import traceback
 
 
-def run_schedule():
+def run_schedule(stop_t):
     import core
-    while 1:
+    while not stop_t.isSet():
         schedule.run_pending()
-        time.sleep(10)
+        stop_t.wait(10)
 
 
 def run_every(moment="day", hour="00:00"):
@@ -34,5 +33,14 @@ def run_every(moment="day", hour="00:00"):
 def init_app(app):
     app.run_every = run_every
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        t = Thread(target=run_schedule)
-        t.start()
+        app.stop_t = Event()
+        app.t = Thread(target=run_schedule, args=(app.stop_t, ))
+        app.t.start()
+
+
+def finish_app(app):
+    if hasattr(app, 'stop_t'):
+        app.stop_t.set()
+    if hasattr(app, 't'):
+        app.t.join()
+
