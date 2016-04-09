@@ -118,6 +118,11 @@ class Manager(object):
         remote = self.get_available(config)
         return config['actual_version'], remote
 
+    def reboot_server(self):
+        print("->\tRestarting server...")
+        os.spawnl(os.P_NOWAIT, 'python pfamserver')
+        raise KeyboardInterrupt()
+
     def update(self):
         local, remote = self.get_versions()
         if float(local) < remote:
@@ -126,8 +131,16 @@ class Manager(object):
             new = Version(remote, self)
             print("->\tPFam: Update from {:} to {:}".format(local, remote))
             new.prepare()
-            # new.upgrade()
-            old.remove()
+            processed = self.config['versions'][new.version]['status']
+            # FIXME: There are 44 tables but the alignment_and_tree is not
+            # been registered on the "status" list.
+            total_milestones = 6 + 43 * 2
+            if len(processed) >= total_milestones:
+                new.upgrade()
+                old.remove()
+                print("->\tPFam: Update {:} is ready.".format(remote))
+                self.reboot_server()
+                # TODO: Restart the flask server or if it is impossible the machine.
         else:
             print("->\tPFam: The database is updated (version {})".format(local))
 
@@ -253,9 +266,11 @@ class Version(object):
         self.load_database()
 
     def remove(self):
-        # TODO: Should remove the database and the files of that specific
-        # version.
-        pass
+        path = self.manager.version_path(self)
+        if os.path.exists(path):
+            print("->\tRemoving files from version {:}.".format(self.version))
+            print("Removing {:}...".format(path))
+            #shutil.rmtree(path)
 
 
 from datetime import datetime, timedelta
