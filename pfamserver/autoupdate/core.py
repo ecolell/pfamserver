@@ -2,6 +2,7 @@
 from __future__ import print_function
 import json
 from application import app
+from sqlalchemy_utils import database_exists, create_database
 import socket
 import gzip
 import shutil
@@ -24,6 +25,10 @@ class Manager(object):
     def __init__(self):
         self.server = {'path': '/pub/databases/Pfam/releases/',
                        'url': 'ftp.ebi.ac.uk'}
+
+    def prepare_database(self, url):
+        if not database_exists(url):
+            create_database(url)
 
     @property
     def config(self):

@@ -3,7 +3,6 @@ from __future__ import print_function
 from sqlalchemy import text
 from application import app
 from sqlalchemy import create_engine
-from sqlalchemy_utils import database_exists, create_database
 import sqlparse
 import os
 import gzip
@@ -84,8 +83,7 @@ class DatabaseConstructor(object):
         self.manager = version.manager
         self.backup_path = version.path + '/database_files/'
         self.url = app.config['SQLALCHEMY_DATABASE_URI'] + self.version
-        if not database_exists(self.url):
-            create_database(self.url)
+        self.manager.prepare_database(self.url)
         self.engine = create_engine(self.url,
                                     pool_size=20,
                                     max_overflow=100)
