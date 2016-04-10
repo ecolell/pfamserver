@@ -59,16 +59,23 @@ class Manager(object):
         if isinstance(function, tuple):
             function, extension = function
         manager = Manager()
+
+
+        def get(version):
+            config = manager.config
+            version_cfg = (config["versions"][version]
+                      if version in config["versions"] else {"status": []})
+            return config, version_cfg
+
+
         def wrapper(*args):
             self = args[0]
-            config = manager.config
-            version = (config["versions"][self.version]
-                      if self.version in config["versions"] else {"status": []})
+            config, version_cfg = get(self.version)
             params = ''
             if len(args) > 1:
                 params = '-' + '_'.join(args[1:])
             name = function.__name__ + extension + params
-            pending = name not in version['status']
+            pending = name not in version_cfg['status']
             ready = False
             if pending:
                 try:
@@ -77,8 +84,9 @@ class Manager(object):
                     print("*---->", e)
                     return False
                 if ready:
-                    version['status'].append(name)
-                    config["versions"][self.version] = version
+                    config, version_cfg = get(self.version)
+                    version_cfg['status'].append(name)
+                    config["versions"][self.version] = version_cfg
                     manager.config = config
             return not pending or ready
         return wrapper
