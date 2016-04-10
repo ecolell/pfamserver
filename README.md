@@ -54,11 +54,11 @@ There are some **special queries** that join multiple tables and accept some spe
 
 First, it is posible to obtain a list of **pfamA** registers from a **uniprot_id** (eg. [http://localhost:5001/api/query/pfam_uniprot/egfr_human](http://localhost:5001/api/query/pfam_uniprot/egfr_human)).
 
-Also, it is available a way to recover a list of **PDB** registers from a "**sequence description**" (eq. [http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168](http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168)) where the 3 parameters are a **uniprot_id**, a **seq_start** and **seq_end** inside that uniprot register.
+Also, it is available a way to recover a list of **PDB** registers from a "**sequence description**" (eg. [http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168](http://localhost:5001/api/query/pdb_sequencedescription/egfr_human,57,168)) where the 3 parameters are a **uniprot_id**, a **seq_start** and **seq_end** inside that uniprot register.
 
 Then, it is accesible an alternative to obtain a **small PDB image** (base 64 enconded after compressed) from an specific **pdb_id** (eg. [http://localhost:5001/api/query/pdbimage_pdb/1IVO](http://localhost:5001/api/query/pdbimage_pdb/1IVO)). 
 
-Last, you can obtain an MSA in stockholm format through a pfamA_acc or pfamA_id (eg. [http://localhost:5001/api/query/stockholm_pfam/piwi](http://localhost:5001/api/query/stockholm_pfam/piwi)). The **output** value is *zip compressed* and then *base 64 encoded*, to optimize transport over the network.
+Last, it is posible to obtain an MSA in stockholm format through a pfamA_acc or pfamA_id (eg. [http://localhost:5001/api/query/stockholm_pfam/piwi](http://localhost:5001/api/query/stockholm_pfam/piwi)). The **output** value is *zip compressed* and then *base 64 encoded*, to optimize transport over the network.
 
 Please, check [http://localhost:5001/](http://localhost:5001/) for more updated examples.
 

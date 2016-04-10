@@ -1,0 +1,34 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 15pt;
+    color: white;
+    background-color: rgba(0, 0, 255, 0.8);
+    font-family: "courier", serif;
+    text-align: center;
+}
+
+.body {
+    margin-top: 100px;
+    padding: 20pt 200pt;
+    text-align: justify;
+    text-justify: distribute;
+}
+
+p {
+    margin: .5em 0em;
+}
+
+ul {
+    margin: 1em;
+}
+
+.version {
+    display: block;
+    float: right;
+}
