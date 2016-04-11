@@ -85,3 +85,8 @@ pypitest-upload: test
 clean:
 	@ echo "[ cleaning     ] remove deployment generated files that doesn't exists in the git repository"
 	@ rm -rf MANIFEST virtualenv* bin/ lib/ lib64 include/ build/ share setuptools-*.tar.gz get-pip.py tracking.log subversion .Python
+
+create_boot_script:
+	echo '#!/bin/sh\ncd $(shell pwd -P) ; $(SOURCE_ACTIVATE) $(PYTHON) -m pfamserver &' > /etc/init.d/S99pfamserver
+	chmod +x /etc/init.d/S99pfamserver
+	ln -s /etc/init.d/S99pfamserver /etc/rcS.d/
