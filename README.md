@@ -20,7 +20,11 @@ On Ubuntu Desktop there are some other libraries not installed by default (zlibc
 
     $ make ubuntu deploy
 
-Also, you need to have the **wget** package installed and access (username and password) of a mysql database.
+Also, you need to have the **wget** package installed and access (username and password) to a mysql database.
+
+Last, if you cloned the repository and want to to create a boot script on Linux you should execute:
+
+    $ sudo make create_boot_script
 
 
 Testing
