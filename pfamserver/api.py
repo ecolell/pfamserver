@@ -3,7 +3,7 @@ from database import scoped_db
 from flask.ext.restless import APIManager
 from models import classes
 if classes:
-    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
+    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, PfamARegFullSignificant, Pfamseq
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
@@ -115,6 +115,35 @@ class StockholmFromPfamAPI(Resource):
         return {'query': query}
 
 
+class SequenceDescriptionFromPfamAPI(Resource):
+
+    def query(self, pfamA_acc):
+        join = (scoped_db.query(PfamARegFullSignificant, Pfamseq).
+                filter(PfamARegFullSignificant.pfamA_acc == pfamA_acc).
+                filter(PfamARegFullSignificant.pfamseq_acc == Pfamseq.pfamseq_acc).
+                order_by(Pfamseq.pfamseq_id)
+                ).all()
+        return join
+
+    def serialize(self, element):
+        return element.Pfamseq.pfamseq_id
+
+    def to_pfam_acc(self, pfam_id):
+        quest = scoped_db.query(PfamA).filter(PfamA.pfamA_id == pfam_id).all()
+        return quest[0].pfamA_acc if len(quest) else pfam_id
+
+    def get(self, query):
+        response = { 'query': query }
+        queries = [query, query.upper(), query.capitalize(), query.lower()]
+        for q in queries:
+            q_aux = self.to_pfam_acc(q)
+            output = self.query(q_aux)
+            if output:
+                response['output'] = map(self.serialize, output)
+                break
+        return response
+
+
 class PdbFromSequenceDescriptionAPI(Resource):
 
     def query(self, uniprot_id, seq_start, seq_end):
@@ -213,6 +242,9 @@ api.add_resource(StockholmFromPfamAPI,
 api.add_resource(PfamFromUniprotAPI,
                  '/api/query/pfam_uniprot/<string:query>',
                  endpoint='pfam_uniprot')
+api.add_resource(SequenceDescriptionFromPfamAPI,
+                 '/api/query/sequencedescription_pfam/<string:query>',
+                 endpoint='sequencedescription_pfam')
 api.add_resource(PdbFromSequenceDescriptionAPI,
                  '/api/query/pdb_sequencedescription/<string:query>',
                  endpoint='pdb_sequencedescription')
