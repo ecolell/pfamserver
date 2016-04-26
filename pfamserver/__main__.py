@@ -29,9 +29,9 @@ def create_server():
     try:
         app.run(host=host, port=port, threaded=True)
     except KeyboardInterrupt, e:
-        raise KeyboardInterrupt(e)
         if debugging:
             shutdown_server()
+        raise KeyboardInterrupt(e)
     if run_once:
         scheduler.finish_app(app)
 

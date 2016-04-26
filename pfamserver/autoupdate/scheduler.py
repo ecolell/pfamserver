@@ -23,7 +23,8 @@ def run_every(moment="day", hour="00:00"):
 
         def wrapper(*args, **kwargs):
             try:
-                function(*args, **kwargs)
+                p = Process(target=function, args=args, kwargs=kwargs)
+                p.start()
             except:
                 print(traceback.format_exc())
         return wrapper

@@ -1,6 +1,7 @@
 from application import app
 from database import scoped_db
 from flask.ext.restless import APIManager
+from sqlalchemy import or_
 from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, PfamARegFullSignificant, Pfamseq
@@ -213,7 +214,7 @@ class PfamFromUniprotAPI(Resource):
 
     def query(self, query):
         join = (scoped_db.query(Uniprot, UniprotRegFull, PfamA).
-                filter(Uniprot.uniprot_id == query).
+                filter(or_(Uniprot.uniprot_id == query, Uniprot.uniprot_acc == query)).
                 filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
                 filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc).
                 order_by(UniprotRegFull.seq_start)).all()
