@@ -4,7 +4,7 @@ from flask.ext.restless import APIManager
 from sqlalchemy import or_
 from models import classes
 if classes:
-    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, PfamARegFullSignificant, Pfamseq
+    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
 from flask.ext.restful import Api, Resource
 import os
 from subprocess import Popen as run, PIPE
@@ -119,15 +119,18 @@ class StockholmFromPfamAPI(Resource):
 class SequenceDescriptionFromPfamAPI(Resource):
 
     def query(self, pfamA_acc):
-        join = (scoped_db.query(PfamARegFullSignificant, Pfamseq).
-                filter(PfamARegFullSignificant.pfamA_acc == pfamA_acc).
-                filter(PfamARegFullSignificant.pfamseq_acc == Pfamseq.pfamseq_acc).
-                order_by(Pfamseq.pfamseq_id)
-                ).all()
+        join = (scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg).
+                filter(UniprotRegFull.pfamA_acc == pfamA_acc).
+                filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
+                filter(UniprotRegFull.auto_uniprot_reg_full ==
+                       PdbPfamAReg.auto_uniprot_reg_full)).all()
         return join
 
     def serialize(self, element):
-        return element.Pfamseq.pfamseq_id
+        return "{:}/{:}-{:}".format(
+            element.Uniprot.uniprot_id,
+            element.UniprotRegFull.seq_start,
+            element.UniprotRegFull.seq_end)
 
     def to_pfam_acc(self, pfam_id):
         quest = scoped_db.query(PfamA).filter(PfamA.pfamA_id == pfam_id).all()
@@ -140,7 +143,7 @@ class SequenceDescriptionFromPfamAPI(Resource):
             q_aux = self.to_pfam_acc(q)
             output = self.query(q_aux)
             if output:
-                response['output'] = map(self.serialize, output)
+                response['output'] = list(set(map(self.serialize, output)))
                 break
         return response
 
