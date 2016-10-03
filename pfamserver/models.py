@@ -2,7 +2,7 @@
 from database import engine, scoped_db as db
 from sqlalchemy.ext.automap import automap_base
 # from sqlalchemy import MetaData
-import loader
+from autoupdate import loader
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.automap import generate_relationship, interfaces
 import re
