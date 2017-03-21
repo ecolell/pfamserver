@@ -3,6 +3,7 @@ from database import scoped_db
 from flask.ext.restless import APIManager
 from sqlalchemy import or_
 from sqlalchemy.orm import Load
+from sqlalchemy.orm.exc import NoResultFound
 from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
@@ -102,19 +103,23 @@ class StockholmFromPfamAPI(Resource):
         cmd = [fetch_call, root_path + "Pfam-A.full", query]
         return run(cmd, stdout=PIPE).communicate()[0]
 
-    def to_pfam_acc(self, pfam_id):
-        quest = scoped_db.query(PfamA).filter(PfamA.pfamA_id == pfam_id).all()
-        return quest[0].pfamA_acc if len(quest) else pfam_id
+    def to_pfam_acc(self, code):
+        icode = "%{:}%".format(code)
+        subquery = scoped_db.query(PfamA)
+        subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
+                                       PfamA.pfamA_id.ilike(icode)))
+        subquery = subquery.options(Load(PfamA).load_only("pfamA_acc"))
+        try:
+            return subquery.one().pfamA_acc
+        except NoResultFound as e:
+            return code
 
+    @cache.cached(timeout=3600)
     def get(self, query):
-        queries = [query, query.upper(), query.capitalize(), query.lower()]
-
-        for q in queries:
-            q_aux = self.to_pfam_acc(q)
-            output = self.query(q_aux)
-            if output:
-                return {'query': q_aux, 'output': b64encode(compress(output))}
-        return {'query': query}
+        pfamA_acc = self.to_pfam_acc(query)
+        output = self.query(pfamA_acc)
+        if output:
+            return {'query': pfamA_acc, 'output': b64encode(compress(output))}
 
 
 class SequenceDescriptionFromPfamAPI(Resource):
@@ -215,7 +220,6 @@ class PdbImageFromPdbAPI(Resource):
         return {'query': query, 'output': output}
 
 
-
 class PfamFromUniprotAPI(Resource):
 
     def query(self, query):
@@ -235,6 +239,7 @@ class PfamFromUniprotAPI(Resource):
             'num_full': element.PfamA.num_full
         }
 
+    @cache.cached(timeout=3600)
     def get(self, query):
         output = self.query(query)
         if output:
