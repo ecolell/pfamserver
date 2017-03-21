@@ -1,4 +1,5 @@
 from flask import Flask
+from flask.ext.cache import Cache
 from config import config
 import os
 from flask.json import JSONEncoder
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.config.update(config)
 app.secret_key = config['SECRET_KEY']
 app.json_encoder = ExtendedEncoder
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
 @app.route('/favicon.png')

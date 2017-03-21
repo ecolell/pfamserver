@@ -1,7 +1,8 @@
-from application import app
+from application import app, cache
 from database import scoped_db
 from flask.ext.restless import APIManager
 from sqlalchemy import or_
+from sqlalchemy.orm import Load
 from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
@@ -118,13 +119,19 @@ class StockholmFromPfamAPI(Resource):
 
 class SequenceDescriptionFromPfamAPI(Resource):
 
-    def query(self, pfamA_acc):
-        join = (scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg).
-                filter(UniprotRegFull.pfamA_acc == pfamA_acc).
-                filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
-                filter(UniprotRegFull.auto_uniprot_reg_full ==
-                       PdbPfamAReg.auto_uniprot_reg_full)).all()
-        return join
+    def get_descriptions(self, code):
+        icode = "%{:}%".format(code)
+        subquery = scoped_db.query(PfamA)
+        subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
+                                       PfamA.pfamA_id.ilike(icode))).subquery()
+        query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
+        query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
+        query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
+        query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
+        query = query.options(Load(Uniprot).load_only("uniprot_id"),
+                              Load(UniprotRegFull).load_only("seq_start",
+                                                             "seq_end"))
+        return query.all()
 
     def serialize(self, element):
         return "{:}/{:}-{:}".format(
@@ -132,19 +139,12 @@ class SequenceDescriptionFromPfamAPI(Resource):
             element.UniprotRegFull.seq_start,
             element.UniprotRegFull.seq_end)
 
-    def to_pfam_acc(self, pfam_id):
-        quest = scoped_db.query(PfamA).filter(PfamA.pfamA_id == pfam_id).all()
-        return quest[0].pfamA_acc if len(quest) else pfam_id
-
+    @cache.cached(timeout=3600)
     def get(self, query):
-        response = { 'query': query }
-        queries = [query, query.upper(), query.capitalize(), query.lower()]
-        for q in queries:
-            q_aux = self.to_pfam_acc(q)
-            output = self.query(q_aux)
-            if output:
-                response['output'] = list(set(map(self.serialize, output)))
-                break
+        response = {'query': query}
+        output = self.get_descriptions(query)
+        if output:
+            response['output'] = list(set(map(self.serialize, output)))
         return response
 
 
@@ -204,6 +204,7 @@ class PdbImageFromPdbAPI(Resource):
             'pdb_image_sml': b64encode(element.pdb_image_sml)
         }
 
+    @cache.cached(timeout=3600)
     def get(self, query):
         output = self.query(query)
         if output:
