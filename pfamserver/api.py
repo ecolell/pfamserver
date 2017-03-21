@@ -151,18 +151,19 @@ class SequenceDescriptionFromPfamAPI(Resource):
 class PdbFromSequenceDescriptionAPI(Resource):
 
     def query(self, uniprot_id, seq_start, seq_end):
-        join = (scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb).
-                filter(Uniprot.uniprot_id == uniprot_id).
-                filter(UniprotRegFull.seq_start == seq_start).
-                filter(UniprotRegFull.seq_end == seq_end).
-                filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
-                filter(UniprotRegFull.auto_uniprot_reg_full ==
-                       PdbPfamAReg.auto_uniprot_reg_full).
-                filter(PdbPfamAReg.pdb_id == Pdb.pdb_id).
-                order_by(PdbPfamAReg.pdb_id).
-                order_by(PdbPfamAReg.chain)
-                ).all()
-        return join
+        query = scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb)
+        query = query.filter(Uniprot.uniprot_id == uniprot_id,
+                             UniprotRegFull.seq_start == seq_start,
+                             UniprotRegFull.seq_end == seq_end,
+                             UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc,
+                             UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full,
+                             PdbPfamAReg.pdb_id == Pdb.pdb_id)
+        query = query.order_by(PdbPfamAReg.pdb_id)
+        query = query.order_by(PdbPfamAReg.chain)
+        query = query.options(Load(PdbPfamAReg).load_only("pdb_id", "chain", "pdb_res_start", "pdb_res_end"),
+                              Load(UniprotRegFull).load_only("pfamA_acc"),
+                              Load(Pdb).load_only("title", "resolution", "method", "date", "author"))
+        return query.all()
 
     def serialize(self, element):
         authors = element.Pdb.author.split(',')
@@ -180,6 +181,7 @@ class PdbFromSequenceDescriptionAPI(Resource):
             'date': element.Pdb.date
         }
 
+    @cache.cached(timeout=3600)
     def get(self, query):
         uniprot_id, seq_start, seq_end = query.split(',')
         response = {
