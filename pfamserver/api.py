@@ -104,22 +104,23 @@ class StockholmFromPfamAPI(Resource):
         return run(cmd, stdout=PIPE).communicate()[0]
 
     def to_pfam_acc(self, code):
-        icode = "%{:}%".format(code)
         subquery = scoped_db.query(PfamA)
         subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                       PfamA.pfamA_id.ilike(icode)))
+                                       PfamA.pfamA_id.ilike(code)))
         subquery = subquery.options(Load(PfamA).load_only("pfamA_acc"))
         try:
             return subquery.one().pfamA_acc
         except NoResultFound as e:
-            return code
+            return None
 
     @cache.cached(timeout=3600)
     def get(self, query):
         pfamA_acc = self.to_pfam_acc(query)
-        output = self.query(pfamA_acc)
-        if output:
-            return {'query': pfamA_acc, 'output': b64encode(compress(output))}
+        output = ''
+        if pfamA_acc:
+            output = self.query(pfamA_acc)
+        return {'query': pfamA_acc,
+                'output': b64encode(compress(output))}
 
 
 class SequenceDescriptionFromPfamAPI(Resource):
@@ -224,7 +225,8 @@ class PfamFromUniprotAPI(Resource):
 
     def query(self, query):
         join = (scoped_db.query(Uniprot, UniprotRegFull, PfamA).
-                filter(or_(Uniprot.uniprot_id == query, Uniprot.uniprot_acc == query)).
+                filter(or_(Uniprot.uniprot_id == query,
+                           Uniprot.uniprot_acc == query)).
                 filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc).
                 filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc).
                 order_by(UniprotRegFull.seq_start)).all()
