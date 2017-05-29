@@ -126,10 +126,10 @@ class StockholmFromPfamAPI(Resource):
 class SequenceDescriptionFromPfamAPI(Resource):
 
     def get_descriptions(self, code):
-        icode = "%{:}%".format(code)
-        subquery = scoped_db.query(PfamA)
+        #icode = "%{:}%".format(code)
+        subquery = scoped_db.query(PfamA.pfamA_acc)
         subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                       PfamA.pfamA_id.ilike(icode))).subquery()
+                                       PfamA.pfamA_id.ilike(code))).subquery()
         query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
         query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
         query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
