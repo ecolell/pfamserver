@@ -8,6 +8,8 @@ from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
 from flask.ext.restful import Api, Resource
+from flask_restful.inputs import boolean
+from flask import request
 import os
 from subprocess import Popen as run, PIPE
 from StringIO import StringIO
@@ -125,9 +127,9 @@ class StockholmFromPfamAPI(Resource):
 
 class SequenceDescriptionFromPfamAPI(Resource):
 
-    def get_descriptions(self, code):
+    def get_descriptions(self, code, with_pdb):
         #icode = "%{:}%".format(code)
-        subquery = scoped_db.query(PfamA.pfamA_acc)
+        subquery = scoped_db.query(PfamA)
         subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
                                        PfamA.pfamA_id.ilike(code))).subquery()
         query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
@@ -145,10 +147,11 @@ class SequenceDescriptionFromPfamAPI(Resource):
             element.UniprotRegFull.seq_start,
             element.UniprotRegFull.seq_end)
 
-    @cache.cached(timeout=3600)
+    @cache.memoize(timeout=3600)
     def get(self, query):
-        response = {'query': query}
-        output = self.get_descriptions(query)
+        with_pdb = boolean(request.args.get('with_pdb', 'true'))
+        response = {'query': query, 'with_pdb': with_pdb}
+        output = self.get_descriptions(query, with_pdb)
         if output:
             response['output'] = list(set(map(self.serialize, output)))
         return response
