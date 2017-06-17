@@ -152,6 +152,7 @@ class SequenceDescriptionFromPfamAPI(Resource):
         query = query.options(Load(Pfamseq).load_only('pfamseq_id'),
                               Load(PfamARegFullSignificant).load_only("seq_start",
                                                                       "seq_end"))
+        query = query.order_by(Pfamseq.pfamseq_id.asc())
         return query.distinct().all()
 
     def serialize(self, element):
@@ -166,7 +167,7 @@ class SequenceDescriptionFromPfamAPI(Resource):
         response = {'query': query, 'with_pdb': with_pdb}
         output = self.get_descriptions(query, with_pdb)
         if output:
-            response['output'] = list(set(map(self.serialize, output)))
+            response['output'] = map(self.serialize, output)
             response['size'] = len(response['output'])
         return response
 
