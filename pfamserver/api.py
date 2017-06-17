@@ -6,7 +6,8 @@ from sqlalchemy.orm import Load
 from sqlalchemy.orm.exc import NoResultFound
 from models import classes
 if classes:
-    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage
+    from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, \
+        PfamARegFullSignificant, Pfamseq
 from flask.ext.restful import Api, Resource
 from flask_restful.inputs import boolean
 from flask import request
@@ -131,21 +132,33 @@ class SequenceDescriptionFromPfamAPI(Resource):
         #icode = "%{:}%".format(code)
         subquery = scoped_db.query(PfamA)
         subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                       PfamA.pfamA_id.ilike(code))).subquery()
-        query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
-        query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
-        query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
-        query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
-        query = query.options(Load(Uniprot).load_only("uniprot_id"),
-                              Load(UniprotRegFull).load_only("seq_start",
-                                                             "seq_end"))
-        return query.all()
+                                       PfamA.pfamA_id.ilike(code))).distinct().subquery()
+
+        #query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
+        #query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
+        #query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
+        #query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
+
+        query = scoped_db.query(PfamARegFullSignificant, Pfamseq)
+        query = query.join(Pfamseq, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
+        query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
+
+        if with_pdb:
+            subquery2 = scoped_db.query(PdbPfamAReg)
+            subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
+            query = query.filter(PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc)
+
+        query = query.filter(PfamARegFullSignificant.in_full)
+        query = query.options(Load(Pfamseq).load_only('pfamseq_id'),
+                              Load(PfamARegFullSignificant).load_only("seq_start",
+                                                                      "seq_end"))
+        return query.distinct().all()
 
     def serialize(self, element):
         return "{:}/{:}-{:}".format(
-            element.Uniprot.uniprot_id,
-            element.UniprotRegFull.seq_start,
-            element.UniprotRegFull.seq_end)
+            element.Pfamseq.pfamseq_id,
+            element.PfamARegFullSignificant.seq_start,
+            element.PfamARegFullSignificant.seq_end)
 
     @cache.memoize(timeout=3600)
     def get(self, query):
@@ -154,6 +167,7 @@ class SequenceDescriptionFromPfamAPI(Resource):
         output = self.get_descriptions(query, with_pdb)
         if output:
             response['output'] = list(set(map(self.serialize, output)))
+            response['size'] = len(response['output'])
         return response
 
 
