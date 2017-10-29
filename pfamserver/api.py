@@ -159,12 +159,6 @@ class SequenceDescriptionFromPfamAPI(Resource):
         query = query.order_by(Pfamseq.pfamseq_id.asc())
         return query.distinct().all()
 
-    def serialize(self, element):
-        return "{:}/{:}-{:}".format(
-            element.Pfamseq.pfamseq_id,
-            element.PfamARegFullSignificant.seq_start,
-            element.PfamARegFullSignificant.seq_end)
-
     @cache.memoize(timeout=3600)
     def get(self, query):
         with_pdb = boolean(request.args.get('with_pdb', 'true'))
