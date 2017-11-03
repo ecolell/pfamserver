@@ -1,9 +1,11 @@
 from application import app, cache
 from database import scoped_db
 from flask.ext.restless import APIManager
-from sqlalchemy import or_
+from sqlalchemy import or_, types
 from sqlalchemy.orm import Load
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import cast
+from sqlalchemy.sql.functions import concat
 from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, \
@@ -139,8 +141,10 @@ class SequenceDescriptionFromPfamAPI(Resource):
         #query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
         #query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
 
-        query = scoped_db.query(PfamARegFullSignificant, Pfamseq)
-        query = query.join(Pfamseq, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
+        query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
+                                       cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
+                                       cast(PfamARegFullSignificant.seq_end, types.Unicode)))
+        query = query.join(PfamARegFullSignificant, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
         query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
 
         if with_pdb:
@@ -155,19 +159,13 @@ class SequenceDescriptionFromPfamAPI(Resource):
         query = query.order_by(Pfamseq.pfamseq_id.asc())
         return query.distinct().all()
 
-    def serialize(self, element):
-        return "{:}/{:}-{:}".format(
-            element.Pfamseq.pfamseq_id,
-            element.PfamARegFullSignificant.seq_start,
-            element.PfamARegFullSignificant.seq_end)
-
     @cache.memoize(timeout=3600)
     def get(self, query):
         with_pdb = boolean(request.args.get('with_pdb', 'true'))
         response = {'query': query, 'with_pdb': with_pdb}
         output = self.get_descriptions(query, with_pdb)
         if output:
-            response['output'] = map(self.serialize, output)
+            response['output'] = [o[0] for o in output]
             response['size'] = len(response['output'])
         return response
 
