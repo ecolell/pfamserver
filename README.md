@@ -40,10 +40,34 @@ If you want to help us or report an issue join to us through the [Github issue t
 Running
 =======
 
+It is best to download Pfam by yourself and place it in a custom directory. Then add the path to the config.py
+
+The DBMANUAL_PATH should include all gz for sql and txt files, and the Pfam-A.full.gz. No subfolders inside
+
+    # path to store and look for pfam data (~130GB)
+    config['ROOT_PATH'] = '/media/disk2/pfam_data/'            # it is important to put the slash at the end..
+     
+    # path to look for you local copy of Pfam, this files will be copied to the path above
+    # so keep in mind that you actually need 2x130GB = 280GB
+    config['DBMANUAL_PATH'] = '/media/disk2/database_files'
+
+
+Add the following lines to your /etc/mysql/mysql.cnf
+
+    [mysqld]
+    secure_file_priv=""
+    [mysql]
+    local-infile
+
+
 To run the server you need to execute:
 
-    $ DEBUG=True DB=root:root@localhost:3306/pfamserver HOST=0.0.0.0 PORT=5001 python -m pfamserver
+    $ make run
 
+<!-- To run the server you need to execute:
+
+    $ DEBUG=True DB=root:root@localhost:3306/pfamserver HOST=0.0.0.0 PORT=5001 python -m pfamserver
+ -->
 After start, the server it is going to check for new updates at night in background. The update is composed of the download and deployment of the last version of the file *Pfam-A.full.gz* (approximately 13GB) and download and deployment of all the files inside the *database_files* folder (approximately 77GB), so be patient it can take a while.
 
 At midnight, when the deploy of the last update is ready (because was runned on background) it should restart the machine. You should ensure the previous command is executed after the server boots up so it should stay update automatically without any human intervention.

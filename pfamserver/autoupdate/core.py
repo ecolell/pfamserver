@@ -6,7 +6,7 @@ from sqlalchemy_utils import database_exists, create_database
 import socket
 import gzip
 import shutil
-from urllib import urlopen
+from urllib2 import urlopen
 from contextlib import closing
 import subprocess
 from progressbar import ProgressBar, ETA, Percentage, RotatingMarker, Bar
@@ -20,6 +20,7 @@ select_proto = None
 
 class Manager(object):
     root_path = app.config['ROOT_PATH']
+    dbmanual_path = app.config['DBMANUAL_PATH']
     config_file = '{:s}version.json'.format(root_path)
 
     def __init__(self):
@@ -182,13 +183,31 @@ class Version(object):
     def download(self, filename):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        folder = "P" if "/" in filename else "O"
-        path_pattern = '{0}{1[url]}{1[path]}Pfam{2}/{3}'
-        origin = path_pattern.format(select_proto, self.manager.server,
+        if not os.path.exists(os.path.join( self.path, os.path.dirname(filename))):
+            os.makedirs(os.path.join( self.path, os.path.dirname(filename)))
+        
+        destiny = os.path.join(self.path, filename)
+        manual_file = os.path.join(self.manager.dbmanual_path, os.path.basename(filename))
+        if os.path.exists(manual_file):
+            if not os.path.exists(destiny):
+                print ("File exists -> ", manual_file)
+                print ("copy to ", destiny)
+                shutil.copy(manual_file, destiny)
+                return True
+            else:
+                print ("File exists in destiny ->", destiny)
+                return True
+        else:
+            folder = "P" if "/" in filename else "O"
+            path_pattern = '{0}{1[url]}{1[path]}Pfam{2}/{3}'
+            origin = path_pattern.format(select_proto, self.manager.server,
                                      self.version, filename)
-        destiny = self.downloaded[filename]
-        command = "wget -c -r {} -{} {}".format(origin, folder, destiny)
-        return not subprocess.call(command.split(" "))
+            print ("Didn't find the downloaded file, attempting to download ->", filename)
+            command = "wget -c -r {} -{} {}".format(origin, folder, destiny)
+            print (command)
+            # return not subprocess.call(command.split(" "))
+            return False
+
 
     @Manager.milestone
     def download_pfama_full(self):
@@ -249,11 +268,28 @@ class Version(object):
             path_pattern = '{0}{1[url]}{1[path]}Pfam{2}/{3}'
             server_tree = path_pattern.format(select_proto, self.manager.server,
                                          self.version, filename)
+            print (server_tree)
             server_tree = server_tree.split('//')[-1]
             origin = destiny + server_tree
             os.system('mv {:} {:}'.format(origin[:-1], destiny[:-1]))
             old_tree = destiny + server_tree.split('/')[0]
             shutil.rmtree(old_tree)
+        return result
+
+    @Manager.milestone
+    def download_manual_database_files(self):
+        from loader import tables
+        extensions = [".innodb.sql.gz", ".txt.gz", ".sql.gz"]
+        for t in tables:
+            for ext in extensions:
+                filename = "database_files/"+t+ext
+                result = self.download(filename)
+                if not result:
+                #     destiny = self.downloaded[filename]
+                #     print ("here->", destiny)
+                # else:
+                    print ("failed to get ", filename)
+        print ("Done downloading database!")
         return result
 
 
@@ -275,7 +311,8 @@ class Version(object):
             exported = self.export()
         self.clean_accession_numbers()
         self.reindex()
-        self.download_database_files()
+        # self.download_database_files()
+        self.download_manual_database_files()
         self.load_database()
 
     def remove(self):

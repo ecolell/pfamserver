@@ -82,7 +82,7 @@ class DatabaseConstructor(object):
         self.version = version.version
         self.manager = version.manager
         self.backup_path = version.path + '/database_files/'
-        self.url = app.config['SQLALCHEMY_DATABASE_URI'] + self.version
+        self.url = app.config['SQLALCHEMY_DATABASE_URI'] + self.version + "?local_infile=1"
         self.manager.prepare_database(self.url)
         self.engine = create_engine(self.url,
                                     pool_size=20,
@@ -136,7 +136,7 @@ class DatabaseConstructor(object):
         print("\t\tLoading {:} data to the database.".format(table_name))
         backup_filename = '{:}{:}.txt'.format(self.backup_path, table_name)
 
-        cmd = ("LOAD DATA INFILE '{:}' INTO TABLE {:} CHARACTER SET latin1 "
+        cmd = ("LOAD DATA LOCAL INFILE '{:}' INTO TABLE {:} CHARACTER SET latin1 "
                "COLUMNS TERMINATED BY '\t' LINES TERMINATED BY '\n'")
         cmd = cmd.format(backup_filename, table_name)
         self.execute("SET SESSION sql_mode='ALLOW_INVALID_DATES'")
