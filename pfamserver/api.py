@@ -1,7 +1,7 @@
 from application import app, cache
 from database import scoped_db
-from flask_restless import APIManager
-from sqlalchemy import or_, types
+from flask.ext.restless import APIManager
+from sqlalchemy import or_, and_, types
 from sqlalchemy.orm import Load
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
@@ -13,7 +13,7 @@ if classes:
 from flask_restful import Api, Resource
 from flask_restful.inputs import boolean
 from flask import request
-import os
+import os, re
 from subprocess import Popen as run, PIPE
 from StringIO import StringIO
 from contextlib import closing
@@ -25,6 +25,8 @@ import multiprocessing
 from zlib import compress
 from base64 import b64encode
 from autoupdate.core import Manager
+from config import config
+import string
 
 
 manager = APIManager(app, flask_sqlalchemy_db=scoped_db)
@@ -52,6 +54,104 @@ def preload_pfamseq_map():
 print("Preloading pfamseq_acc to pfamseq_id map:")
 print("   This mighy take a few minutes:")
 pfamseq_map = preload_pfamseq_map()
+
+def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+# from sqlalchemy.ext.compiler import compiles
+# from sqlalchemy.sql.expression import ClauseElement, Executable
+
+# class CreateTableAs(Executable, ClauseElement):
+
+#     def __init__(self, name, query):
+#         self.name = name
+#         self.query = query
+
+# @compiles(CreateTableAs)
+# def _create_table_as(element, compiler, **kw):
+#     return "CREATE TABLE %s AS %s" % (
+#         element.name,
+#         compiler.process(element.query)
+#     )
+
+class PfamAJoinPfamseqidAPI(Resource):
+    def create_aux_pfamA_pfamseqid(self):
+        from sqlalchemy.orm import aliased
+
+        query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
+                                       cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
+                                       cast(PfamARegFullSignificant.seq_end, types.Unicode)),
+                                PfamARegFullSignificant.pfamA_acc)
+
+        query = query.join(PfamARegFullSignificant, and_(PfamARegFullSignificant.in_full , Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc))
+        # query = query.filter(PfamARegFullSignificant.in_full)
+        # query = query.options(Load(PfamA).load_only('pfamA_id'),
+        #                       Load(Pfamseq).load_only('pfamseq_id'))
+                              # Load(PfamARegFullSignificant).load_only("seq_start",
+                              #                                         "seq_end"))
+
+        return query.distinct().all()
+
+    def get(self):
+        import time
+        response = {}
+        start_time_sql = time.time()
+        output = self.create_aux_pfamA_pfamseqid()
+        end_time_sql = time.time()
+        if output:
+            start_time_loop = time.time()
+            response['output'] = list(output) #[o[0] for o in list(output)]
+            end_time_loop = time.time()
+            response['size'] = len(response['output'])
+            response['time_sql'] = end_time_sql - start_time_sql
+            response['time_loop'] = end_time_loop - start_time_loop
+        return response
+
+class PfamScanAPI(Resource):
+
+    def get_pfam_from_pfamacc(self, pfam_acc):
+        query = scoped_db.query(PfamA.num_full, PfamA.description)
+        query = query.filter(PfamA.pfamA_acc == pfam_acc)
+        return query.one()
+
+    def is_pfam_match(self, line):
+        return re.match("\w+\s+\d+\s+\d+\s+(\d+)\s+(\d+)\s+(\w+)\.\d+", line)
+
+    def pfamscan(self, seq):
+        os.environ["PERL5LIB"] = config['PFAMSCAN_PATH']
+        pfamscan_call = ('{:s}/pfam_scan.pl -dir {:s}').format(config['PFAMSCAN_PATH'], config['PFAMSCAN_PATH'])
+
+        # fasta_path = "{:s}/PfamScan/P00533.fasta.txt".format(pfamscan_dir)
+        fasta_path = os.path.join(config['TEMP'], id_generator()+".fasta")
+        with open(fasta_path, 'w') as outstream:
+            outstream.write(">user_sequence\n"+seq)
+
+        cmd = pfamscan_call.split() + ["-fasta", fasta_path]
+        return run(cmd, stdout=PIPE).communicate()[0]
+
+    def parse_pfamscan(self, text):
+        matches = [self.is_pfam_match(line) for line in text.split("\n") if self.is_pfam_match(line)]
+        pfams = [self.get_pfam_from_pfamacc(m.group(3)) for m in matches]
+        return  [{
+                "description":t[1].description,
+                "pfamA_acc":t[0].group(3),
+                "seq_start": int(t[0].group(1)),
+                "seq_end": int(t[0].group(2)),
+                "num_full":t[1].num_full
+                }  for t in zip(matches, pfams)]
+
+    @cache.cached(timeout=3600)
+    def get(self, query):
+        seq = query.upper().strip()
+        sequence = r'^[AC-IK-Y]*\r*$'
+        if re.match(sequence, seq):
+            output = self.parse_pfamscan(self.pfamscan(seq))
+        else:
+            output = []
+        response = {
+            'query': seq }
+        response['output'] = output
+        return response
 
 def fill(seqrecord, length):
     seq = seqrecord.seq.__dict__
@@ -176,6 +276,7 @@ class SequenceDescriptionFromPfamAPI(Resource):
             response['size'] = len(response['output'])
         return response
 
+
 class SequenceDescriptionFromPfamAPIEx(Resource):
 
     def get_descriptions(self, code, with_pdb):
@@ -194,12 +295,11 @@ class SequenceDescriptionFromPfamAPIEx(Resource):
                                        cast(PfamARegFullSignificant.seq_end, types.Unicode)))
         #query = query.join(PfamARegFullSignificant, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
         query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
-
         if with_pdb:
             subquery2 = scoped_db.query(PdbPfamAReg)
             subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
             query = query.filter(PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc)
-        
+    
         query = query.filter(PfamARegFullSignificant.in_full)
         query = query.options(Load(Pfamseq).load_only('pfamseq_id'),
                               Load(PfamARegFullSignificant).load_only("seq_start",
@@ -211,21 +311,57 @@ class SequenceDescriptionFromPfamAPIEx(Resource):
 
         return results
 
-    #@cache.memoize(timeout=3600)
+    # @cache.memoize(timeout=3600)
     def get(self, query):
         with_pdb = boolean(request.args.get('with_pdb', 'true'))
         response = {'query': query, 'with_pdb': with_pdb}
-        import time
-        a = time.time()
         output = self.get_descriptions(query, with_pdb)
-        b = time.time()
-        print "get_descriptions: " + str(b-a)
-        print type(output)
         if output:
             response['output'] = output #[o[0]+o[1] for o in output]
             response['size'] = len(response['output'])
         return response
 
+class SequenceDescriptionFromPfam2API(Resource):
+
+    def get_descriptions(self, code, with_pdb):
+
+        query1 = scoped_db.query(PfamARegFullSignificant.pfamseq_acc, PfamARegFullSignificant.seq_start, PfamARegFullSignificant.seq_end)
+        query1 = query1.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc, PfamARegFullSignificant.in_full)
+        query1 = query1.options(Load(PfamARegFullSignificant).load_only("seq_start","seq_end"))
+        query1 = query1.distinct().subquery()
+
+        # query2 = scoped_db.query(Pfamseq.pfamseq_id)
+        # query2 = query2.filter(Pfamseq.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
+
+        query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
+                                       cast(query1.c.seq_start, types.Unicode), '-',
+                                       cast(query1.c.seq_end, types.Unicode)))
+        query = query.filter(Pfamseq.pfamseq_acc == query1.c.pfamseq_acc)
+
+        if with_pdb:
+            subquery2 = scoped_db.query(PdbPfamAReg)
+            subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
+            query = query.filter(PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc)
+
+        query = query.order_by(Pfamseq.pfamseq_id.asc())
+        return query.distinct().all()
+
+    # @cache.memoize(timeout=3600)
+    def get(self, query):
+        with_pdb = boolean(request.args.get('with_pdb', 'true'))
+        response = {'query': query, 'with_pdb': with_pdb}
+        import time
+        start_time_sql = time.time()
+        output = self.get_descriptions(query, with_pdb)
+        end_time_sql = time.time()
+        if output:
+            start_time_loop = time.time()
+            response['output'] = [o[0] for o in list(output)]
+            end_time_loop = time.time()
+            response['size'] = len(response['output'])
+            response['time_sql'] = end_time_sql - start_time_sql
+            response['time_loop'] = end_time_loop - start_time_loop
+        return response
 
 class PdbFromSequenceDescriptionAPI(Resource):
 
@@ -345,3 +481,12 @@ api.add_resource(PdbFromSequenceDescriptionAPI,
 api.add_resource(PdbImageFromPdbAPI,
                  '/api/query/pdbimage_pdb/<string:query>',
                  endpoint='pdbimage_pdb')
+api.add_resource(PfamAJoinPfamseqidAPI,
+                 '/api/query/pfamjoinpfamseq',
+                 endpoint='pfamjoinpfamseq')
+api.add_resource(PfamScanAPI,
+                 '/api/query/pfamscan/<string:query>',
+                 endpoint='pfamscan')
+api.add_resource(SequenceDescriptionFromPfam2API,
+                 '/api/query/sequencedescription_pfam2/<string:query>',
+                 endpoint='sequencedescription_pfam2')

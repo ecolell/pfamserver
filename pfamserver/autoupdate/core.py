@@ -237,12 +237,22 @@ class Version(object):
         with open(temp_file, 'wb') as f_out:
             with open(self.extracted[filename],"r") as f_in:
                 widgets = [Percentage(), ' ', Bar(marker='#'), ' ', ETA()]
+## MERGE CONFICT <<<<<<< HEAD
                 # with ProgressBar(widgets=widgets, maxval=int(max_value)) as progress:
                 for line in f_in:
                     new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
                                       r'\1\n#=GF DC   Revision: \2', line)
                     f_out.write(new_line)
                     # progress.update(fsize(temp_file))
+## MERGE CONFICT =======
+#                 with ProgressBar(widgets=widgets,
+#                                  maxval=int(max_value)) as progress:
+#                     for line in f_in:
+#                         new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
+#                                           r'\1\n#=GF DC   Revision: \2', line)
+#                         f_out.write(new_line)
+#                         progress.update(fsize(temp_file))
+## MERGE CONFICT >>>>>>> b34bf81b49d77a7d3e2fc5f99b811fb1474605d9
             print("->\tPFam: Updating Pfam IDs")
             shutil.move(temp_file, self.extracted[filename])
         return True
