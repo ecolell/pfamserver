@@ -1,5 +1,5 @@
 from application import app, cache
-from database import scoped_db
+from database import scoped_db, engine
 from flask.ext.restless import APIManager
 from sqlalchemy import or_, and_, types
 from sqlalchemy.orm import Load
@@ -50,39 +50,39 @@ mafft_call = ('MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 '
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-# from sqlalchemy.ext.compiler import compiles
-# from sqlalchemy.sql.expression import ClauseElement, Executable
-
-# class CreateTableAs(Executable, ClauseElement):
-
-#     def __init__(self, name, query):
-#         self.name = name
-#         self.query = query
-
-# @compiles(CreateTableAs)
-# def _create_table_as(element, compiler, **kw):
-#     return "CREATE TABLE %s AS %s" % (
-#         element.name,
-#         compiler.process(element.query)
-#     )
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import ClauseElement, Executable
+from sqlalchemy import Table, Column, String, MetaData, select
 
 class PfamAJoinPfamseqidAPI(Resource):
+
     def create_aux_pfamA_pfamseqid(self):
         from sqlalchemy.orm import aliased
 
-        query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
-                                       cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
-                                       cast(PfamARegFullSignificant.seq_end, types.Unicode)),
-                                PfamARegFullSignificant.pfamA_acc)
+        tablename = "pfamjoinpfamseq"
+        m = MetaData()
+        t = Table(tablename, m, Column('pfamseqid', String(40)), Column('pfam_acc', String(7)))
+        if not engine.dialect.has_table(engine, tablename):
+            # t.drop(engine) # to delete/drop table
+            t.create(engine)
 
-        query = query.join(PfamARegFullSignificant, and_(PfamARegFullSignificant.in_full , Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc))
-        # query = query.filter(PfamARegFullSignificant.in_full)
-        # query = query.options(Load(PfamA).load_only('pfamA_id'),
-        #                       Load(Pfamseq).load_only('pfamseq_id'))
-                              # Load(PfamARegFullSignificant).load_only("seq_start",
-                              #                                         "seq_end"))
+            pfams = scoped_db.query(PfamA.pfamA_acc).all()
+            for pf in pfams:
+                print pf[0]
 
-        return query.distinct().all()
+                query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
+                                               cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
+                                               cast(PfamARegFullSignificant.seq_end, types.Unicode)),
+                                        PfamARegFullSignificant.pfamA_acc)
+
+                query = query.join(PfamARegFullSignificant, and_(PfamARegFullSignificant.in_full , Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc, PfamARegFullSignificant.pfamA_acc == pf[0]))
+
+                engine.execute(
+                    t.insert().values(tuple(query.all())))
+
+            return query.distinct().limit(10).all()
+        else:
+            return ["Table exists"]
 
     def get(self):
         import time
