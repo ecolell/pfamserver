@@ -238,7 +238,7 @@ class Version(object):
             with open(self.extracted[filename],"r") as f_in:
                 widgets = [Percentage(), ' ', Bar(marker='#'), ' ', ETA()]
                 with ProgressBar(widgets=widgets,
-                                 max_value=max_value) as progress:
+                                 maxval=int(max_value)) as progress:
                     for line in f_in:
                         new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
                                           r'\1\n#=GF DC   Revision: \2', line)

@@ -9,6 +9,8 @@ config['LIB_PATH'] = get_python_lib()
 
 # path to store and look for pfam data (+100GB)
 config['ROOT_PATH'] = '/media/disk2/pfam_data/' # it is important to put the slash at the end..
+config['TEMP'] = '/tmp/'
+config['PFAMSCAN_PATH'] = '/media/disk2/pfam_data/31.0/pfamscan'
 config['DBMANUAL_PATH'] = '/media/disk2/database_files'
 config.update(
     #SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@192.168.101.100:3306/pfamserver',
