@@ -13,6 +13,7 @@ scoped_db = scoped_session(Session)
 app.config['SESSION_SQLALCHEMY'] = scoped_db()
 
 
+
 @app.teardown_appcontext
 def shutdown_session(exception=None):
         scoped_db.remove()

@@ -14,7 +14,7 @@ import re
 import os
 
 
-proto = ['ftp://', 'http://']
+proto = ['http://']
 select_proto = None
 
 
@@ -237,13 +237,12 @@ class Version(object):
         with open(temp_file, 'wb') as f_out:
             with open(self.extracted[filename],"r") as f_in:
                 widgets = [Percentage(), ' ', Bar(marker='#'), ' ', ETA()]
-                with ProgressBar(widgets=widgets,
-                                 max_value=max_value) as progress:
-                    for line in f_in:
-                        new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
-                                          r'\1\n#=GF DC   Revision: \2', line)
-                        f_out.write(new_line)
-                        progress.update(fsize(temp_file))
+                # with ProgressBar(widgets=widgets, maxval=int(max_value)) as progress:
+                for line in f_in:
+                    new_line = re.sub(r'^(#=GF AC   [A-Z0-9]+)\.(.+)$',
+                                      r'\1\n#=GF DC   Revision: \2', line)
+                    f_out.write(new_line)
+                    # progress.update(fsize(temp_file))
             print("->\tPFam: Updating Pfam IDs")
             shutil.move(temp_file, self.extracted[filename])
         return True
@@ -251,7 +250,7 @@ class Version(object):
     @Manager.milestone
     def reindex(self):
         print("->\tPFam: Reindexing database")
-        from pfamserver.api import fetch_call
+        from api import fetch_call
         filename = "Pfam-A.full.gz"
         index_file = '{}.ssi'.format(self.extracted[filename])
         self.manager.silent_remove(index_file)
@@ -306,14 +305,18 @@ class Version(object):
 
     def prepare(self):
         exported = False
-        while not exported:
-            self.download_pfama_full()
-            exported = self.export()
+        # while not exported:
+        #    self.download_pfama_full()
+        #    exported = self.export()
+	# lo de arriba deberia funcionar pero se queda trabado en el exported (siempre es false) como si
+	# nunca descomprimiera el archivo
+	#self.download_pfama_full()
+        #self.export()
         self.clean_accession_numbers()
         self.reindex()
-        # self.download_database_files()
-        self.download_manual_database_files()
-        self.load_database()
+        ## self.download_database_files()
+        #self.download_manual_database_files()
+        #self.load_database()
 
     def remove(self):
         path = self.manager.version_path(self)

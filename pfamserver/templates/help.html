@@ -27,12 +27,13 @@
       <li><a href='/api/PfamA?q={"filters":[{"name":"pfamA_id","op":"eq","val":"Piwi"}],"single":true}'>/api/PfamA?q={"filters":[{"name":"pfamA_id","op":"eq","val":"Piwi"}],"single":true}</a></li>
     </ul>
     <p>There are some <strong>special queries</strong> that join multiple tables and accept some specific parameters. This queries respond with a json dictionary with the "query" and "output" keys.</p>
-    <p>First, it is posible to obtain a list of <strong>pfamA</strong> registers from a <strong>uniprot_id</strong> (eg. <a href="/api/query/pfam_uniprot/egfr_human">/api/query/pfam_uniprot/egfr_human</a>).</p>
+    <p>First, it is possible to obtain a list of <strong>pfamA</strong> registers from a <strong>uniprot_id</strong> (eg. <a href="/api/query/pfam_uniprot/egfr_human">/api/query/pfam_uniprot/egfr_human</a>).</p>
     <p>Also, it is available a way to recover a list of <strong>PDB</strong> registers from a "<strong>sequence description</strong>" (eg. <a href="/api/query/pdb_sequencedescription/egfr_human,57,168">/api/query/pdb_sequencedescription/egfr_human,57,168</a>) where the 3 parameters are a <strong>uniprot_id</strong>, a <strong>seq_start</strong> and <strong>seq_end</strong> inside that uniprot register.</p>
-    <p>Then, it is accesible an alternative to obtain a <strong>small PDB image</strong> (base 64 enconded after compressed) from an specific <strong>pdb_id</strong> (eg. <a href="/api/query/pdbimage_pdb/1IVO">/api/query/pdbimage_pdb/1IVO</a>).</p> 
-    <p>Last, it is posible to obtain an MSA in stockholm format through a pfamA_acc or pfamA_id (eg. <a href="/api/query/stockholm_pfam/piwi">/api/query/stockholm_pfam/piwi</a>). The <strong>output</strong> value is <em>zip compressed</em> and then <em>base 64 encoded</em>, to optimize transport over the network.</p>
+    <p>Then, it is accessible an alternative to obtain a <strong>small PDB image</strong> (base 64 encoded after compressed) from an specific <strong>pdb_id</strong> (eg. <a href="/api/query/pdbimage_pdb/1IVO">/api/query/pdbimage_pdb/1IVO</a>).</p> 
+    <p>Last, it is possible to obtain an MSA in stockholm format through a pfamA_acc or pfamA_id (eg. <a href="/api/query/stockholm_pfam/piwi">/api/query/stockholm_pfam/piwi</a>). The <strong>output</strong> value is <em>zip compressed</em> and then <em>base 64 encoded</em>, to optimize transport over the network.</p>
     <p>Check the next examples:</p>
     <ul>
+      <li><a href="/api/query/sequencedescription_pfam/pf02171?with_pdb=true">/api/query/sequencedescription_pfam/pf02171?with_pdb=true</a></li>
       <li><a class="s_pfam" href="/api/query/stockholm_pfam/pf02171">/api/query/stockholm_pfam/pf02171</a></li>
       <li><a class="s_pfam" href="/api/query/stockholm_pfam/pax">/api/query/stockholm_pfam/pax</a></li>
       <li><a class="s_pfam" href="/api/query/stockholm_pfam/paz">/api/query/stockholm_pfam/paz</a></li>

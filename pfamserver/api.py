@@ -1,6 +1,6 @@
 from application import app, cache
 from database import scoped_db
-from flask.ext.restless import APIManager
+from flask_restless import APIManager
 from sqlalchemy import or_, types
 from sqlalchemy.orm import Load
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,7 +10,7 @@ from models import classes
 if classes:
     from models import Uniprot, UniprotRegFull, PfamA, PdbPfamAReg, Pdb, PdbImage, \
         PfamARegFullSignificant, Pfamseq
-from flask.ext.restful import Api, Resource
+from flask_restful import Api, Resource
 from flask_restful.inputs import boolean
 from flask import request
 import os
@@ -45,6 +45,13 @@ mafft_call = ('MAFFT_BINARIES={0} {0}/mafft --retree 2 --maxiterate 0 '
               '--thread {1} --quiet').format(lib_path + '/mafft/core',
                                              thread_count)
 
+def preload_pfamseq_map():
+    query = scoped_db.query(Pfamseq.pfamseq_id, Pfamseq.pfamseq_acc).all()
+    return {acc: id for id, acc in query}
+
+print("Preloading pfamseq_acc to pfamseq_id map:")
+print("   This mighy take a few minutes:")
+pfamseq_map = preload_pfamseq_map()
 
 def fill(seqrecord, length):
     seq = seqrecord.seq.__dict__
@@ -169,6 +176,56 @@ class SequenceDescriptionFromPfamAPI(Resource):
             response['size'] = len(response['output'])
         return response
 
+class SequenceDescriptionFromPfamAPIEx(Resource):
+
+    def get_descriptions(self, code, with_pdb):
+        #icode = "%{:}%".format(code)
+        subquery = scoped_db.query(PfamA)
+        subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
+                                       PfamA.pfamA_id.ilike(code))).distinct().subquery()
+
+        #query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
+        #query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
+        #query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
+        #query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
+
+        query = scoped_db.query(PfamARegFullSignificant.pfamseq_acc, concat('/',
+                                       cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
+                                       cast(PfamARegFullSignificant.seq_end, types.Unicode)))
+        #query = query.join(PfamARegFullSignificant, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
+        query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
+
+        if with_pdb:
+            subquery2 = scoped_db.query(PdbPfamAReg)
+            subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
+            query = query.filter(PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc)
+        
+        query = query.filter(PfamARegFullSignificant.in_full)
+        query = query.options(Load(Pfamseq).load_only('pfamseq_id'),
+                              Load(PfamARegFullSignificant).load_only("seq_start",
+                                                                      "seq_end"))
+        #query = query.order_by(Pfamseq.pfamseq_id.asc())
+
+        results = query.distinct().all()
+        results = [pfamseq_map[prefix] + suffix for prefix, suffix in results]
+
+        return results
+
+    #@cache.memoize(timeout=3600)
+    def get(self, query):
+        with_pdb = boolean(request.args.get('with_pdb', 'true'))
+        response = {'query': query, 'with_pdb': with_pdb}
+        import time
+        a = time.time()
+        output = self.get_descriptions(query, with_pdb)
+        b = time.time()
+        print "get_descriptions: " + str(b-a)
+        print type(output)
+        if output:
+            response['output'] = output #[o[0]+o[1] for o in output]
+            response['size'] = len(response['output'])
+        return response
+
 
 class PdbFromSequenceDescriptionAPI(Resource):
 
@@ -272,12 +329,19 @@ api.add_resource(StockholmFromPfamAPI,
 api.add_resource(PfamFromUniprotAPI,
                  '/api/query/pfam_uniprot/<string:query>',
                  endpoint='pfam_uniprot')
+
 api.add_resource(SequenceDescriptionFromPfamAPI,
                  '/api/query/sequencedescription_pfam/<string:query>',
                  endpoint='sequencedescription_pfam')
+
+api.add_resource(SequenceDescriptionFromPfamAPIEx,
+                 '/api/query/sequencedescription_pfam_ex/<string:query>',
+                 endpoint='sequencedescription_pfam_ex')
+
 api.add_resource(PdbFromSequenceDescriptionAPI,
                  '/api/query/pdb_sequencedescription/<string:query>',
                  endpoint='pdb_sequencedescription')
+
 api.add_resource(PdbImageFromPdbAPI,
                  '/api/query/pdbimage_pdb/<string:query>',
                  endpoint='pdbimage_pdb')
