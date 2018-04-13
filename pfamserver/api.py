@@ -327,10 +327,8 @@ class SequenceDescriptionFromPfam3API(Resource):
         query = scoped_db.query(Pfamjoinpfamseq.pfamseq_id, Pfamjoinpfamseq.pfamA_acc)
         query = query.filter(Pfamjoinpfamseq.pfamA_acc == subquery.c.pfamA_acc)
 
-        # if with_pdb:
-        #     subquery2 = scoped_db.query(PdbPfamAReg)
-        #     subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
-        #     query = query.filter(Pfamjoinpfamseq.pfamseq_acc == subquery2.c.pfamseq_acc)
+        if with_pdb:
+            query = query.filter(Pfamjoinpfamseq.has_pdb == 1)
 
         query = query.order_by(Pfamjoinpfamseq.pfamseq_id.asc())
         return query.distinct().all()
