@@ -20,7 +20,7 @@ filename = 'uniprot_sprot.dat'
 db_path = '{:s}/uniprot_data/{:s}'.format(lib_path, filename)
 server = {'path': '/pub/databases/uniprot/current_release/knowledgebase/complete/',
           'url': 'ftp.uniprot.org'}
-proto = ['ftp://']
+proto = ['http://']
 select_proto = None
 config_file = '{:s}/uniprot_data/version.json'.format(lib_path)
 

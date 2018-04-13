@@ -36,7 +36,7 @@ def init_app(app):
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         app.stop_t = Event()
         app.t = Thread(target=run_schedule, args=(app.stop_t, ))
-        app.t.start()
+        #app.t.start()
 
 
 def finish_app(app):
