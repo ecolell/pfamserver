@@ -177,54 +177,6 @@ class StockholmFromPfamAPI(Resource):
         return {'query': pfamA_acc,
                 'output': b64encode(compress(output))}
 
-class SequenceDescriptionSeedFromPfamAPI(Resource):
-
-    def get_descriptions(self, code, with_pdb):
-        #icode = "%{:}%".format(code)
-        subquery = scoped_db.query(PfamA)
-        subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                       PfamA.pfamA_id.ilike(code))).distinct().subquery()
-
-        #query = scoped_db.query(UniprotRegFull, Uniprot, PdbPfamAReg)
-        #query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
-        #query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
-        #query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
-
-        query = scoped_db.query(concat(Pfamseq.pfamseq_id, '/',
-                                       cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
-                                       cast(PfamARegFullSignificant.seq_end, types.Unicode)))
-        query = query.join(PfamARegFullSignificant, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
-        query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
-
-        if with_pdb:
-            subquery2 = scoped_db.query(PdbPfamAReg)
-            subquery2 = subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc).distinct().subquery()
-            query = query.filter(PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc)
-
-        query = query.filter(PfamARegFullSignificant.in_full)
-        query = query.options(Load(Pfamseq).load_only('pfamseq_id'),
-                              Load(PfamARegFullSignificant).load_only("seq_start",
-                                                                      "seq_end"))
-        query = query.order_by(Pfamseq.pfamseq_id.asc())
-        return query.distinct().all()
-
-    @cache.memoize(timeout=3600)
-    def get(self, query):
-        with_pdb = boolean(request.args.get('with_pdb', 'true'))
-        response = {'query': query, 'with_pdb': with_pdb}
-        import time
-        start_time_sql = time.time()
-        output = self.get_descriptions(query, with_pdb)
-        end_time_sql = time.time()
-        if output:
-            start_time_loop = time.time()
-            response['output'] = [o[0] for o in list(output)]
-            end_time_loop = time.time()
-            response['size'] = len(response['output'])
-            response['time_sql'] = end_time_sql - start_time_sql
-            response['time_loop'] = end_time_loop - start_time_loop
-        return response
-
 class SequenceDescriptionFromPfamAPI(Resource):
 
     def get_descriptions(self, code, with_pdb):
