@@ -88,8 +88,10 @@ def create_aux_pfamA_pfamseqid():
 
         pfams = db.query(PfamA.pfamA_acc).all()
         for pf in pfams:
+        # for pf in ["PF00451", "PF00452", "PF00453"]:
             print pf[0]
             pfam = pf[0]
+            # pfam = pf
 
             query = db.query(concat(Pfamseq.pfamseq_id, '/',
                                            cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
@@ -118,8 +120,9 @@ def create_aux_pfamA_pfamseqid():
             query = query.add_columns(literal_column("0").label("has_pdb")).distinct()
             query_pdb = query_pdb.add_columns(literal_column("1").label("has_pdb")).distinct()
             query_union = query.union(query_pdb)
-            engine.execute(
-                t.insert().values(tuple(query_union.all())))
+            if query_union.first():
+                engine.execute(
+                    t.insert().values(tuple(query_union.all())))
         return ["Succesfully created pfamjoinpfamseq"]
 
     else:
