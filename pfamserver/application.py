@@ -1,5 +1,5 @@
 from flask import Flask
-from flask.ext.cache import Cache
+from flask_cache import Cache
 from config import config
 import os
 from flask.json import JSONEncoder
