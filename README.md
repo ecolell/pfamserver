@@ -2,8 +2,8 @@
 
 A python service that expose an api to the pfam database.
 
-[![build status](http://wichi.no-ip.org/leloir/pfamserver/badges/master/build.svg)](http://wichi.no-ip.org/leloir/pfamserver/commits/master)
-[![coverage report](http://wichi.no-ip.org/leloir/pfamserver/badges/master/coverage.svg)](http://wichi.no-ip.org/leloir/pfamserver/commits/master)
+[![build status](https://wichi.no-ip.org/leloir/pfamserver/badges/master/build.svg)](https://wichi.no-ip.org/leloir/pfamserver/commits/master)
+[![coverage report](https://wichi.no-ip.org/leloir/pfamserver/badges/master/coverage.svg)](https://wichi.no-ip.org/leloir/pfamserver/commits/master)
 [![Stories in Ready](https://badge.waffle.io/ecolell/pfamserver.png?label=ready&title=Ready)](https://waffle.io/ecolell/pfamserver)
 
 
@@ -33,7 +33,7 @@ Configure
     export PROJECT_HOME=$HOME/Devel
     source /usr/local/bin/virtualenvwrapper.sh
 
-Then, you should download [this repository](http://wichi.no-ip.org/leloir/pfamserver) and execute:
+Then, you should download [this repository](https://wichi.no-ip.org/leloir/pfamserver) and execute:
 
     $ mkvirtualenv pfamserver
     $ workon pfamserver
@@ -98,7 +98,7 @@ To test all the project you should use the command:
 
     $ py.test
 
-If you want to help us or report an issue join to us through our [issue tracker](http://wichi.no-ip.org/leloir/pfamserver/issues).
+If you want to help us or report an issue join to us through our [issue tracker](https://wichi.no-ip.org/leloir/pfamserver/issues).
 
 
 Running
@@ -116,7 +116,7 @@ At midnight, when the deploy of the last update is ready (because was runned on 
 Example
 =======
 
-A json API is available through [http://localhost:5001/api/](http://localhost:5001/api/), or use the graphical interface to discover some pfams database tables and apply some filters (access to [http://localhost:5001/admin](http://localhost:5001/admin)).
+A json API is available through [https://localhost:5001/api/](http://localhost:5001/api/), or use the graphical interface to discover some pfams database tables and apply some filters (access to [https://localhost:5001/admin](http://localhost:5001/admin)).
 
 There are some **special queries** that join multiple tables and accept some specific parameters. This queries respond with a json dictionary with the "query" and "output" keys.
 
@@ -134,4 +134,4 @@ Please, check [http://localhost:5001/](http://localhost:5001/) for more updated 
 About
 =====
 
-This software is developed by [LELOIR](http://leloir.org.ar/). You can contact us to [eloy.colell@gmail.com](mailto:eloy.colell@gmail.com).
+This software is developed by [LELOIR](https://leloir.org.ar/). You can contact us to [eloy.colell@gmail.com](mailto:eloy.colell@gmail.com).
