@@ -28,6 +28,8 @@ share/
 include/
 pip-selfcheck.json
 database_files/
+node_modules/
+celerybeat-schedule
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
