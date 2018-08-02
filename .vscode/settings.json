@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "${env.HOME}/.virtualenvs/pfamserver/bin/python",
+    "python.unitTest.unittestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "python.unitTest.pyTestEnabled": true,
+    "python.unitTest.pyTestArgs": [
+        "--no-cov",
+    ],
+    "python.linting.pylintEnabled": false,
+}
