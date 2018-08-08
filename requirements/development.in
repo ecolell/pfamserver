@@ -1,0 +1,14 @@
+bumpversion
+cryptography==2.2.2
+futures==3.1.1; python_version <= '2.7'
+isort
+pdbpp
+pip-tools
+pycodestyle
+pydot==1.0.2; python_version <= '2.7'
+pylint
+requests[security]==2.9.1
+rope
+safety
+sqltap
+vim-debug

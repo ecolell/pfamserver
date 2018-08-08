@@ -1,0 +1,14 @@
+cryptography==2.2.2
+factory-boy
+Faker
+flower
+futures==3.1.1
+pytest
+pytest-cov
+pytest-html
+pytest-mock
+pytest-profiling
+pytest-sugar
+requests[security]==2.9.1
+responses
+tox
