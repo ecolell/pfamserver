@@ -1,3 +1,4 @@
+"""
 from application import app, cache
 from database import scoped_db
 from flask.ext.restless import APIManager
@@ -281,3 +282,4 @@ api.add_resource(PdbFromSequenceDescriptionAPI,
 api.add_resource(PdbImageFromPdbAPI,
                  '/api/query/pdbimage_pdb/<string:query>',
                  endpoint='pdbimage_pdb')
+"""

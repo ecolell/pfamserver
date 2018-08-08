@@ -1,3 +1,7 @@
+#from .pdb_pfam_a_reg import PdbPfamAReg
+
+
+"""
 # from application import app
 from database import engine, scoped_db as db
 from sqlalchemy.ext.automap import automap_base
@@ -63,3 +67,4 @@ classes = dict(Base.classes.items())
 globals().update(classes)
 classes = classes.values()
 print "--> Coverage: ", len(classes), "/", len(loader.tables)
+"""

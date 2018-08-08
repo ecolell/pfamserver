@@ -1,18 +1,15 @@
-from application import app
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from autoupdate.core import Manager
-
-manager = Manager()
-db_path = app.config['SQLALCHEMY_DATABASE_URI'] + manager.get_versions()[0]
-manager.prepare_database(db_path)
-engine = create_engine(db_path, pool_size=20, max_overflow=100)
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Session.configure(bind=engine)
-scoped_db = scoped_session(Session)
-app.config['SESSION_SQLALCHEMY'] = scoped_db()
+from .extensions import db
+import sqlalchemy as sa
 
 
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-        scoped_db.remove()
+class TimestampMixin(object):
+    """Mixin to add timestamp columns to SQLAlchemy models"""
+
+    created = sa.Column(sa.types.DateTime(timezone=True), default=sa.func.now())
+    updated = sa.Column(sa.types.DateTime(timezone=True), default=sa.func.now(), onupdate=sa.func.now())
+
+
+class Base(TimestampMixin, db.Model):
+    """Base Class for SQLAlchemy models"""
+
+    __abstract__ = True
