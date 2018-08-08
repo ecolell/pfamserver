@@ -26,8 +26,7 @@ class BaseConfig(object):
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     # Flask Security
-    SECRET_KEY = 'a6a5c4dce409af370a1c94ab07c447a365dadfe99a8d5df635a556f9'
-    OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 3600 * 24 * 365 * 10  # 10 years in seconds
+    SECRET_KEY = 'f49dc0a9de00d4e337e74b87bee8dbf806765ec73212ee7c9e6b1b5079a75eb7'
     SECURITY_PASSWORD_HASH = 'sha512_crypt'
 
     SECURITY_TRACKABLE = True
@@ -52,37 +51,13 @@ class BaseConfig(object):
 
     WEBPACK_MANIFEST_PATH = './static/manifest.json'
 
-    CELERYBEAT_SCHEDULE = {
-        'detect-new-version-every-1-hour': {
-            'task': 'register_new_versions',
-            'schedule': timedelta(hours=1)
-        },
-    #    'notifier-jobrequest-every-10-seconds': {
-    #        'task': 'job_request.notifier',
-    #        'schedule': timedelta(seconds=10)
-    #    },
-    #    'clean-jobrequest-every-2-hours': {
-    #        'task': 'job_request.clean_open_jobs',
-    #        'schedule': timedelta(hours=2)
-    #    },
-    #    'clean-jobrequest-every-2-hours': {
-    #        'task': 'job_request.clean_finished_jobs',
-    #        'schedule': timedelta(days=30)
-    #    },
-    }
-
-    CELERY_CORES = 3
-
     SEND_FILE_MAX_AGE_DEFAULT=3600
 
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:root@localhost:3306/pfamserver')
     PFAMSERVER_ROOT_PATH = os.getenv('PFAMSERVER_ROOT_PATH',
                                      'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/')
 
-
-    # Celery configuration
-    CELERY_SERVER_IP = env.str('CELERY_SERVER_IP', 'localhost')
-    CELERY_BROKER_URL = 'amqp://guest:guest@{:}:5672//'.format(CELERY_SERVER_IP)
+    SENTRY_CONFIG = {}
 
     @staticmethod
     def init_app(app):
