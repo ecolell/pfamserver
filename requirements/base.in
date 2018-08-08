@@ -7,12 +7,11 @@ Flask==1.0.2
 Flask-Admin
 Flask-Caching==1.2.0
 Flask-Collect
+flask-compress
 Flask-DotEnv==0.1.0
 Flask-Mail==0.9.1
-Flask-Migrate
 flask-restplus
 Flask-Script
-Flask-Security==1.7.5
 Flask-SQLAlchemy
 Flask-Webpack
 Flask-WTF
@@ -22,7 +21,7 @@ futures==3.1.1; python_version <= '2.7'
 gunicorn
 honcho==0.7.1
 merry
-pymysql==0.7.1
+pymysql
 python-dotenv
 raven
 requests[security]==2.9.1
