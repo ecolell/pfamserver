@@ -1,0 +1,135 @@
+.brand-beta {
+    position: relative;
+    top: 10px;
+    left: -30px;
+    font-size: 10pt;
+    color: white;
+}
+
+textarea {
+    resize: none;
+    enabled: false;
+}
+
+.dropzone {
+    min-height: 60px;
+    padding: 0.5em;
+    resize: none;
+    overflow: hidden;
+}
+
+.dragzone {
+    border: 4px dashed #000000;
+    font-size: 30pt;
+    padding-top: 40px;
+    text-align: center;
+    background: #ffffff url("./img/drophere.png") no-repeat center 130px;
+    min-height: 240px;
+}
+
+.label {
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:9pt;
+    font-weight: 500;
+}
+
+.input-tag {
+    display: inline-flex;
+    text-align: left;
+    white-space: normal;
+}
+
+/*
+Generic Styling, for Desktops/Laptops
+*/
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+td, th {
+    padding: 6px;
+    text-align: left;
+}
+
+
+/*
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr {
+		display: block;
+	}
+
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+
+	tr { border: 1px solid #ccc; }
+
+	td {
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee;
+		position: relative;
+		padding-left: 50%;
+	}
+
+	td:before {
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%;
+		padding-right: 10px;
+		white-space: nowrap;
+	}
+
+	/*
+	Label the data
+	*/
+	td.msa:nth-of-type(1):before { content: "Accession"; }
+	td.msa:nth-of-type(2):before { content: "Description"; }
+	td.msa:nth-of-type(3):before { content: "Start"; }
+	td.msa:nth-of-type(4):before { content: "End"; }
+	td.msa:nth-of-type(5):before { content: "Sequences"; }
+
+	td.pdb:nth-of-type(1):before { content: "Identification"; }
+	td.pdb:nth-of-type(2):before { content: "Chain"; }
+	td.pdb:nth-of-type(3):before { content: "Title"; }
+	td.pdb:nth-of-type(4):before { content: "Start"; }
+	td.pdb:nth-of-type(5):before { content: "End"; }
+
+	td.algorithms:nth-of-type(1):before { content: "Name"; }
+	td.algorithms:nth-of-type(2):before { content: "Parameters"; }
+
+	td.algorithm:nth-of-type(1):before { content: "Value"; }
+}
+
+.not_default_value {
+    background-color: #fffacd;
+}
+
+.algorithm input {
+    width: 70px;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+@media (min-width: 1900px) {
+  .container {
+    width: 1550px;
+  }
+}
+
+.mini-toastr {
+    margin-top: 70px;
+}
