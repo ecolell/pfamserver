@@ -53,6 +53,7 @@ coverage.xml
 *,cover
 .pytest_cache
 .vs
+pfamserver/static/manifest.json
 
 # Translations
 *.mo
