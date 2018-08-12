@@ -14,7 +14,7 @@ api = Api(
 )
 
 
-#from pfamserver.api.v0.job_requests import ns as job_requests
+from pfamserver.api.v0.uniprot import ns as uniprot
 #from pfamserver.api.v0.msa_settings import ns as msa_settings
 #from pfamserver.api.v0.pdb_settings import ns as pdb_settings
 #from pfamserver.api.v0.algorithms import ns as algorithms

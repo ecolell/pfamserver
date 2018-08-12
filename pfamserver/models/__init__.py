@@ -1,5 +1,7 @@
 from .pfam_a import PfamA
 #from .pdb_pfam_a_reg import PdbPfamAReg
+from .uniprot import Uniprot
+from .uniprot_reg_full import UniprotRegFull
 
 
 """

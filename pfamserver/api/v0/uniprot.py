@@ -23,7 +23,7 @@ class UniprotAPI(Resource):
     @ns.response(200, "response")
     @ns.doc('Obtain a pfams list from a uniprot.')
     #@ns.marshal_with(schemas.pfams_from_uniprot)
-    @cache.cached(timeout=3600)
+    #@cache.cached(timeout=3600)
     def get(self, uniprot):
         pfams = uniprot_service.get_pfams_from_uniprot(uniprot)
         return pfams, 200

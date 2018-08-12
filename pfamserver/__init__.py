@@ -58,7 +58,7 @@ def register_blueprints(app):
 
     prefix = app.config.get('ROOT_URL_PREFIX', '')
     app.register_blueprint(static.blueprint)
-    #app.register_blueprint(api_v0, url_prefix=prefix + '/api/v0')
+    app.register_blueprint(api_v0, url_prefix=prefix + '/api/v0')
 
     if app.config.get('DEBUG'):
         app.register_blueprint(apidoc.apidoc, url_prefix=prefix)

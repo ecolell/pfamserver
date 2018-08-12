@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from pfamserver.database import db, Base
+from sqlalchemy import PrimaryKeyConstraint
 
 
 class PfamARegFullSignificant(Base):

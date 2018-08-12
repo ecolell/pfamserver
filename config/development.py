@@ -6,7 +6,6 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
     # BOOTSTRAP_SERVE_LOCAL = True
-    SQLALCHEMY_DATABASE_URI = env.str('SQLALCHEMY_DATABASE_URI', 'postgres://pfamserver:password@localhost:5432/pfamserver')
     MAIL_ENABLED = True
 
     @staticmethod
