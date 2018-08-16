@@ -2,9 +2,9 @@ from config.base import env, BaseConfig
 
 
 class TestingConfig(BaseConfig):
-    DEBUG = False
+    DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = env.str('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
+    # SQLALCHEMY_DATABASE_URI = env.str('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
     MAIL_ENABLED = False
 
     @staticmethod

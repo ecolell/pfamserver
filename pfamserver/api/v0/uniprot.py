@@ -19,11 +19,16 @@ def handle_root_exception(error):
 
 @ns.route('/<uniprot>/pfams')
 class UniprotAPI(Resource):
+    schema = schemas.PfamASchema
 
     @ns.response(200, "response")
     @ns.doc('Obtain a pfams list from a uniprot.')
-    #@ns.marshal_with(schemas.pfams_from_uniprot)
     #@cache.cached(timeout=3600)
     def get(self, uniprot):
-        pfams = uniprot_service.get_pfams_from_uniprot(uniprot)
-        return pfams, 200
+        uniprot = uniprot_service.get_pfams_from_uniprot(uniprot)
+        data, errors = self.schema.dump(uniprot.pfams, many=True)
+        payload = {
+            'query': uniprot.uniprot_id,
+            'output': data
+        }
+        return payload, 200

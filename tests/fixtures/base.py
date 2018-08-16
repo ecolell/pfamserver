@@ -5,6 +5,7 @@ import pytest
 from pfamserver import create_app
 from pfamserver.database import db as _db
 from contextlib import closing
+from sqlalchemy import MetaData
 import os
 import sys
 import json
@@ -22,14 +23,18 @@ def session_db(request, session_app):
     app = session_app
     _db.app = app
 
-    def teardown():
-        _db.engine.execute('DROP SCHEMA IF EXISTS public CASCADE')
-        _db.engine.execute('CREATE SCHEMA public AUTHORIZATION pfamserver')
+    #def teardown():
+    #    meta = MetaData()
+    #    with closing(_db.engine.connect()) as con:
+    #        trans = con.begin()
+    #        for table in reversed(meta.sorted_tables):
+    #            con.execute(table.delete())
+    #        trans.commit()
 
-    teardown()
-    _db.create_all()
+    #teardown()
+    #_db.create_all()
 
-    request.addfinalizer(teardown)
+    #request.addfinalizer(teardown)
     return _db
 
 
@@ -89,7 +94,7 @@ def testdb(session_db, request, session_app):
 
         engine.dispose()
 
-    request.addfinalizer(teardown)
+    #request.addfinalizer(teardown)
     return app
 
 
