@@ -30,4 +30,5 @@ SQLAlchemy
 SQLAlchemy-Utils
 sqlparse
 uwsgi
+webargs
 Werkzeug

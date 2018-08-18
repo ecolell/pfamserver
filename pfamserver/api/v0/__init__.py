@@ -15,8 +15,4 @@ api = Api(
 
 
 from pfamserver.api.v0.uniprot import ns as uniprot
-#from pfamserver.api.v0.msa_settings import ns as msa_settings
-#from pfamserver.api.v0.pdb_settings import ns as pdb_settings
-#from pfamserver.api.v0.algorithms import ns as algorithms
-#from pfamserver.api.v0.algorithm_settings import ns as algorithm_settings
-#from pfamserver.api.v0.notifications import ns as notifications
+from pfamserver.api.v0.pfam import ns as pfam

@@ -3,7 +3,6 @@ from flask_restplus import Resource, abort
 from pfamserver.api.v0 import api, schemas
 from pfamserver.services import uniprot_service
 from pfamserver.extensions import cache
-from flask import request, current_app
 
 
 ns = api.namespace('uniprots', decorators=[
@@ -19,16 +18,12 @@ def handle_root_exception(error):
 
 @ns.route('/<uniprot>/pfams')
 class UniprotAPI(Resource):
-    schema = schemas.PfamASchema
+    schema = schemas.UniprotSchema()
 
     @ns.response(200, "response")
     @ns.doc('Obtain a pfams list from a uniprot.')
-    #@cache.cached(timeout=3600)
+    @cache.cached(timeout=3600)
     def get(self, uniprot):
         uniprot = uniprot_service.get_pfams_from_uniprot(uniprot)
-        data, errors = self.schema.dump(uniprot.pfams, many=True)
-        payload = {
-            'query': uniprot.uniprot_id,
-            'output': data
-        }
-        return payload, 200
+        data, errors = self.schema.dump(uniprot)
+        return data, 200

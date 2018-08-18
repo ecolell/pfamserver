@@ -1,20 +1,20 @@
 from __future__ import unicode_literals
-from pfamserver.database import db, Base
+from pfamserver.database import db
 from sqlalchemy import PrimaryKeyConstraint
 
 
-class PfamARegFullSignificant(Base):
+class PfamARegFullSignificant(db.Model):
+    __tablename__ = 'pfamA_reg_full_significant'
+
     #auto_pfamA_reg_full = db.Column(
     #    db.Integer,
     #    primary_key=True)
     pfamA_acc = db.Column(
         db.UnicodeText,
-        index=True,
-        unique=True)
+        index=True)
     pfamseq_acc = db.Column(
         db.UnicodeText,
-        index=True,
-        unique=True)
+        index=True)
     seq_start = db.Column(
         db.Integer,
         index=True)

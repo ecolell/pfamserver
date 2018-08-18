@@ -21,9 +21,10 @@ class UniprotServiceError(Exception):
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise UniprotServiceError('Job already Fixed.')
+    raise UniprotServiceError('Uniprot desn''t exists.')
 
 
+@merry._try
 def get_pfams_from_uniprot(uniprot):
     uniprot = uniprot.upper()
     query = db.session.query(Uniprot)
@@ -34,4 +35,4 @@ def get_pfams_from_uniprot(uniprot):
     query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
     query = query.filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc)
     query = query.order_by(UniprotRegFull.seq_start)
-    return query.first()
+    return query.one()
