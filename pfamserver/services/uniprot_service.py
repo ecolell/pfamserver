@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import or_
 
 from pfamserver.models import Uniprot, UniprotRegFull, PfamA
-from pfamserver.extensions import db, cache
+from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 

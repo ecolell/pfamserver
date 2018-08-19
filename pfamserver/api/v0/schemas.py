@@ -1,6 +1,5 @@
 from . import api
 from marshmallow import Schema, fields
-from flask_restplus import reqparse
 from flask_restplus import inputs
 
 
@@ -17,5 +16,18 @@ class UniprotSchema(Schema):
     output = fields.List(fields.Nested(UniprotRegFullSchema), attribute='pfams')
 
 
-pfam_a_query = reqparse.RequestParser()
-pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', default='true')
+class PdbPfamARegSchema(Schema):
+    pdb_id = fields.Str()
+    chain = fields.Str()
+    pdb_res_start = fields.Int()
+    pdb_res_end = fields.Int()
+    pfamA_acc = fields.Str()
+    title = fields.Str(attribute='pdb.title')
+    resolution = fields.Float(attribute='pdb.resolution')
+    method = fields.Str(attribute='pdb.method')
+    author = fields.Str(attribute='pdb.author')
+    date = fields.Str(attribute='pdb.date')
+
+
+pfam_a_query = api.parser()
+pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', default=True)

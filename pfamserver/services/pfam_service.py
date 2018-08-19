@@ -6,7 +6,7 @@ from sqlalchemy.sql.functions import concat
 from sqlalchemy import or_, types
 from sqlalchemy.orm import Load
 from pfamserver.models import PfamA, PfamARegFullSignificant, Pfamseq, PdbPfamAReg
-from pfamserver.extensions import db, cache
+from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 

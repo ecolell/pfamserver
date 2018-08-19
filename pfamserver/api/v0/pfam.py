@@ -16,15 +16,22 @@ def handle_root_exception(error):
     return {'message': error.message}, 400
 
 
+def make_cache_key(*args, **kwargs):
+    path = request.path
+    args = str(request.args.items())
+    return (path + args).encode('utf-8')
+
+
 @ns.route('/<pfam>/sequence_descriptions')
 class PfamAAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc('Obtain a sequence_description list from a pfam.')
+    @cache.cached(timeout=3600, key_prefix=make_cache_key)
     @ns.expect(schemas.pfam_a_query)
-    @cache.cached(timeout=3600)
     def get(self, pfam):
-        with_pdb = request.args.get('with_pdb', True)
+        kwargs = schemas.pfam_a_query.parse_args()
+        with_pdb = kwargs['with_pdb']
         sequence_descriptions = pfam_service.get_sequence_descriptions_from_pfam(pfam, with_pdb)
         data = {'query': pfam,
                 'with_pdb': with_pdb,

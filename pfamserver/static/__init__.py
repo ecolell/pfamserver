@@ -1,7 +1,6 @@
 import os
 from flask import Blueprint, send_from_directory, url_for
 from flask import render_template
-from flask_login import login_required
 
 from pfamserver.extensions import cache
 

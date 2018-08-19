@@ -10,11 +10,13 @@ class PdbPfamAReg(db.Model):
     #    db.Integer,
     #    primary_key=True)
     auto_uniprot_reg_full = db.Column(
-        db.UnicodeText,
-        index=True)
+        db.UnicodeText(),
+        db.ForeignKey('uniprot_reg_full.auto_uniprot_reg_full'))
+    uniprot_reg_full = db.relationship('UniprotRegFull', backref=db.backref('pdbs'))
     pdb_id = db.Column(
-        db.UnicodeText,
-        index=True)
+        db.UnicodeText(),
+        db.ForeignKey('pdb.pdb_id'))
+    pdb = db.relationship('Pdb', backref=db.backref('pfams'))
     chain = db.Column(
         db.UnicodeText,
         index=True)

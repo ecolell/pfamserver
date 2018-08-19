@@ -4,9 +4,9 @@ from sqlalchemy import PrimaryKeyConstraint
 
 
 class UniprotRegFull(db.Model):
-    #auto_pfamA_reg_full = db.Column(
-    #    db.Integer,
-    #    primary_key=True)
+    auto_uniprot_reg_full = db.Column(
+        db.Integer,
+        primary_key=True)
     pfamA_acc = db.Column(
         db.UnicodeText(),
         db.ForeignKey('pfamA.pfamA_acc'))
