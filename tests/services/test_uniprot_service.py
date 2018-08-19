@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from pfamserver.services import uniprot_service as service
 
 
