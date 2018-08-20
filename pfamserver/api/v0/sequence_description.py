@@ -15,7 +15,7 @@ def handle_root_exception(error):
     return {'message': error.message}, 400
 
 
-@ns.route('/<uniprot_id>,<int:seq_start>,<int:seq_end>/pdbs')
+@ns.route('/<uniprot_id>/<int:seq_start>-<int:seq_end>/pdbs')
 class SequenceDescriptionAPI(Resource):
     schema = schemas.PdbPfamARegSchema()
 

@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import json
 
 
-def test_job_request_create_post(db, client):
+def test_get_uniprot_pfams(db, client):
     headers = [('Accept', 'application/json'),
                ('Content-Type', 'application/json')]
     res = client.get('/api/v0/uniprots/egfr_human/pfams', headers=headers)

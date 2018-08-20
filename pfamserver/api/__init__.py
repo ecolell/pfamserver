@@ -68,57 +68,9 @@ class StockholmFromPfamAPI(Resource):
                 'output': b64encode(compress(output))}
 
 
-class PdbFromSequenceDescriptionAPI(Resource):
-
-    def query(self, uniprot_id, seq_start, seq_end):
-        query = scoped_db.query(Uniprot, UniprotRegFull, PdbPfamAReg, Pdb)
-        query = query.filter(Uniprot.uniprot_id == uniprot_id,
-                             UniprotRegFull.seq_start == seq_start,
-                             UniprotRegFull.seq_end == seq_end,
-                             UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc,
-                             UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full,
-                             PdbPfamAReg.pdb_id == Pdb.pdb_id)
-        query = query.order_by(PdbPfamAReg.pdb_id)
-        query = query.order_by(PdbPfamAReg.chain)
-        query = query.options(Load(PdbPfamAReg).load_only("pdb_id", "chain", "pdb_res_start", "pdb_res_end"),
-                              Load(UniprotRegFull).load_only("pfamA_acc"),
-                              Load(Pdb).load_only("title", "resolution", "method", "date", "author"))
-        return query.all()
-
-    def serialize(self, element):
-        authors = element.Pdb.author.split(',')
-        return {
-            'pdb_id': element.PdbPfamAReg.pdb_id,
-            'chain': element.PdbPfamAReg.chain,
-            'pdb_res_start': element.PdbPfamAReg.pdb_res_start,
-            'pdb_res_end': element.PdbPfamAReg.pdb_res_end,
-            'pfamA_acc': element.UniprotRegFull.pfamA_acc,
-            'title': element.Pdb.title,
-            'resolution': float(element.Pdb.resolution),
-            'method': element.Pdb.method,
-            'author': (authors[0] + ' et. al.'
-                       if len(authors) > 2 else ''),
-            'date': element.Pdb.date
-        }
-
-    @cache.cached(timeout=3600)
-    def get(self, query):
-        uniprot_id, seq_start, seq_end = query.split(',')
-        response = {
-            'query': {
-                'uniprot_id': uniprot_id,
-                'seq_start': seq_start,
-                'seq_end': seq_end}}
-        output = self.query(uniprot_id, seq_start, seq_end)
-        if output:
-            response['output'] = map(self.serialize, output)
-        return response
 
 
 api.add_resource(StockholmFromPfamAPI,
                  '/api/query/stockholm_pfam/<string:query>',
                  endpoint='stockholm_pfam')
-api.add_resource(PdbFromSequenceDescriptionAPI,
-                 '/api/query/pdb_sequencedescription/<string:query>',
-                 endpoint='pdb_sequencedescription')
 """
