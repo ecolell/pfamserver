@@ -2,10 +2,10 @@ stages:
 - frontend-check
 - backend27-safety
 - backend27-style
-  #- backend27-tests
-  #- backend36-tests
-  #- master-deploy
-  #- master-test-e2e
+- backend27-tests
+- backend36-tests
+- master-deploy
+- master-test-e2e
 - production-deploy
 
 deploy_production:
