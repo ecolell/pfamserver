@@ -27,8 +27,7 @@ def install(version='3.2.1'):
     cmds = [
         'wget http://eddylab.org/software/hmmer/hmmer-{version}.tar.gz',
         'tar xvzf hmmer-{version}.tar.gz',
-        'cd hmmer-{version}',
-        './configure',
-        'make'
+        'cd hmmer-{version} && ./configure',
+        'cd hmmer-{version} && make'
     ]
     run(cmds, version=version)
