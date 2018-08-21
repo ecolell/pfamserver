@@ -75,7 +75,6 @@ protractor_test:
     PIP_CACHE_DIR: "pip-cache"
     NODE_TLS_REJECT_UNAUTHORIZED: 0
   script:
-  - npm --proxy http://192.168.101.105:8080 --https-proxy http://192.168.101.105:8080 --strict-ssl false install v8-profiler@5.7.0
   - npm --proxy http://192.168.101.105:8080 --https-proxy http://192.168.101.105:8080 --strict-ssl false install .
   - ./node_modules/protractor/bin/webdriver-manager update && xvfb-run -a npm run test-e2e --headless"
   allow_failure: true
@@ -96,7 +95,6 @@ frontend:
   environment:
     name: review/$CI_COMMIT_REF_NAME
   script:
-  - npm --proxy http://192.168.101.105:8080 --https-proxy http://192.168.101.105:8080 --strict-ssl false install v8-profiler@5.7.0
   - npm --proxy http://192.168.101.105:8080 --https-proxy http://192.168.101.105:8080 --strict-ssl false install .
   - npm run lint
   - npm run build
