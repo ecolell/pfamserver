@@ -6,9 +6,6 @@ from sqlalchemy import PrimaryKeyConstraint
 class PfamARegFullSignificant(db.Model):
     __tablename__ = 'pfamA_reg_full_significant'
 
-    #auto_pfamA_reg_full = db.Column(
-    #    db.Integer,
-    #    primary_key=True)
     pfamA_acc = db.Column(
         db.UnicodeText,
         index=True)

@@ -23,7 +23,7 @@ def session_db(request, session_app):
     app = session_app
     _db.app = app
 
-    #def teardown():
+    # def teardown():
     #    meta = MetaData()
     #    with closing(_db.engine.connect()) as con:
     #        trans = con.begin()
@@ -31,10 +31,10 @@ def session_db(request, session_app):
     #            con.execute(table.delete())
     #        trans.commit()
 
-    #teardown()
-    #_db.create_all()
+    # teardown()
+    # _db.create_all()
 
-    #request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return _db
 
 
@@ -94,7 +94,7 @@ def testdb(session_db, request, session_app):
 
         engine.dispose()
 
-    #request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return app
 
 

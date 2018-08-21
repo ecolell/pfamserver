@@ -106,13 +106,15 @@ class DatabaseConstructor(object):
             keys = []
             if table_name in patched_pk:
                 keys = patched_pk[table_name].split(',')
-                field_name = lambda r: any(map(lambda e: e in keys,
-                                               re.findall('`[^`]*`', r)))
+
+                def field_name(r):
+                    return any(map(lambda e: e in keys,
+                                   re.findall('`[^`]*`', r)))
                 cmds = map(lambda r: r if field_name(r) else
                            r.replace('DEFAULT NULL', ''),
                            cmds)
             cmds = filter(lambda c: c and c[0] not in ['/', '-'],
-                                  cmds)
+                          cmds)
             cmds = ''.join(cmds)
             cmds = cmds.replace("`created` datetime DEFAULT NULL",
                                 "`created` datetime NULL DEFAULT NULL")

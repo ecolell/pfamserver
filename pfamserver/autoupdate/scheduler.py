@@ -25,7 +25,7 @@ def run_every(moment="day", hour="00:00"):
             try:
                 p = Process(target=function, args=args, kwargs=kwargs)
                 p.start()
-            except:
+            except Exception:
                 print(traceback.format_exc())
         return wrapper
     return real_decorator
@@ -44,4 +44,3 @@ def finish_app(app):
         app.stop_t.set()
     if hasattr(app, 't'):
         app.t.join()
-

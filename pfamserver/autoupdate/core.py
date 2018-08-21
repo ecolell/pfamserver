@@ -60,13 +60,11 @@ class Manager(object):
             function, extension = function
         manager = Manager()
 
-
         def get(version):
             config = manager.config
             version_cfg = (config["versions"][version]
-                      if version in config["versions"] else {"status": []})
+                           if version in config["versions"] else {"status": []})
             return config, version_cfg
-
 
         def wrapper(*args):
             self = args[0]
@@ -102,8 +100,8 @@ class Manager(object):
                                conn.readlines())
             elif "http" in protocol:
                 hrefs = filter(lambda l: "href=\"Pfam" in l, conn.readlines())
-                versions = map(lambda l: float(re.sub('^.+href="Pfam([0-9\.]+).+$',
-                                                      r'\1',l)), hrefs)
+                versions = map(lambda l: float(re.sub('^.+href="Pfam([0-9.]+).+$',
+                                                      r'\1', l)), hrefs)
         return max(versions)
 
     def get_available(self, config):
@@ -162,7 +160,6 @@ class Manager(object):
             os.remove(filename)
 
 
-
 class Version(object):
 
     def __init__(self, version, manager):
@@ -213,10 +210,13 @@ class Version(object):
         print("->\tPFam: Spliting Pfam IDs and Pfam revision")
         filename = "Pfam-A.full.gz"
         temp_file = self.extracted[filename] + ".tmp"
-        fsize = lambda f: os.stat(f).st_size
+
+        def fsize(f):
+            return os.stat(f).st_size
+
         max_value = fsize(self.extracted[filename]) * 1.10
         with open(temp_file, 'wb') as f_out:
-            with open(self.extracted[filename],"r") as f_in:
+            with open(self.extracted[filename], "r") as f_in:
                 widgets = [Percentage(), ' ', Bar(marker='#'), ' ', ETA()]
                 with ProgressBar(widgets=widgets,
                                  max_value=max_value) as progress:
@@ -248,14 +248,13 @@ class Version(object):
             destiny = self.downloaded[filename]
             path_pattern = '{0}{1[url]}{1[path]}Pfam{2}/{3}'
             server_tree = path_pattern.format(select_proto, self.manager.server,
-                                         self.version, filename)
+                                              self.version, filename)
             server_tree = server_tree.split('//')[-1]
             origin = destiny + server_tree
             os.system('mv {:} {:}'.format(origin[:-1], destiny[:-1]))
             old_tree = destiny + server_tree.split('/')[0]
             shutil.rmtree(old_tree)
         return result
-
 
     @Manager.milestone
     def load_database(self):
@@ -283,7 +282,7 @@ class Version(object):
         if os.path.exists(path):
             print("->\tRemoving files from version {:}.".format(self.version))
             print("Removing {:}...".format(path))
-            #shutil.rmtree(path)
+            # shutil.rmtree(path)
 
 
 from datetime import datetime, timedelta
@@ -291,6 +290,8 @@ from datetime import datetime, timedelta
 
 # @app.run_every("day", "21:07")
 dt = datetime.now() + timedelta(minutes=1)
+
+
 @app.run_every("day", dt.strftime("%H:%M"))
 def check_for_new_version():
     Manager().update()

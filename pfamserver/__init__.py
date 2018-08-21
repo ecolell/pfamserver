@@ -4,7 +4,7 @@ import sys
 import os
 from pfamserver import static
 from pfamserver.extensions import db, cache, collect, compress, webpack, sentry
-from flask import Flask, render_template
+from flask import Flask
 from flask_restplus import apidoc
 
 from config.development import DevelopmentConfig
@@ -41,8 +41,6 @@ def create_app():
     register_extensions(app)
     register_blueprints(app)
     register_cli(app)
-
-    #engine = db.get_engine(app)
 
     register_middlewares(app)
 
@@ -91,7 +89,6 @@ def register_middlewares(app):
     if app.config.get('PROFILE_SQL', None):
         from sqltap.wsgi import SQLTapMiddleware
         app.wsgi_app = SQLTapMiddleware(app.wsgi_app)
-
 
 
 def register_cli(app):

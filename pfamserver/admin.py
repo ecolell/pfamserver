@@ -15,9 +15,9 @@ def view_constructor(cls_in, db):
     blobs = dict(filter(lambda e: "blob" in
                         e[1].type.__class__.__name__.lower(),
                         attributes)).keys()
-    related = map(lambda e: e[0], filter(lambda e: e[0][0] != "_" and
-                                         e[1].expression.foreign_keys,
-                                         attributes))
+    related = map(lambda e: e[0],
+                  filter(lambda e: e[0][0] != "_" and e[1].expression.foreign_keys,
+                         attributes))
     not_searchables = related + blobs
     searchables = filter(lambda k: k not in not_searchables,
                          dict(attributes).keys())

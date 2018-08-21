@@ -11,6 +11,7 @@ def content(name):
     version = Manager().config['actual_version']
     return render_template(name, name=name, version=version)
 
+
 @cache.cached(timeout=3600)
 @app.route('/')
 def index():

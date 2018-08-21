@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 
 
 lib_path = get_python_lib()
-#filename = 'uniprot_trembl.dat'
+# filename = 'uniprot_trembl.dat'
 filename = 'uniprot_sprot.dat'
 db_path = '{:s}/uniprot_data/{:s}'.format(lib_path, filename)
 server = {'path': '/pub/databases/uniprot/current_release/knowledgebase/complete/',
@@ -47,6 +47,7 @@ def silent_remove(filename):
     if os.path.exists(filename):
         os.remove(filename)
 
+
 @milestone
 def clean_old_db(filename):
     silent_remove(filename)
@@ -62,8 +63,8 @@ def get_max_version(protocol):
         elif "http" in protocol:
             # TODO: uniprot doesn't support the http procotol.
             hrefs = filter(lambda l: "href=\"Pfam" in l, conn.readlines())
-            versions = map(lambda l: float(re.sub('^.+href="Pfam([0-9\.]+).+$',
-                                              r'\1',l)), hrefs)
+            versions = map(lambda l: float(re.sub('^.+href="Pfam([0-9.]+).+$',
+                                                  r'\1', l)), hrefs)
     return max(versions)
 
 

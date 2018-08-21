@@ -32,7 +32,7 @@ def handle_no_result_found(e):
 def get_pfam_acc_from_pfam(code):
     query = db.session.query(PfamA)
     query = query.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                   PfamA.pfamA_id.ilike(code)))
+                             PfamA.pfamA_id.ilike(code)))
     return query
 
 
@@ -41,8 +41,8 @@ def get_sequence_descriptions_from_pfam(pfam, with_pdb):
     subquery = subquery.distinct().subquery()
 
     query = db.session.query(concat(Pfamseq.pfamseq_id, '/',
-                                   cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
-                                   cast(PfamARegFullSignificant.seq_end, types.Unicode)))
+                                    cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
+                                    cast(PfamARegFullSignificant.seq_end, types.Unicode)))
     query = query.join(PfamARegFullSignificant, Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc)
     query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
 
