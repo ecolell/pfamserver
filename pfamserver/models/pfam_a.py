@@ -4,10 +4,10 @@ from pfamserver.database import db, Base
 
 class PfamA(Base):
     pfamA_acc = db.Column(
-        db.UnicodeText,
+        db.String(7),
         primary_key=True)
     pfamA_id = db.Column(
-        db.UnicodeText,
+        db.String(16),
         index=True,
         unique=True)
     description = db.Column(db.UnicodeText)

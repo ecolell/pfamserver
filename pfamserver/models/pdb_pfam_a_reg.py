@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from pfamserver.database import db
 from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.dialects.mysql import INTEGER
 
 
 class PdbPfamAReg(db.Model):
@@ -10,23 +11,22 @@ class PdbPfamAReg(db.Model):
     #    db.Integer,
     #    primary_key=True)
     auto_uniprot_reg_full = db.Column(
-        db.UnicodeText(),
+        INTEGER(unsigned=True),
         db.ForeignKey('uniprot_reg_full.auto_uniprot_reg_full'))
     uniprot_reg_full = db.relationship('UniprotRegFull', backref=db.backref('pdbs'))
     pdb_id = db.Column(
-        db.UnicodeText(),
+        db.String(5),
         db.ForeignKey('pdb.pdb_id'))
     pdb = db.relationship('Pdb', backref=db.backref('pfams'))
     chain = db.Column(
-        db.UnicodeText,
+        db.String(4),
         index=True)
     pfamA_acc = db.Column(
-        db.UnicodeText,
+        db.String(7),
         index=True)
     pfamseq_acc = db.Column(
-        db.UnicodeText,
-        index=True
-    )
+        db.String(10),
+        index=True)
     pdb_res_start = db.Column(
         db.Integer,
         index=True)

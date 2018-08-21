@@ -7,10 +7,10 @@ class PfamARegFullSignificant(db.Model):
     __tablename__ = 'pfamA_reg_full_significant'
 
     pfamA_acc = db.Column(
-        db.UnicodeText,
+        db.String(7),
         index=True)
     pfamseq_acc = db.Column(
-        db.UnicodeText,
+        db.String(10),
         index=True)
     seq_start = db.Column(
         db.Integer,

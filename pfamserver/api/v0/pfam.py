@@ -23,7 +23,7 @@ def make_cache_key(*args, **kwargs):
 
 
 @ns.route('/<pfam>/sequence_descriptions')
-class PfamAAPI(Resource):
+class PfamASequenceDescriptionsAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc('Obtain a sequence_description list from a pfam.')
@@ -41,7 +41,7 @@ class PfamAAPI(Resource):
 
 
 @ns.route('/<pfam>/stockholm')
-class PfamAAPI(Resource):
+class PfamAStockholmAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc('Obtain a sequence_description list from a pfam.')

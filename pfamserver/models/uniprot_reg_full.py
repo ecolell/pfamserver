@@ -1,18 +1,19 @@
 from __future__ import unicode_literals
 from pfamserver.database import db, Base
 from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy.dialects.mysql import INTEGER
 
 
 class UniprotRegFull(db.Model):
     auto_uniprot_reg_full = db.Column(
-        db.Integer,
+        INTEGER(unsigned=True),
         primary_key=True)
     pfamA_acc = db.Column(
-        db.UnicodeText(),
+        db.String(7),
         db.ForeignKey('pfamA.pfamA_acc'))
     pfamA = db.relationship('PfamA', backref=db.backref('uniprots'))
     uniprot_acc = db.Column(
-        db.UnicodeText(),
+        db.String(10),
         db.ForeignKey('uniprot.uniprot_acc'))
     uniprot = db.relationship('Uniprot', backref=db.backref('pfams'))
     seq_start = db.Column(

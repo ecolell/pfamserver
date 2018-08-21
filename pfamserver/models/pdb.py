@@ -4,7 +4,7 @@ from pfamserver.database import db
 
 class Pdb(db.Model):
     pdb_id = db.Column(
-        db.UnicodeText,
+        db.String(5),
         primary_key=True)
     title = db.Column(db.UnicodeText)
     method = db.Column(db.UnicodeText)
