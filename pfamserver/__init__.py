@@ -95,13 +95,6 @@ def register_middlewares(app):
 
 
 def register_cli(app):
-    pass
-    """
-    from pfamserver.commands.data import data as data_command
-    from pfamserver.commands.profile import profile as profile_command
-    from pfamserver.commands.os import deployment as deployment_command
+    from pfamserver.commands.library import library as library_command
 
-    app.cli.add_command(data_command)
-    app.cli.add_command(profile_command)
-    app.cli.add_command(deployment_command)
-    """
+    app.cli.add_command(library_command)

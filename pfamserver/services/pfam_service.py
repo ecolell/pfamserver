@@ -9,6 +9,9 @@ from pfamserver.models import PfamA, PfamARegFullSignificant, Pfamseq, PdbPfamAR
 from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
+from subprocess import Popen as run, PIPE
+from flask import current_app
+
 
 merry = Merry()
 
@@ -26,16 +29,16 @@ def handle_no_result_found(e):
     raise PfamServiceError('PfamA desn''t exists.')
 
 
-def get_sequence_descriptions_from_pfam(pfam, with_pdb):
-    # icode = "%{:}%".format(code)
-    subquery = db.session.query(PfamA)
-    subquery = subquery.filter(or_(PfamA.pfamA_acc == pfam.upper(),
-                                   PfamA.pfamA_id.ilike(pfam))).distinct().subquery()
+def get_pfam_acc_from_pfam(code):
+    query = db.session.query(PfamA)
+    query = query.filter(or_(PfamA.pfamA_acc == code.upper(),
+                                   PfamA.pfamA_id.ilike(code)))
+    return query
 
-    # query = db.session.query(UniprotRegFull, Uniprot, PdbPfamAReg)
-    # query = query.filter(UniprotRegFull.pfamA_acc == subquery.c.pfamA_acc)
-    # query = query.filter(UniprotRegFull.auto_uniprot_reg_full == PdbPfamAReg.auto_uniprot_reg_full)
-    # query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
+
+def get_sequence_descriptions_from_pfam(pfam, with_pdb):
+    subquery = get_pfam_acc_from_pfam(pfam)
+    subquery = subquery.distinct().subquery()
 
     query = db.session.query(concat(Pfamseq.pfamseq_id, '/',
                                    cast(PfamARegFullSignificant.seq_start, types.Unicode), '-',
@@ -55,3 +58,16 @@ def get_sequence_descriptions_from_pfam(pfam, with_pdb):
     query = query.order_by(Pfamseq.pfamseq_id.asc()).distinct()
     results = query.all()
     return [r[0] for r in results]
+
+
+def get_stockholm_from_pfam(pfam):
+    query = get_pfam_acc_from_pfam(pfam)
+    query = query.options(Load(PfamA).load_only("pfamA_acc"))
+    try:
+        pfamA_acc = query.one().pfamA_acc
+    except NoResultFound as e:
+        return None
+    else:
+        fetch_call = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(app.config['LIB_PATH'])
+        cmd = [fetch_call, current_app.config['ROOT_PATH'] + "Pfam-A.full", pfamA_acc]
+        return run(cmd, stdout=PIPE).communicate()[0]
