@@ -160,7 +160,7 @@ backend27_tests:
   variables:
     PIP_CACHE_DIR: "pip-cache"
     MYSQL_DATABASASE: python2_$CI_COMMIT_SHA
-    MYSQL_ROOT_PASSWORD: ""
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     NODE_TLS_REJECT_UNAUTHORIZED: 0
   before_script:
     - export SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:@postgres:5432/python2_$CI_COMMIT_SHA
@@ -190,7 +190,7 @@ backend36_tests:
   variables:
     PIP_CACHE_DIR: "pip-cache"
     MYSQL_DATABASASE: python3_$CI_COMMIT_SHA
-    MYSQL_ROOT_PASSWORD: ""
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     NODE_TLS_REJECT_UNAUTHORIZED: 0
   before_script:
     - export SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:@postgres:5432/python3_$CI_COMMIT_SHA
