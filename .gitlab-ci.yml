@@ -20,7 +20,7 @@ deploy_production:
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
   - echo $SSHPASS > sshkey.txt
   - mkdir -p ~/.ssh
-  - sshpass -f sshkey.txt $SSH_PROD_TUNNEL "nohup /home/mistic/stage/mistic/deploy_production.sh &"
+  - sshpass -f sshkey.txt $SSH_PROD_TUNNEL "nohup /home/pfamserver/stage/pfamserver/deploy_production.sh &"
   only:
   - production
   tags:
@@ -49,7 +49,7 @@ deploy_master:
   - rm -f .git/hooks/pre-push
   - git push -q heroku master
   - mkdir ~/.pip
-  - echo '{"assets":{},"publicPath":""}' > mistic/static/manifest.json
+  - echo '{"assets":{},"publicPath":""}' > pfamserver/static/manifest.json
   - echo "[global]\nindex-url = http://192.168.101.105:3141/root/pypi/+simple/\ntrusted-host = 192.168.101.105" > ~/.pip/pip.conf
   - pip install -r requirements_development.txt
   - git push -f heroku master
@@ -165,7 +165,7 @@ backend27_tests:
   script:
   - mkdir ~/.pip
   - echo $SQLALCHEMY_DATABASE_URI
-  - echo '{"assets":{},"publicPath":""}' > mistic/static/manifest.json
+  - echo '{"assets":{},"publicPath":""}' > pfamserver/static/manifest.json
   - echo "[global]\nindex-url = http://192.168.101.105:3141/root/pypi/+simple/\ntrusted-host = 192.168.101.105" > ~/.pip/pip.conf
   - pip install -r requirements_development.txt
   - FLASK_ENV=testing flask db upgrade
@@ -195,7 +195,7 @@ backend36_tests:
   script:
   - mkdir ~/.pip
   - echo $SQLALCHEMY_DATABASE_URI
-  - echo '{"assets":{},"publicPath":""}' > mistic/static/manifest.json
+  - echo '{"assets":{},"publicPath":""}' > pfamserver/static/manifest.json
   - echo "[global]\nindex-url = http://192.168.101.105:3141/root/pypi/+simple/\ntrusted-host = 192.168.101.105" > ~/.pip/pip.conf
   - pip install -r requirements_development.txt
   - FLASK_ENV=testing flask db upgrade
