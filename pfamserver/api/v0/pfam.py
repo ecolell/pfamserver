@@ -4,6 +4,8 @@ from pfamserver.api.v0 import api, schemas
 from pfamserver.services import pfam_service
 from pfamserver.extensions import cache
 from flask import request
+from zlib import compress
+from base64 import b64encode
 
 ns = api.namespace('pfams', decorators=[
     api.response(200, "success"),
@@ -46,13 +48,8 @@ class PfamAStockholmAPI(Resource):
     @ns.response(200, "response")
     @ns.doc('Obtain a sequence_description list from a pfam.')
     @cache.cached(timeout=3600, key_prefix=make_cache_key)
-    @ns.expect(schemas.pfam_a_query)
     def get(self, pfam):
-        kwargs = schemas.pfam_a_query.parse_args()
-        with_pdb = kwargs['with_pdb']
-        sequence_descriptions = pfam_service.get_sequence_descriptions_from_pfam(pfam, with_pdb)
+        stockholm = pfam_service.get_stockholm_from_pfam(pfam)
         data = {'query': pfam,
-                'with_pdb': with_pdb,
-                'output': sequence_descriptions,
-                'size': len(sequence_descriptions)}
+                'output': b64encode(compress(stockholm))}
         return data, 200

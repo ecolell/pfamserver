@@ -1,26 +1,7 @@
 from __future__ import unicode_literals
-
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import Load
 from pfamserver.models import Uniprot, UniprotRegFull, Pdb, PdbPfamAReg
 from pfamserver.extensions import db
-from pfamserver.exceptions import SentryIgnoredError
-from merry import Merry
-
-merry = Merry()
-
-
-class SequenceDescriptionServiceError(Exception):
-    message = ''
-
-    def __init__(self, message):
-        super(SequenceDescriptionServiceError, self).__init__()
-        self.message = message
-
-
-@merry._except(NoResultFound)
-def handle_no_result_found(e):
-    raise SequenceDescriptionServiceError('PfamA desn''t exists.')
 
 
 def get_pdbs_from_uniprot_pfam_a_reg(uniprot_id, seq_start, seq_end):

@@ -9,12 +9,6 @@ ns = api.namespace('sequence_descriptions', decorators=[
     api.response(400, "not found")])
 
 
-@ns.errorhandler(pdb_service.SequenceDescriptionServiceError)
-def handle_root_exception(error):
-    '''Return a custom message and 400 status code'''
-    return {'message': error.message}, 400
-
-
 @ns.route('/<uniprot_id>/<int:seq_start>-<int:seq_end>/pdbs')
 class SequenceDescriptionAPI(Resource):
     schema = schemas.PdbPfamARegSchema()

@@ -10,7 +10,6 @@ from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 from subprocess import Popen as run, PIPE
-from flask import current_app
 
 
 merry = Merry()
@@ -26,7 +25,7 @@ class PfamServiceError(Exception):
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise PfamServiceError('PfamA desn''t exists.')
+    raise PfamServiceError('PfamA doesn''t exist.')
 
 
 def get_pfam_acc_from_pfam(code):
@@ -60,14 +59,11 @@ def get_sequence_descriptions_from_pfam(pfam, with_pdb):
     return [r[0] for r in results]
 
 
+@merry._try
 def get_stockholm_from_pfam(pfam):
     query = get_pfam_acc_from_pfam(pfam)
     query = query.options(Load(PfamA).load_only("pfamA_acc"))
-    try:
-        pfamA_acc = query.one().pfamA_acc
-    except NoResultFound as e:
-        return None
-    else:
-        fetch_call = '{:s}/hmmer/easel/miniapps/esl-afetch'.format(app.config['LIB_PATH'])
-        cmd = [fetch_call, current_app.config['ROOT_PATH'] + "Pfam-A.full", pfamA_acc]
-        return run(cmd, stdout=PIPE).communicate()[0]
+    pfamA_acc = query.one().pfamA_acc
+    fetch_call = './esl-afetch'
+    cmd = [fetch_call, "Pfam-A.full", pfamA_acc]
+    return run(cmd, stdout=PIPE).communicate()[0]

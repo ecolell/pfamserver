@@ -10,3 +10,8 @@ def test_get_uniprot_pfams(db, client):
     data = json.loads(res.get_data(as_text=True))
     assert data['query'] == 'EGFR_HUMAN'
     assert len(data['output']) == 6
+
+    res = client.get('/api/v0/uniprots/invalid_uniprot/pfams', headers=headers)
+    assert res.status_code == 400
+    data = json.loads(res.get_data(as_text=True))
+    assert data['message'] == 'Uniprot doesn''t exist.'

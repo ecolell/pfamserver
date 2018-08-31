@@ -21,7 +21,7 @@ class UniprotServiceError(Exception):
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise UniprotServiceError('Uniprot desn''t exists.')
+    raise UniprotServiceError('Uniprot doesn''t exist.')
 
 
 @merry._try

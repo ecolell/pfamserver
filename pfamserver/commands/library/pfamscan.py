@@ -10,8 +10,8 @@ import os
 
 
 @click.group()
-def hmmer():
-    """HMMER commands"""
+def pfamscan():
+    """PfamScan commands"""
     pass
 
 
@@ -21,25 +21,25 @@ def run(cmds, **kwargs):
     os.system(cmd)
 
 
-@hmmer.command()
+@pfamscan.command()
 @click.option('--version', '-v', 'version',
               type=click.STRING,
               multiple=False,
               default='3.2.1',
               help='Version to install.')
 def install(version):
-    """Download and compile hmmer sourcecode."""
+    """Download and compile pfamscan sourcecode."""
     cmds = [
-        'wget http://eddylab.org/software/hmmer/hmmer-{version}.tar.gz',
-        'tar xvzf hmmer-{version}.tar.gz',
-        'cd hmmer-{version} && ./configure',
-        'cd hmmer-{version} && make',
-        'ln -s hmmer-{version}/easel/miniapps/esl-afetch esl-afetch'
+        'wget http://eddylab.org/software/pfamscan/pfamscan-{version}.tar.gz',
+        'tar xvzf pfamscan-{version}.tar.gz',
+        'cd pfamscan-{version} && ./configure',
+        'cd pfamscan-{version} && make',
+        'ln -s pfamscan-{version}/easel/miniapps/esl-afetch esl-afetch'
     ]
     run(cmds, version=version)
 
 
-@hmmer.command()
+@pfamscan.command()
 @click.option('--version', '-v', 'version',
               type=click.STRING,
               multiple=False,
@@ -48,13 +48,12 @@ def install(version):
 @click.option('--ftp',
               is_flag=True,
               help='Force to use ftp.')
-def stockholm_index(version, ftp):
-    """Download and index PfamA-full file."""
+def index(version, ftp):
+    """Download PfamA-full file."""
     protocol = 'ftp' if ftp else 'http'
     cmds = [
-        #'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.full.gz',
-        #'gunzip -c Pfam-A.full.gz > Pfam-A.full',
-        'sed -i -E "s/(#=GF AC   [A-Z0-9]+)\.(.+)/\\1\\'+'n#=GF DC   Revision: \\2/g" Pfam-A.full',
-        './esl-afetch --index Pfam-A.full'
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.gz',
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.dat.gz',
+        'gunzip Pfam-A.hmm*.gz',
     ]
     run(cmds, version=version, protocol=protocol)
