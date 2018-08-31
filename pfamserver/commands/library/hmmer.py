@@ -52,9 +52,9 @@ def stockholm_index(version, ftp):
     """Download and index PfamA-full file."""
     protocol = 'ftp' if ftp else 'http'
     cmds = [
-        #'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.full.gz',
-        #'gunzip -c Pfam-A.full.gz > Pfam-A.full',
-        'sed -i -E "s/(#=GF AC   [A-Z0-9]+)\.(.+)/\\1\\'+'n#=GF DC   Revision: \\2/g" Pfam-A.full',
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.full.gz',
+        'gunzip -c Pfam-A.full.gz > Pfam-A.full',
+        'sed -i -E "s/(#=GF AC   [A-Z0-9]+)\\.(.+)/\\1\\' + 'n#=GF DC   Revision: \\2/g" Pfam-A.full',
         './esl-afetch --index Pfam-A.full'
     ]
     run(cmds, version=version, protocol=protocol)
