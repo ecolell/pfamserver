@@ -32,6 +32,8 @@ node_modules/
 celerybeat-schedule
 dumps
 hmmer-*
+Pfam*
+esl-afetch
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
