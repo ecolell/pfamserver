@@ -32,48 +32,12 @@ def decompress(function):
 
 patched_pk = {
     "version": "number_families",
-    "pfamA_reg_seed": "pfamA_acc,pfamseq_acc,seq_version,source,seq_start",
-    "secondary_pfamseq_acc": "pfamseq_acc,secondary_acc",
-    "pfamseq_disulphide": "pfamseq_acc,bond_start",
-    "pfamseq_markup": "pfamseq_acc,auto_markup,residue",
-    "pfamA_architecture": "pfamA_acc,auto_architecture",
-    "interpro": "pfamA_acc",
-    "pfamA_interactions": "pfamA_acc_A,pfamA_acc_B",
-    "clan_membership": "pfamA_acc,clan_acc",
-    "clan_alignment_and_relationship": "clan_acc",
-    "clan_architecture": "clan_acc,auto_architecture",
-    "pfamA_architecture": "pfamA_acc,auto_architecture",
-    "dead_family": "pfamA_acc,pfamA_id",
-    "dead_clan": "clan_acc,clan_id",
-    "nested_locations": "pfamA_acc,nested_pfamA_acc,pfamseq_acc,seq_version,seq_start",
-    "pdb_residue_data": "pdb_id,pfamseq_acc,pdb_seq_number,pfamseq_seq_number,pdb_res,pfamseq_res,pdb_insert_code,chain,serial,dssp_code",
-    "pdb_image": "pdb_id",
-    "proteome_regions": "pfamA_acc,ncbi_taxid",
-    "complete_proteomes": "ncbi_taxid",
-    "taxonomy": "ncbi_taxid",
-    "pfamA2pfamA_scoop": "pfamA_acc_1,pfamA_acc_2",
-    "pfamA_HMM": "pfamA_acc",
-    "alignment_and_tree": "pfamA_acc,type",
 }
 
 
 tables = ['version', 'pfamA', 'pfamseq', 'uniprot']
-tables += ['pfamA_reg_seed', 'uniprot_reg_full', 'pfamA_reg_full_significant',
-           'pfamA_reg_full_insignificant']
-tables += ['pfam_annseq', 'secondary_pfamseq_acc', 'evidence']
-tables += ['markup_key', 'pfamseq_disulphide', 'other_reg', 'pfamseq_markup']
-tables += ['architecture', 'pfamA_architecture']
-tables += ['literature_reference', 'gene_ontology', 'pfamA_database_links',
-           'interpro', 'pfamA_literature_reference', 'pfamA_interactions']
-tables += ['clan_alignment_and_relationship', 'clan', 'clan_database_links',
-           'clan_membership', 'clan_lit_ref', 'clan_architecture']
-tables += ['dead_family', 'dead_clan']
-tables += ['nested_locations']
-tables += ['pdb', 'pdb_image', 'pdb_residue_data', 'pdb_pfamA_reg']
-tables += ['proteome_regions', 'complete_proteomes', 'taxonomy',
-           'ncbi_taxonomy']
-tables += ['pfamA2pfamA_scoop', 'pfamA2pfamA_hhsearch']
-tables += ['pfamA_HMM', 'alignment_and_tree']
+tables += ['uniprot_reg_full', 'pfamA_reg_full_significant']
+tables += ['pdb', 'pdb_pfamA_reg']
 
 
 class DatabaseConstructor(object):
@@ -149,7 +113,3 @@ class DatabaseConstructor(object):
             self.execute(cmd)
         return True
 
-
-def init_db(version):
-    constructor = DatabaseConstructor(version)
-    constructor.construct()
