@@ -31,3 +31,7 @@ class PdbPfamARegSchema(Schema):
 
 pfam_a_query = api.parser()
 pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', default=True)
+
+
+class SequenceSchema(Schema):
+    pass
