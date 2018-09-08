@@ -17,9 +17,22 @@ def handle_root_exception(error):
     return {'message': error.message}, 400
 
 
-@ns.route('/<uniprot>/pfams')
+@ns.route('/<uniprot>')
 class UniprotAPI(Resource):
     schema = schemas.UniprotSchema()
+
+    @ns.response(200, "response")
+    @ns.doc('Obtain the uniprot information.')
+    @cache.cached(timeout=3600)
+    def get(self, uniprot):
+        uniprot = uniprot_service.get_uniprot(uniprot)
+        data, errors = self.schema.dump(uniprot)
+        return data, 200
+
+
+@ns.route('/<uniprot>/pfams')
+class UniprotPfamsAPI(Resource):
+    schema = schemas.UniprotPfamsSchema()
 
     @ns.response(200, "response")
     @ns.doc('Obtain a pfams list from a uniprot.')

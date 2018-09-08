@@ -53,7 +53,7 @@ class BaseConfig(object):
 
     SEND_FILE_MAX_AGE_DEFAULT=3600
 
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:root@192.168.0.105:3306/pfamserver')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:root@192.168.0.105:3306/Pfam31_0')
     PFAMSERVER_ROOT_PATH = os.getenv('PFAMSERVER_ROOT_PATH',
                                      'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/')
 
