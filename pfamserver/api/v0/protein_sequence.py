@@ -17,7 +17,7 @@ def handle_root_exception(error):
 
 
 @ns.route('/<sequence>')
-class UniprotAPI(Resource):
+class ProteinSequenceAPI(Resource):
     schema = schemas.SequenceSchema()
 
     @ns.response(200, "response")

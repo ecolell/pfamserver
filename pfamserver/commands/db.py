@@ -10,6 +10,7 @@ from urllib import urlopen
 from contextlib import closing
 import re
 import os
+from pfamserver.commands.unused_columns import unused_columns
 
 
 @click.group()
@@ -129,7 +130,7 @@ def download(version, ftp):
         'mkdir -p Pfam{version}'
     ]
     commands += [url.format(version=version, file=filename, protocol=protocol)
-                 for filename in zip(files, tables)]
+                 for filename in files]
     click.echo('\n'.join(commands))
     run(commands, version=version)
 
@@ -162,3 +163,47 @@ def load(version):
                  for (filename, table) in zip(files, tables)]
     click.echo('\n'.join(commands))
     run(commands, version=version)
+
+
+@data.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to install.')
+def size(version):
+    """Get database size."""
+    db_name = 'Pfam' + version[:2] + '_' + version[-1:]
+    query = 'SELECT table_schema, ' \
+            'ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) \'DB Size in GB\' ' \
+            'FROM information_schema.tables ' \
+            'GROUP BY table_schema HAVING table_schema=\'{db_name}\';'.format(db_name=db_name)
+    commands = ['sudo mysql -u root {db_name} -e "{query}"'.format(query=query, db_name=db_name)]
+    run(commands)
+
+
+@data.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to install.')
+def shrink(version):
+    """Shrink the data into the database removing unused columns."""
+    db_name = 'Pfam' + version[:2] + '_' + version[-1:]
+    query = 'set @exist_Check := ( ' \
+            '   select count(*) from information_schema.columns ' \
+            '   where table_name=\'{table}\' ' \
+            '   and column_name=\'{column}\' ' \
+            '   and table_schema=database()  ' \
+            ') ; ' \
+            'set @sqlstmt := if(@exist_Check>0,\'ALTER TABLE {table} DROP COLUMN {column};\', \'select 1\') ; '\
+            'prepare stmt from @sqlstmt ; '\
+            'execute stmt ;'
+    db_name = 'Pfam' + version[:2] + '_' + version[-1:]
+    superquery = [
+        query.format(db_name=db_name, table=table, column=column)
+        for (table, columns) in unused_columns.items() for column in columns
+    ]
+    commands = ['sudo mysql -u root {db_name} -e "{query}"'.format(query=''.join(superquery), db_name=db_name)]
+    run(commands)
