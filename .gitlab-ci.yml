@@ -170,6 +170,7 @@ backend27_tests:
   - pip install -r requirements_development.txt
   - FLASK_ENV=testing flask db upgrade
   - FLASK_ENV=testing py.test
+  allow_failure: true
   except:
   - production
   - master

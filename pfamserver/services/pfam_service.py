@@ -35,6 +35,11 @@ def get_pfam_acc_from_pfam(code):
     return query
 
 
+@merry._try
+def get_pfam(pfam):
+    return get_pfam_acc_from_pfam(pfam).one()
+
+
 def get_sequence_descriptions_from_pfam(pfam, with_pdb):
     subquery = get_pfam_acc_from_pfam(pfam)
     subquery = subquery.distinct().subquery()

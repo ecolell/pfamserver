@@ -16,4 +16,4 @@ api = Api(
 
 from pfamserver.api.v0.uniprot import ns as uniprot
 from pfamserver.api.v0.pfam import ns as pfam
-from pfamserver.api.v0.sequence_description import ns as sequence_description
+from pfamserver.api.v0.protein_sequence import ns as protein_sequence

@@ -12,8 +12,22 @@ class UniprotRegFullSchema(Schema):
 
 
 class UniprotSchema(Schema):
+    uniprot_acc = fields.Str()
+    uniprot_id = fields.Str()
+    description = fields.Str()
+    length = fields.Int()
+
+
+class UniprotPfamsSchema(Schema):
     query = fields.Str(attribute='uniprot_id')
     output = fields.List(fields.Nested(UniprotRegFullSchema), attribute='pfams')
+
+
+class PfamSchema(Schema):
+    pfamA_acc = fields.Str()
+    pfamA_id = fields.Str()
+    description = fields.Str()
+    num_full = fields.Int()
 
 
 class PdbPfamARegSchema(Schema):
@@ -31,3 +45,7 @@ class PdbPfamARegSchema(Schema):
 
 pfam_a_query = api.parser()
 pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', default=True)
+
+
+class SequenceSchema(Schema):
+    pass

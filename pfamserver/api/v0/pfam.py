@@ -24,6 +24,19 @@ def make_cache_key(*args, **kwargs):
     return (path + args).encode('utf-8')
 
 
+@ns.route('/<pfam>')
+class UniprotAPI(Resource):
+    schema = schemas.PfamSchema()
+
+    @ns.response(200, "response")
+    @ns.doc('Obtain the pfam information.')
+    @cache.cached(timeout=3600)
+    def get(self, pfam):
+        pfam = pfam_service.get_pfam(pfam)
+        data, errors = self.schema.dump(pfam)
+        return data, 200
+
+
 @ns.route('/<pfam>/sequence_descriptions')
 class PfamASequenceDescriptionsAPI(Resource):
 
