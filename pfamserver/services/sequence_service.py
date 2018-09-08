@@ -38,7 +38,7 @@ def get_pfam_from_pfamacc(pfam_acc):
 
 
 def is_pfam_match(line):
-    return re.match("\w+\s+\d+\s+\d+\s+(\d+)\s+(\d+)\s+(\w+)\.\d+", line)
+    return re.match(r"\w+\s+\d+\s+\d+\s+(\d+)\s+(\d+)\s+(\w+)\.\d+", line)
 
 
 def id_generator():
@@ -69,7 +69,7 @@ def parse_pfamscan(text):
             "seq_end": int(t[0].group(2)),
             "num_full": t[1].num_full
         }
-    for t in zip(matches, pfams)]
+        for t in zip(matches, pfams)]
 
 
 def get_pfams_from_sequence(sequence):

@@ -45,9 +45,14 @@ def last_available_version():
     """Get the last available version."""
     url = 'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D'
     with closing(urlopen(url)) as conn:
-        hrefs = filter(lambda l: "href=\"Pfam" in l, conn.readlines())
-        versions = map(lambda l: re.sub('^.+href="Pfam([0-9.]+).+\n$',
-            r'\1', l), hrefs)
+        hrefs = [
+            line for line in conn.readlines()
+            if "href=\"Pfam" in line
+        ]
+        versions = [
+            re.sub('^.+href="Pfam([0-9.]+).+\n$', r'\1', links)
+            for links in hrefs
+        ]
     return versions[0]
 
 
