@@ -84,8 +84,6 @@ enum34==1.1.6 ; python_version <= "2.7" \
 environs==3.0.0 \
     --hash=sha256:3cb0f9bad06efc644aab2029590e619878713960390d9b51d291acf27ddf7034 \
     --hash=sha256:a454ad7fb374dfafce4ba3a1b398cfcb1ccd72becc9cf6ab33c3b62b6e7b4fd4
-flask-admin==1.5.1 \
-    --hash=sha256:e3a8268fdb6c271a44196de7f2a85faff886df18061d337e66b4b3c80e9c4f23
 flask-caching==1.2.0 \
     --hash=sha256:3928396e64138bdac63f67ea8438ecf16e44f3252ee560a4c857b47406b2418d \
     --hash=sha256:5f31d030efe8c4158a03a82928c7296651d4cabed41e1236fed043b754f96ba5
@@ -213,4 +211,4 @@ werkzeug==0.14.1 \
 wtforms==2.2.1 \
     --hash=sha256:0cdbac3e7f6878086c334aa25dc5a33869a3954e9d1e015130d65a69309b3b61 \
     --hash=sha256:e3ee092c827582c50877cdbd49e9ce6d2c5c1f6561f849b3b068c1b8029626f1 \
-    # via flask-admin, flask-wtf
+    # via flask-wtf
