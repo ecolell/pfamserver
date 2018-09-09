@@ -198,7 +198,7 @@ def shrink(version):
             '   and column_name=\'{column}\' ' \
             '   and table_schema=database()  ' \
             ') ; ' \
-            'set @sqlstmt := if(@exist_Check>0,\'ALTER TABLE {table} DROP COLUMN {column};\', \'select 1\') ; '\
+            'set @sqlstmt := if(@exist_Check>0,\'ALTER TABLE {table} DROP COLUMN {column};\' , \'select 1\') ; '\
             'prepare stmt from @sqlstmt ; '\
             'execute stmt ;'
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
@@ -209,6 +209,7 @@ def shrink(version):
     queries = [
         'UPDATE uniprot SET created=updated;',
         'UPDATE pfamseq SET created=updated;',
+        'UPDATE pfamA SET created=updated;',
         ''.join(superquery)
     ]
     commands = [
