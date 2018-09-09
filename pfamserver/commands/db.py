@@ -191,7 +191,8 @@ def size(version):
 def shrink(version):
     """Shrink the data into the database removing unused columns."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
-    query = 'set @exist_Check := ( ' \
+    query = 'SELECT \'{table}->{column}\'; ' \
+            'set @exist_Check := ( ' \
             '   select count(*) from information_schema.columns ' \
             '   where table_name=\'{table}\' ' \
             '   and column_name=\'{column}\' ' \
