@@ -205,5 +205,16 @@ def shrink(version):
         query.format(db_name=db_name, table=table, column=column)
         for (table, columns) in unused_columns.items() for column in columns
     ]
-    commands = ['sudo mysql -u root {db_name} -e "{query}"'.format(query=''.join(superquery), db_name=db_name)]
+    queries = [
+        'UPDATE uniprot SET created=updated;',
+        'UPDATE pfamseq SET created=updated;',
+        ''.join(superquery)
+    ]
+    commands = [
+        'sudo mysql -u root {db_name} -e "{query}"'.format(
+            query=q,
+            db_name=db_name
+        )
+        for q in queries
+    ]
     run(commands)
