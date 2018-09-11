@@ -34,6 +34,11 @@ dumps
 hmmer-*
 Pfam*
 esl-afetch
+hmmpress
+hmmscan
+pfam*.sql.bz2
+tmp/
+wget-log
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
