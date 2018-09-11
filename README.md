@@ -47,7 +47,6 @@ To install the hmmer library and be able to recover a pfam alignment in stockhol
 
     flask library hmmer install -v 3.2.1
     flask library hmmer stockholm_index -v 31.0
-    flask library hmmer stockholm_index -v 3.2.1
 
 To install the pfamscan library to be able to get a list of pfam accessions from a protein sequence you should execute:
 

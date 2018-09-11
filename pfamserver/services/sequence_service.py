@@ -10,8 +10,13 @@ from subprocess import Popen as run, PIPE
 import re
 import os
 from pfamserver.services import version_service
+import uuid
+from builtins import str as text
 
 merry = Merry()
+
+os.environ["PERL5LIB"] = os.path.abspath('./PfamScan')
+os.environ["PATH"] = os.path.abspath('.') + ':' + os.environ["PATH"]
 
 
 class SequenceServiceError(Exception):
@@ -38,18 +43,15 @@ def is_pfam_match(line):
 
 
 def id_generator():
-    return '1'
+    return text(uuid.uuid4())
 
 
 def pfamscan(seq):
     hmmdata_path = os.path.abspath(os.path.join('./', version_service.version()))
     pfamscan_bin = os.path.abspath('./PfamScan/pfam_scan.pl')
     tmp_path = os.path.abspath('./tmp')
-    os.environ["PERL5LIB"] = os.path.abspath('./PfamScan')
-    os.environ["PATH"] = os.path.abspath('.') + ':' + os.environ["PATH"]
     pfamscan_call = pfamscan_bin + ' -dir ' + hmmdata_path
 
-    # fasta_path = "{:s}/PfamScan/P00533.fasta.txt".format(pfamscan_dir)
     fasta_path = os.path.join(tmp_path, id_generator() + ".fasta")
     with open(fasta_path, 'w') as outstream:
         outstream.write(">user_sequence\n" + seq)
