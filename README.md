@@ -48,9 +48,8 @@ To deploy the database structure you should execute:
 
     $ workon pfamserver
     $ pip install -r requirements.txt
-    $ flask db structure build -v 32.0
-    $ flask db data download -v 32.0
-    $ flask db data load -v 32.0
+    $ flask db shrinked download -v 32.0
+    $ flask db shrinked install -v 32.0
 
 NOTE: On the last command the console will take the connection parameters from the SQLALCHEMY_DATABASE_URI variable.
 
@@ -75,6 +74,33 @@ Then in both systems you need to run:
     $ sudo npm install -g npm@5.1.0
     $ sudo npm install -g yarn@0.27.5
     $ yarn install && yarn run build
+
+
+Shrinking process
+=======
+
+To download a specific database version from the [ebi.ac.uk] server, use the commands:
+
+    $ workon pfamserver
+    $ pip install -r requirements.txt
+    $ flask db structure build -v 32.0
+    $ flask db data download -v 32.0
+    $ flask db data load -v 32.0
+
+To shrink it and pack it (it could take a day):
+
+    $ flask db data shrink -v 32.0
+    $ flask db dump -v 32.0
+    $ flask db pack_dump -v 32.0
+
+To make the shrink available:
+    
+    1. Upload the file into the proper `Google Drive account`.
+    2. Update the `pfamserver/commands/db.py` file. Set the reationship between `pfam_version` and `google_drive_object_id` into the `versions` dictionary.
+    3. Push the changes to the main repository.
+    4. Test it using:
+
+        $ flask db shrinked download -v 32.0
 
 
 Testing

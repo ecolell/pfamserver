@@ -96,7 +96,7 @@ def build(version, ftp):
               default=last_available_version(),
               help='Version to install.')
 def clean(version):
-    """Get download commands."""
+    """Clean database."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
     if click.confirm('Do you want to remove database {db_name}?'.format(db_name=db_name)):
         commands = [
@@ -117,7 +117,7 @@ def data():
               type=click.STRING,
               multiple=False,
               default=last_available_version(),
-              help='Version to install.')
+              help='Version to download.')
 @click.option('--ftp',
               is_flag=True,
               help='Force to use ftp.')
@@ -140,7 +140,7 @@ def download(version, ftp):
               type=click.STRING,
               multiple=False,
               default=last_available_version(),
-              help='Version to install.')
+              help='Version to load.')
 def load(version):
     """Load the data into the database (be aware to apply into a clean database)."""
     files = [(t + '.txt.gz') for t in tables]
@@ -170,7 +170,7 @@ def load(version):
               type=click.STRING,
               multiple=False,
               default=last_available_version(),
-              help='Version to install.')
+              help='Version to measure size.')
 def size(version):
     """Get database size."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
@@ -187,7 +187,7 @@ def size(version):
               type=click.STRING,
               multiple=False,
               default=last_available_version(),
-              help='Version to install.')
+              help='Version to shrink.')
 def shrink(version):
     """Shrink the data into the database removing unused columns."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
@@ -220,3 +220,89 @@ def shrink(version):
         for q in queries
     ]
     run(commands)
+
+
+@db.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to dump.')
+def dump(version):
+    """Dump the database into a sql file."""
+    db_name = 'Pfam' + version[:2] + '_' + version[-1:]
+    commands = [
+        'mkdir -p data',
+        'sudo mysqldump --databases {db_name} > ./data/pfam{version}.sql'
+    ]
+    run(commands, db_name=db_name, version=version)
+
+
+@db.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to dump.')
+def pack_dump(version):
+    """Pack the dump of the database into a bzip2 file."""
+    commands = [
+        'bzip2 -c ./data/pfam{version}.sql > ./data/pfam{version}.sql.bz2'
+    ]
+    run(commands, version=version)
+
+
+@db.group()
+def shrinked():
+    """Shrinked data commands"""
+    pass
+
+
+versions = {
+    '31.0': '1S0jrbULH9ZlXrDsxQPYms29REuYDNjDK'
+}
+
+
+@shrinked.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to install.')
+def download(version):
+    """Download shrinked file, continue on break (it could take a few hours)."""
+    if version not in versions:
+        click.echo('Version ' + version + ' is not available as a skrinked DB.')
+        return None
+    filename = './data/pfam' + version + '.sql.bz2'
+    commands = [
+        'mkdir -p data',
+        'bash ./pfamserver/commands/shrinked_downloader.sh {id} {filename}'
+    ]
+    click.echo('\n'.join(commands))
+    run(commands,
+        id=versions[version],
+        filename=filename)
+
+
+@shrinked.command()
+@click.option('--version', '-v', 'version',
+              type=click.STRING,
+              multiple=False,
+              default=last_available_version(),
+              help='Version to install.')
+def install(version):
+    """Install shrinked file, continue on break (it could take a few hours)."""
+    filename = './data/pfam' + version + '.sql.bz2'
+    data_filename = './data/pfam' + version + '.sql'
+    if not os.path.isfile(filename):
+        click.echo('Version ' + version + ' wasn\'t downloaded as a shrinked DB.')
+        return None
+    commands = [
+        'bzip2 -d {filename} > {data_filename}',
+        'cat {data_filename} | sudo mysql -u root'
+    ]
+    click.echo('\n'.join(commands))
+    run(commands,
+        filename=filename,
+        data_filename=data_filename)
