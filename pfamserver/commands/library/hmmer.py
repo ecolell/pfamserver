@@ -35,7 +35,7 @@ def install(version):
         'cd hmmer-{version} && ./configure',
         'cd hmmer-{version} && make',
         'ln -s hmmer-{version}/easel/miniapps/esl-afetch esl-afetch',
-        'ln -s hmmer-{version}/src/hmmpres hmmpres',
+        'ln -s hmmer-{version}/src/hmmpress hmmpress',
         'ln -s hmmer-{version}/src/hmmscan hmmscan'
     ]
     run(cmds, version=version)
