@@ -32,9 +32,6 @@ def install():
         'wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz',
         'tar xvzf PfamScan.tar.gz',
         'sudo perl - MCPAN - e"install Moose"'
-        #'cd PfamScan && ./configure',
-        #'cd PfamScan && make',
-        #'ln -s PfamScan/easel/miniapps/esl-afetch esl-afetch'
     ]
     run(cmds)
 
