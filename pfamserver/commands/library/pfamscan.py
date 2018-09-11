@@ -49,6 +49,7 @@ def index(version, ftp):
     """Download PfamA-full file."""
     protocol = 'ftp' if ftp else 'http'
     cmds = [
+        'mkdir -p ./Pfam{version}',
         'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.gz -O ./Pfam{version}/Pfam-A.hmm.gz',
         'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.dat.gz -O ./Pfam{version}/Pfam-A.hmm.dat.gz',
         'gunzip -c ./Pfam{version}/Pfam-A.hmm.gz > ./Pfam{version}/Pfam-A.hmm',
