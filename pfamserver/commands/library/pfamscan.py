@@ -37,13 +37,6 @@ def install():
 
 
 @pfamscan.command()
-@with_appcontext
-def test():
-    filename = os.path.abspath(os.path.join(current_app.root_path, '../PfamScan'))
-    click.echo(filename)
-
-
-@pfamscan.command()
 @click.option('--version', '-v', 'version',
               type=click.STRING,
               multiple=False,

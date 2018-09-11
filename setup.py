@@ -23,7 +23,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=reqs,
-    url='pfamserver.leloir.org.ar',
+    url='mistic2.leloir.org.ar:5001',
     license='MIT License',
     author='Eloy Adonis Colell',
     author_email='eloy.colell@gmail.com',
