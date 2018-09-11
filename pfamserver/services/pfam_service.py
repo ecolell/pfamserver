@@ -11,6 +11,7 @@ from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 from subprocess import Popen as run, PIPE
 
+from pfamserver.services import version_service
 
 merry = Merry()
 
@@ -70,5 +71,9 @@ def get_stockholm_from_pfam(pfam):
     query = query.options(Load(PfamA).load_only("pfamA_acc"))
     pfamA_acc = query.one().pfamA_acc
     fetch_call = './esl-afetch'
-    cmd = [fetch_call, "Pfam-A.full", pfamA_acc]
+    cmd = [
+        fetch_call,
+        "./{version}/Pfam-A.full".format(version=version_service.version()),
+        pfamA_acc
+    ]
     return run(cmd, stdout=PIPE).communicate()[0]

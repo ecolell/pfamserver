@@ -24,6 +24,11 @@ class ProteinSequenceAPI(Resource):
     @ns.doc('Obtain a pfams list from a uniprot.')
     @cache.cached(timeout=3600)
     def get(self, sequence):
-        uniprot = sequence_service.get_pfams_from_sequence(sequence)
-        data, errors = self.schema.dump(uniprot)
+        sequence = sequence.upper().strip()
+        output = sequence_service.get_pfams_from_sequence(sequence)
+        # data, errors = self.schema.dump(uniprot)
+        data = {
+            'query': sequence,
+            'output': output
+        }
         return data, 200

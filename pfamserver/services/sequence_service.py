@@ -1,19 +1,15 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import cast
-from sqlalchemy.sql.functions import concat
-from sqlalchemy import or_, types
-from sqlalchemy.orm import Load
 from flask import current_app
-from pfamserver.models import PfamA, PfamARegFullSignificant, Pfamseq, PdbPfamAReg
+from pfamserver.models import PfamA
 from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 from subprocess import Popen as run, PIPE
 import re
 import os
-
+from pfamserver.services import version_service
 
 merry = Merry()
 
@@ -46,11 +42,15 @@ def id_generator():
 
 
 def pfamscan(seq):
-    os.environ["PERL5LIB"] = current_app.config['PFAMSCAN_PATH']
-    pfamscan_call = ('{:s}/pfam_scan.pl -dir {:s}').format(current_app.config['PFAMSCAN_PATH'], current_app.config['PFAMSCAN_PATH'])
+    hmmdata_path = os.path.abspath(os.path.join('./', version_service.version()))
+    pfamscan_bin = os.path.abspath('./PfamScan/pfam_scan.pl')
+    tmp_path = os.path.abspath('./tmp')
+    os.environ["PERL5LIB"] = os.path.abspath('./PfamScan')
+    os.environ["PATH"] = os.path.abspath('.') + ':' + os.environ["PATH"]
+    pfamscan_call = pfamscan_bin + ' -dir ' + hmmdata_path
 
     # fasta_path = "{:s}/PfamScan/P00533.fasta.txt".format(pfamscan_dir)
-    fasta_path = os.path.join(current_app.config['TEMP'], id_generator() + ".fasta")
+    fasta_path = os.path.join(tmp_path, id_generator() + ".fasta")
     with open(fasta_path, 'w') as outstream:
         outstream.write(">user_sequence\n" + seq)
 
@@ -72,14 +72,10 @@ def parse_pfamscan(text):
         for t in zip(matches, pfams)]
 
 
-def get_pfams_from_sequence(sequence):
-    seq = sequence.upper().strip()
+def get_pfams_from_sequence(seq):
     sequence = r'^[AC-IK-Y]*\r*$'
     if re.match(sequence, seq):
         output = parse_pfamscan(pfamscan(seq))
     else:
         output = []
-    return {
-        'query': seq,
-        'output': output
-    }
+    return output

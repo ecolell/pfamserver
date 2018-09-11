@@ -34,7 +34,9 @@ def install(version):
         'tar xvzf hmmer-{version}.tar.gz',
         'cd hmmer-{version} && ./configure',
         'cd hmmer-{version} && make',
-        'ln -s hmmer-{version}/easel/miniapps/esl-afetch esl-afetch'
+        'ln -s hmmer-{version}/easel/miniapps/esl-afetch esl-afetch',
+        'ln -s hmmer-{version}/src/hmmpres hmmpres',
+        'ln -s hmmer-{version}/src/hmmscan hmmscan'
     ]
     run(cmds, version=version)
 
@@ -52,8 +54,8 @@ def stockholm_index(version, ftp):
     """Download and index PfamA-full file."""
     protocol = 'ftp' if ftp else 'http'
     cmds = [
-        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.full.gz',
-        'gunzip -c Pfam-A.full.gz > Pfam-A.full',
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.full.gz -O ./Pfam{version}/Pfam-A.full.gz',
+        'gunzip -c ./Pfam{version}/Pfam-A.full.gz > ./Pfam{version}/Pfam-A.full',
         'sed -i -E "s/(#=GF AC   [A-Z0-9]+)\\.(.+)/\\1\\' + 'n#=GF DC   Revision: \\2/g" Pfam-A.full',
         './esl-afetch --index Pfam-A.full'
     ]

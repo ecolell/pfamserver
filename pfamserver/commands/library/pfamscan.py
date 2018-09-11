@@ -4,6 +4,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import click
+from flask.cli import with_appcontext
+from flask import current_app
+
+
 click.disable_unicode_literals_warning = True
 
 import os
@@ -22,21 +26,24 @@ def run(cmds, **kwargs):
 
 
 @pfamscan.command()
-@click.option('--version', '-v', 'version',
-              type=click.STRING,
-              multiple=False,
-              default='3.2.1',
-              help='Version to install.')
-def install(version):
+def install():
     """Download and compile pfamscan sourcecode."""
     cmds = [
-        'wget http://eddylab.org/software/pfamscan/pfamscan-{version}.tar.gz',
-        'tar xvzf pfamscan-{version}.tar.gz',
-        'cd pfamscan-{version} && ./configure',
-        'cd pfamscan-{version} && make',
-        'ln -s pfamscan-{version}/easel/miniapps/esl-afetch esl-afetch'
+        'wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz',
+        'tar xvzf PfamScan.tar.gz',
+        'sudo perl - MCPAN - e"install Moose"'
+        #'cd PfamScan && ./configure',
+        #'cd PfamScan && make',
+        #'ln -s PfamScan/easel/miniapps/esl-afetch esl-afetch'
     ]
-    run(cmds, version=version)
+    run(cmds)
+
+
+@pfamscan.command()
+@with_appcontext
+def test():
+    filename = os.path.abspath(os.path.join(current_app.root_path, '../PfamScan'))
+    click.echo(filename)
 
 
 @pfamscan.command()
@@ -52,8 +59,12 @@ def index(version, ftp):
     """Download PfamA-full file."""
     protocol = 'ftp' if ftp else 'http'
     cmds = [
-        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.gz',
-        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.dat.gz',
-        'gunzip Pfam-A.hmm*.gz',
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.gz -O ./Pfam{version}/Pfam-A.hmm.gz',
+        'wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/Pfam-A.hmm.dat.gz -O ./Pfam{version}/Pfam-A.hmm.dat.gz',
+        'gunzip -c ./Pfam{version}/Pfam-A.hmm.gz > ./Pfam{version}/Pfam-A.hmm',
+        'gunzip -c ./Pfam{version}/Pfam-A.hmm.dat.gz > ./Pfam{version}/Pfam-A.hmm.dat',
+        './hmmpress ./Pfam{version}/Pfam-A.hmm',
+        'mkdir -p tmp',
+
     ]
     run(cmds, version=version, protocol=protocol)
