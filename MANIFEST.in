@@ -1,4 +1,0 @@
-include AUTHORS README.md LICENSE requirements.txt requirements.*.txt Makefile version.py
-recursive-include pfamserver *.py
-recursive-include pfamserver/templates *.html
-recursive-include tests *.py
