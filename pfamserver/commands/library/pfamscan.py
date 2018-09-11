@@ -29,7 +29,7 @@ def run(cmds, **kwargs):
 def install():
     """Download and compile pfamscan sourcecode."""
     cmds = [
-        'wget ftp://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz',
+        'wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz',
         'tar xvzf PfamScan.tar.gz',
         'sudo perl - MCPAN - e"install Moose"'
     ]
