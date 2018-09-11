@@ -298,7 +298,7 @@ def install(version):
         click.echo('Version ' + version + ' wasn\'t downloaded as a shrinked DB.')
         return None
     commands = [
-        'bzip2 -d {filename} > {data_filename}',
+        'bzip2 -dk {filename}',
         'cat {data_filename} | sudo mysql -u root'
     ]
     click.echo('\n'.join(commands))
