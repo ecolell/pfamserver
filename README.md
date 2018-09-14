@@ -57,8 +57,7 @@ To deploy the database structure you should execute:
 
     flask db shrinked download -v 31.0
     flask db shrinked install -v 31.0
-
-NOTE: On the last command the console will take the connection parameters from the SQLALCHEMY_DATABASE_URI variable.
+    flask db data build_cache -v 31.0 
 
 On the frontend side, it was tested with:
 
@@ -80,7 +79,7 @@ Then in both systems you need to run:
     sudo n 6.11.0
     sudo npm install -g npm@5.1.0
     sudo npm install -g yarn@0.27.5
-    yarn install && yarn run build
+    npm install .
 
 ## Shrinking process
 
@@ -109,9 +108,11 @@ To make the shrink available:
 
 ## Testing
 
-To test all the project you should use the command:
+To test the project you should use the command:
 
     FLASK_ENV=testing py.test
+
+NOTE: Remember to set SQLALCHEMY_DATABASE_URI to the right version of the pfam database.
 
 If you want to help us or report an issue join to us through our [issue tracker](https://wichi.no-ip.org/leloir/pfamserver/issues).
 
@@ -120,6 +121,8 @@ If you want to help us or report an issue join to us through our [issue tracker]
 To run the project you should use the command:
 
     FLASK_ENV=developing honcho start web webpack
+
+NOTE: Remember to set SQLALCHEMY_DATABASE_URI to the right version of the pfam database.
 
 ## Example
 
