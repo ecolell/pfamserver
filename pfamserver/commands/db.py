@@ -230,16 +230,10 @@ def shrink(version):
 def build_cache(version):
     """Build cache tables to improve the performance of some queries."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
-    queries = [
-        'DROP TABLE IF EXISTS pfamA_pfamseq;',
-        'CREATE TABLE pfamA_pfamseq (pfamseq_id VARCHAR(16), pfamA_acc VARCHAR(7), pfamseq_acc VARCHAR(10), has_pdb BOOLEAN NOT NULL DEFAULT 0)'
-    ]
     commands = [
-        'sudo mysql -u root {db_name} -e "{query}"'.format(
-            query=q,
+        'cat ./pfamserver/commands/db_build_cache.sql | sudo mysql -u root {db_name}'.format(
             db_name=db_name
         )
-        for q in queries
     ]
     run(commands)
 
@@ -299,7 +293,7 @@ def download(version):
     filename = './data/pfam' + version + '.sql.bz2'
     commands = [
         'mkdir -p data',
-        'bash ./pfamserver/commands/shrinked_downloader.sh {id} {filename}'
+        'bash ./pfamserver/commands/db_shrinked_downloader.sh {id} {filename}'
     ]
     click.echo('\n'.join(commands))
     run(commands,
