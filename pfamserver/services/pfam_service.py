@@ -44,7 +44,7 @@ def get_pfam(pfam):
 def get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb):
     subquery = scoped_db.query(PfamA)
     subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                    PfamA.pfamA_id.ilike(code))).distinct().subquery()
+                                   PfamA.pfamA_id.ilike(code))).distinct().subquery()
 
     query = scoped_db.query(PfamAPfamseq.pfamseq_id, PfamAPfamseq.pfamA_acc)
     query = query.filter(PfamAPfamseq.pfamA_acc == subquery.c.pfamA_acc)
@@ -54,7 +54,6 @@ def get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb):
 
     query = query.order_by(PfamAPfamseq.pfamseq_id.asc())
     return query.distinct().all()
-
 
 
 def get_sequence_descriptions_from_pfam(pfam, with_pdb):
