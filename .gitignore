@@ -27,12 +27,11 @@ bin/
 share/
 include/
 pip-selfcheck.json
-database_files/
 node_modules/
 celerybeat-schedule
 dumps
 hmmer-*
-Pfam*
+Pfam*\.0
 esl-afetch
 hmmpress
 hmmscan

@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS pfamA_pfamseq;
 
-CREATE TABLE pfamA_pfamseq ( pfamseq_id VARCHAR(16), pfamA_acc VARCHAR(7), pfamseq_acc VARCHAR(10), has_pdb BOOLEAN NOT NULL DEFAULT 0)
+CREATE TABLE pfamA_pfamseq ( pfamseq_id VARCHAR(40), pfamA_acc VARCHAR(7), pfamseq_acc VARCHAR(10), has_pdb BOOLEAN NOT NULL DEFAULT 0)
 SELECT CONCAT(pfamseq.pfamseq_id, '/', CONVERT(pfamA_reg_full_significant.seq_start, CHAR), '-', CONVERT(pfamA_reg_full_significant.seq_end, CHAR)) AS 'pfamseq_id',
        pfamA_reg_full_significant.pfamA_acc,
        pfamA_reg_full_significant.pfamseq_acc,
