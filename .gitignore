@@ -32,6 +32,7 @@ celerybeat-schedule
 dumps
 hmmer-*
 Pfam*\.0
+PfamScan*
 esl-afetch
 hmmpress
 hmmscan
