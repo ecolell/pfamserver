@@ -25,7 +25,7 @@ def make_cache_key(*args, **kwargs):
 
 
 @ns.route('/<pfam>')
-class UniprotAPI(Resource):
+class PfamAAPI(Resource):
     schema = schemas.PfamSchema()
 
     @ns.response(200, "response")

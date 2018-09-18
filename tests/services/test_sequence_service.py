@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from pfamserver.services import sequence_service as service
+import pytest
 
 
 def test_get_pfams_from_sequence(app):
@@ -57,14 +58,8 @@ def test_get_pfams_from_sequence(app):
         assert service.get_pfams_from_sequence(sequence) == expected_result
 
 
-def test_get_pfams_from_invalid_sequence(app):
-    sequence = 'DNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRH' \
-               'IVRKRTLRRLLQERELVEPLTPSGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMAS' \
-               'VDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGA' \
-               'EEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPK' \
-               'FRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQ' \
-               'SCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFD' \
-               'SPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA'
+def test_get_pfams_from_invalid_sequence(app, egfr_human_partial_sequence):
+    sequence = egfr_human_partial_sequence
     expected_result = [
         {
             'seq_end': 61,
@@ -85,3 +80,13 @@ def test_get_pfams_from_invalid_sequence(app):
         assert service.get_pfams_from_sequence(sequence) == expected_result
         sequence = sequence[:30] + '\n' + sequence[31:]
         assert service.get_pfams_from_sequence(sequence) == []
+
+
+def test_get_pfam_from_pfamacc(db):
+    pfamA = service.get_pfam_from_pfamacc('PF00131')
+    assert pfamA.description == 'Metallothionein'
+    assert pfamA.num_full == 345
+
+    with pytest.raises(service.SequenceServiceError) as exc:
+        service.get_pfam_from_pfamacc('invalid_pfam')
+        assert exc.value.message == 'PfamA doesn''t exist.'

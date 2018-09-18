@@ -29,9 +29,10 @@ class SequenceServiceError(Exception):
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise SequenceServiceError('Sequence doesn''t exist.')
+    raise SequenceServiceError('PfamA doesn''t exist.')
 
 
+@merry._try
 def get_pfam_from_pfamacc(pfam_acc):
     query = db.session.query(PfamA.num_full, PfamA.description)
     query = query.filter(PfamA.pfamA_acc == pfam_acc)

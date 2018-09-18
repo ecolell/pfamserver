@@ -5,3 +5,4 @@ from .pfam_a_reg_full_significant import PfamARegFullSignificant
 from .pfamseq import Pfamseq
 from .uniprot import Uniprot
 from .uniprot_reg_full import UniprotRegFull
+from .pfam_a_pfamseq import PfamAPfamseq

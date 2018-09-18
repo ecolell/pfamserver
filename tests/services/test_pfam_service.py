@@ -3,7 +3,37 @@ from pfamserver.services import pfam_service as service
 import pytest
 
 
-def test_get_sequence_descriptions_from_pfam(db):
+def test_get_sequence_descriptions_from_pfam_without_join_table(db):
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_without_join_table('pf00131', True)
+    assert len(sequence_descriptions) == 6
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_without_join_table('pf00131', False)
+    assert len(sequence_descriptions) == 345
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_without_join_table('pf01030', True)
+    assert len(sequence_descriptions) == 18
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_without_join_table('pf01030', False)
+    assert len(sequence_descriptions) == 3152
+
+
+def test_get_sequence_descriptions_from_pfam_with_join_table(db):
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_with_join_table('pf00131', True)
+    assert len(sequence_descriptions) == 6
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_with_join_table('pf00131', False)
+    assert len(sequence_descriptions) == 345
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_with_join_table('pf01030', True)
+    assert len(sequence_descriptions) == 18
+
+    sequence_descriptions = service.get_sequence_descriptions_from_pfam_with_join_table('pf01030', False)
+    assert len(sequence_descriptions) == 3152
+
+
+@pytest.mark.parametrize('table_cache_enabled', [True, False])
+def test_get_sequence_descriptions_from_pfam(app, table_cache_enabled):
+    app.config['TABLE_CACHE_ENABLED'] = table_cache_enabled
     sequence_descriptions = service.get_sequence_descriptions_from_pfam('pf00131', True)
     assert len(sequence_descriptions) == 6
 
@@ -15,6 +45,7 @@ def test_get_sequence_descriptions_from_pfam(db):
 
     sequence_descriptions = service.get_sequence_descriptions_from_pfam('pf01030', False)
     assert len(sequence_descriptions) == 3152
+    app.config['TABLE_CACHE_ENABLED'] = False
 
 
 def test_get_stockholm_from_pfam(db):

@@ -29,3 +29,15 @@ def test_get_reference_sequences_pdbs(db, client):
         'uniprot_id': 'MT2_HUMAN'
     }
     assert len(data['output']) == 2
+
+
+def test_get_uniprots(db, client):
+    headers = [('Accept', 'application/json'),
+               ('Content-Type', 'application/json')]
+
+    res = client.get('/api/v0/uniprots/egfr_human', headers=headers)
+    assert res.status_code == 200
+    data = json.loads(res.get_data(as_text=True))
+    assert data['description'] == 'Epidermal growth factor receptor EC=2.7.10.1'
+    assert data['uniprot_id'] == 'EGFR_HUMAN'
+    assert data['uniprot_acc'] == 'P00533'

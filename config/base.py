@@ -36,6 +36,7 @@ class BaseConfig(object):
 
     SQLALCHEMY_DATABASE_SCHEMA = 'public'
     SQLALCHEMY_ECHO = False  # True to log queries
+    TABLE_CACHE_ENABLED = os.getenv('TABLE_CACHE_ENABLED', False)
 
     # Pagination setting
     ITEMS_PER_PAGE = 10

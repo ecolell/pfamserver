@@ -5,12 +5,12 @@ from sqlalchemy.sql.expression import cast
 from sqlalchemy.sql.functions import concat
 from sqlalchemy import or_, types
 from sqlalchemy.orm import Load
-from pfamserver.models import PfamA, PfamARegFullSignificant, Pfamseq, PdbPfamAReg
+from pfamserver.models import PfamA, PfamARegFullSignificant, Pfamseq, PdbPfamAReg, PfamAPfamseq
 from pfamserver.extensions import db
 from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
 from subprocess import Popen as run, PIPE
-
+from flask import current_app
 from pfamserver.services import version_service
 
 merry = Merry()
@@ -42,21 +42,21 @@ def get_pfam(pfam):
 
 
 def get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb):
-    subquery = scoped_db.query(PfamA)
-    subquery = subquery.filter(or_(PfamA.pfamA_acc == code.upper(),
-                                   PfamA.pfamA_id.ilike(code))).distinct().subquery()
+    subquery = get_pfam_acc_from_pfam(pfam)
+    subquery = subquery.distinct().subquery()
 
-    query = scoped_db.query(PfamAPfamseq.pfamseq_id, PfamAPfamseq.pfamA_acc)
+    query = db.session.query(PfamAPfamseq.pfamseq_id)
     query = query.filter(PfamAPfamseq.pfamA_acc == subquery.c.pfamA_acc)
 
     if with_pdb:
         query = query.filter(PfamAPfamseq.has_pdb == 1)
 
     query = query.order_by(PfamAPfamseq.pfamseq_id.asc())
-    return query.distinct().all()
+    results = query.distinct().all()
+    return [r[0] for r in results]
 
 
-def get_sequence_descriptions_from_pfam(pfam, with_pdb):
+def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
     subquery = get_pfam_acc_from_pfam(pfam)
     subquery = subquery.distinct().subquery()
 
@@ -78,6 +78,14 @@ def get_sequence_descriptions_from_pfam(pfam, with_pdb):
     query = query.order_by(Pfamseq.pfamseq_id.asc()).distinct()
     results = query.all()
     return [r[0] for r in results]
+
+
+def get_sequence_descriptions_from_pfam(pfam, with_pdb):
+    if current_app.config.get('TABLE_CACHE_ENABLED'):
+        sequence_descriptions = get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb)
+    else:
+        sequence_descriptions = get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb)
+    return sequence_descriptions
 
 
 @merry._try

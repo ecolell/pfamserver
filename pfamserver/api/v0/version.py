@@ -11,12 +11,6 @@ ns = api.namespace('version', decorators=[
     api.response(400, "not found")])
 
 
-def make_cache_key(*args, **kwargs):
-    path = request.path
-    args = str(request.args.items())
-    return (path + args).encode('utf-8')
-
-
 @ns.route('')
 class VersionAPI(Resource):
 
