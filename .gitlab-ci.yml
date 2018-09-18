@@ -168,7 +168,6 @@ backend27_tests:
   - echo '{"assets":{},"publicPath":""}' > pfamserver/static/manifest.json
   - echo "[global]\nindex-url = http://192.168.101.105:3141/root/pypi/+simple/\ntrusted-host = 192.168.101.105" > ~/.pip/pip.conf
   - pip install -r requirements_development.txt
-  - FLASK_ENV=testing flask db upgrade
   - FLASK_ENV=testing py.test
   allow_failure: true
   except:
@@ -199,7 +198,6 @@ backend36_tests:
   - echo '{"assets":{},"publicPath":""}' > pfamserver/static/manifest.json
   - echo "[global]\nindex-url = http://192.168.101.105:3141/root/pypi/+simple/\ntrusted-host = 192.168.101.105" > ~/.pip/pip.conf
   - pip install -r requirements_development.txt
-  - FLASK_ENV=testing flask db upgrade
   - FLASK_ENV=testing py.test
   allow_failure: true
   except:
