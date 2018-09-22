@@ -36,9 +36,9 @@ BEGIN
         WHERE pfamA_reg_full_significant.pfamA_acc = pfamA_acc;
         SET i = i + 1;
     END WHILE;
-    CREATE INDEX pfamA_pfamseq_pfamseq_id_IDX USING HASH ON Pfam31_0.pfamA_pfamseq (pfamseq_id);
-    CREATE INDEX pfamA_pfamseq_pfamA_acc_IDX USING HASH ON Pfam31_0.pfamA_pfamseq (pfamA_acc);
-    CREATE INDEX pfamA_pfamseq_pfamseq_acc_IDX USING HASH ON Pfam31_0.pfamA_pfamseq (pfamseq_acc);
+    CREATE INDEX pfamA_pfamseq_pfamseq_id_IDX USING HASH ON pfamA_pfamseq (pfamseq_id);
+    CREATE INDEX pfamA_pfamseq_pfamA_acc_IDX USING HASH ON pfamA_pfamseq (pfamA_acc);
+    CREATE INDEX pfamA_pfamseq_pfamseq_acc_IDX USING HASH ON pfamA_pfamseq (pfamseq_acc);
 END;
 ;;
 
