@@ -38,6 +38,7 @@ hmmpress
 hmmscan
 pfam*.sql.bz2
 tmp/
+data/
 wget-log
 
 # PyInstaller

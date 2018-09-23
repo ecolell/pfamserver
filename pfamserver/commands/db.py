@@ -275,7 +275,8 @@ def shrinked():
 
 
 versions = {
-    '31.0': '1S0jrbULH9ZlXrDsxQPYms29REuYDNjDK'
+    '31.0': '1S0jrbULH9ZlXrDsxQPYms29REuYDNjDK',
+    '32.0': '1MPWPvgmrbbzt-xmyra3mPcJFkXoYun3G'
 }
 
 
