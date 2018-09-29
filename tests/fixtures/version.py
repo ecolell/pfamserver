@@ -4,4 +4,4 @@ import pytest
 
 @pytest.fixture
 def current_version(app):
-    return "Pfam32.0"
+    return 'Pfam32.0'
