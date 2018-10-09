@@ -46,18 +46,18 @@ On Ubuntu Desktop there are some other libraries not installed by default which 
 To install the hmmer library and be able to recover a pfam alignment in stockholm format you should execute:
 
     flask library hmmer install -v 3.2.1
-    flask library hmmer stockholm_index -v 31.0
+    flask library hmmer stockholm_index -v 32.0
 
 To install the pfamscan library to be able to get a list of pfam accessions from a protein sequence you should execute:
 
     flask library pfamscan install
-    flask library pfamscan index -v 31.0
+    flask library pfamscan index -v 32.0
 
 To deploy the database structure you should execute:
 
-    flask db shrinked download -v 31.0
-    flask db shrinked install -v 31.0
-    flask db data build_cache -v 31.0 
+    flask db shrinked download -v 32.0
+    flask db shrinked install -v 32.0
+    flask db data build_cache -v 32.0
 
 On the frontend side, it was tested with:
 
@@ -87,15 +87,15 @@ To download a specific database version from the [ebi.ac.uk] server, use the com
 
     workon pfamserver
     pip install -r requirements.txt
-    flask db structure build -v 31.0
-    flask db data download -v 31.0
-    flask db data load -v 31.0
+    flask db structure build -v 32.0
+    flask db data download -v 32.0
+    flask db data load -v 32.0
 
 To shrink it and pack it (it could take a day):
 
-    flask db data shrink -v 31.0
-    flask db dump -v 31.0
-    flask db pack_dump -v 31.0
+    flask db data shrink -v 32.0
+    flask db dump -v 32.0
+    flask db pack_dump -v 32.0
 
 To make the shrink available:
 
@@ -104,7 +104,7 @@ To make the shrink available:
     3. Push the changes to the main repository.
     4. Test it using:
 
-        flask db shrinked download -v 31.0
+        flask db shrinked download -v 32.0
 
 ## Testing
 
