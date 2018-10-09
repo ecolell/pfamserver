@@ -3,7 +3,7 @@ __version__ = '1.0.0'
 import sys
 import os
 from pfamserver import static
-from pfamserver.extensions import db, cache, collect, compress, webpack, sentry
+from pfamserver.extensions import db, cache, collect, compress, mail, webpack, sentry
 from flask import Flask
 from flask_restplus import apidoc
 
@@ -72,6 +72,7 @@ def register_extensions(app):
     collect.init_app(app)
     compress.init_app(app)
     sentry.init_app(app)
+    mail.init_app(app)
     webpack.init_app(app)
 
 

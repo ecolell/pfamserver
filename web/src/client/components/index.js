@@ -14,16 +14,9 @@ define(['require', 'knockout', 'mini-toastr', 'lodash/forEach'], function(requir
     var components = [
         'main',
         'home',
-        /* 'home-header',
-        'home-footer',
-        'home-services',
-        'home-about',
-        'home-tour',
-        'pricing',
-        'clients',
         'examples',
         'team',
-        'contact', */
+        'contact',
     ];
 
     forEach(components, register);

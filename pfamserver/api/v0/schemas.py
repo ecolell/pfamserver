@@ -49,3 +49,10 @@ pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', defa
 
 class SequenceSchema(Schema):
     pass
+
+
+contact_us_query = api.parser()
+contact_us_query.add_argument('name', required=True)
+contact_us_query.add_argument('email', required=True)
+contact_us_query.add_argument('phone', required=True)
+contact_us_query.add_argument('message', required=True)

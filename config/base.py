@@ -58,6 +58,18 @@ class BaseConfig(object):
     PFAMSERVER_ROOT_PATH = os.getenv('PFAMSERVER_ROOT_PATH',
                                      'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/')
 
+    # FLASK MAIL CONFIG
+    MAIL_ENABLED = env.bool('MAIL_ENABLED', True)
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_USE_TLS = env.bool('MAIL_USE_TLS', False)
+    MAIL_USE_SSL = env.bool('MAIL_USE_SSL', True)
+    MAIL_PORT = os.environ.get('MAIL_PORT', 465)
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'SET_THIS_ON_CONSOLE')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'SET_THIS_ON_CONSOLE')
+    MAIL_DEFAULT_SENDER = 'Pfamserver No Reply <{email}>'.format(email=MAIL_USERNAME)
+
+    FEEDBACK_EMAIL = 'Feedback <mistic.leloir+pfamserver@gmail.com>'
+
     SENTRY_CONFIG = {}
 
     @staticmethod
