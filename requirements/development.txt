@@ -10,7 +10,8 @@ asn1crypto==0.24.0 \
     # via cryptography
 bumpversion==0.5.3 \
     --hash=sha256:6744c873dd7aafc24453d8b6a1a0d6d109faf63cd0cd19cb78fd46e74932c77e \
-    --hash=sha256:6753d9ff3552013e2130f7bc03c1007e24473b4835952679653fb132367bdd57
+    --hash=sha256:6753d9ff3552013e2130f7bc03c1007e24473b4835952679653fb132367bdd57 \
+    # via -r development.in
 cffi==1.11.5 \
     --hash=sha256:151b7eefd035c56b2b2e1eb9963c90c6302dc15fbd8c1c0a83a163ff2c7d7743 \
     --hash=sha256:1553d1e99f035ace1c0544050622b7bc963374a00c467edafac50ad7bd276aef \
@@ -68,7 +69,8 @@ cryptography==2.3 \
     --hash=sha256:c132bab45d4bd0fff1d3fe294d92b0a6eb8404e93337b3127bdec9f21de117e6 \
     --hash=sha256:c3d945b7b577f07a477700f618f46cbc287af3a9222cd73035c6ef527ef2c363 \
     --hash=sha256:cee18beb4c807b5c0b178f4fa2fae03cef9d51821a358c6890f8b23465b7e5d2 \
-    --hash=sha256:d01dfc5c2b3495184f683574e03c70022674ca9a7be88589c5aba130d835ea90
+    --hash=sha256:d01dfc5c2b3495184f683574e03c70022674ca9a7be88589c5aba130d835ea90 \
+    # via -r development.in, pyopenssl
 dparse==0.4.1 \
     --hash=sha256:00a5fdfa900629e5159bf3600d44905b333f4059a3366f28e0dbd13eeab17b19 \
     --hash=sha256:cef95156fa0adedaf042cd42f9990974bec76f25dfeca4dc01f381a243d5aa5b \
@@ -88,7 +90,8 @@ first==2.0.1 \
     # via pip-tools
 futures==3.1.1 ; python_version <= "2.7" \
     --hash=sha256:51ecb45f0add83c806c68e4b06106f90db260585b25ef2abfcda0bd95c0132fd \
-    --hash=sha256:c4884a65654a7c45435063e14ae85280eb1f111d94e542396717ba9828c4337f
+    --hash=sha256:c4884a65654a7c45435063e14ae85280eb1f111d94e542396717ba9828c4337f \
+    # via -r development.in, isort
 idna==2.7 \
     --hash=sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e \
     --hash=sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16 \
@@ -100,7 +103,8 @@ ipaddress==1.0.22 \
 isort==4.3.4 \
     --hash=sha256:1153601da39a25b14ddc54955dbbacbb6b2d19135386699e2ad58517953b34af \
     --hash=sha256:b9c40e9750f3d77e6e4d441d8b0266cf555e7cdabdcff33c4fd06366ca761ef8 \
-    --hash=sha256:ec9ef8f4a9bc6f71eec99e1806bfa2de401650d996c59330782b89a5555c1497
+    --hash=sha256:ec9ef8f4a9bc6f71eec99e1806bfa2de401650d996c59330782b89a5555c1497 \
+    # via -r development.in
 mako==1.0.7 \
     --hash=sha256:4e02fde57bd4abb5ec400181e4c314f56ac3e49ba4fb8b0d50bba18cb27d25ae \
     # via sqltap
@@ -117,22 +121,26 @@ packaging==17.1 \
     --hash=sha256:f019b770dd64e585a99714f1fd5e01c7a8f11b45635aa953fd41c689a657375b \
     # via dparse, safety
 pdbpp==0.9.2 \
-    --hash=sha256:dde77326e4ea41439c243ed065826d53539530eeabd1b6615aae15cfbb9fda05
+    --hash=sha256:dde77326e4ea41439c243ed065826d53539530eeabd1b6615aae15cfbb9fda05 \
+    # via -r development.in
 pip-tools==2.0.2 \
     --hash=sha256:90bbe6731a6a34d339bf14d90cf2892475386c7d06c458208191ac9992110e0a \
-    --hash=sha256:f11fc3bf1d87a0b4a68d4d595f619814e2396e92d75d7bdd2500edbf002ea6de
+    --hash=sha256:f11fc3bf1d87a0b4a68d4d595f619814e2396e92d75d7bdd2500edbf002ea6de \
+    # via -r development.in
 pyasn1==0.4.4 \
     --hash=sha256:b9d3abc5031e61927c82d4d96c1cec1e55676c1a991623cfed28faea73cdd7ca \
     --hash=sha256:f58f2a3d12fd754aa123e9fa74fb7345333000a035f3921dbdaa08597aa53137 \
     # via ndg-httpsclient, requests
 pycodestyle==2.4.0 \
     --hash=sha256:cbc619d09254895b0d12c2c691e237b2e91e9b2ecf5e84c26b35400f93dcfb83 \
-    --hash=sha256:cbfca99bd594a10f674d0cd97a3d802a1fdef635d4361e1a2658de47ed261e3a
+    --hash=sha256:cbfca99bd594a10f674d0cd97a3d802a1fdef635d4361e1a2658de47ed261e3a \
+    # via -r development.in
 pycparser==2.18 \
     --hash=sha256:99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226 \
     # via cffi
 pydot==1.0.2 ; python_version <= "2.7" \
-    --hash=sha256:80ea01a7ba75671a3b7890375be0ad8d5321b07bfb6f572192c31409062b59f3
+    --hash=sha256:80ea01a7ba75671a3b7890375be0ad8d5321b07bfb6f572192c31409062b59f3 \
+    # via -r development.in
 pygments==2.2.0 \
     --hash=sha256:78f3f434bcc5d6ee09020f92ba487f95ba50f1e3ef83ae96b9d5ffa1bab25c5d \
     --hash=sha256:dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc \
@@ -163,12 +171,15 @@ pyyaml==3.13 \
     # via dparse
 requests[security]==2.9.1 \
     --hash=sha256:113fbba5531a9e34945b7d36b33a084e8ba5d0664b703c81a7c572d91919a5b8 \
-    --hash=sha256:c577815dd00f1394203fc44eb979724b098f88264a9ef898ee45b8e5e9cf587f
+    --hash=sha256:c577815dd00f1394203fc44eb979724b098f88264a9ef898ee45b8e5e9cf587f \
+    # via -r development.in, safety
 rope==0.10.7 \
-    --hash=sha256:a09edfd2034fd50099a67822f9bd851fbd0f4e98d3b87519f6267b60e50d80d1
+    --hash=sha256:a09edfd2034fd50099a67822f9bd851fbd0f4e98d3b87519f6267b60e50d80d1 \
+    # via -r development.in
 safety==1.8.4 \
     --hash=sha256:399511524f47230d5867f1eb75548f9feefb7a2711a4985cb5be0e034f87040f \
-    --hash=sha256:69b970918324865dcd7b92337e07152a0ea1ceecaf92f4d3b38529ee0ca83441
+    --hash=sha256:69b970918324865dcd7b92337e07152a0ea1ceecaf92f4d3b38529ee0ca83441 \
+    # via -r development.in
 six==1.11.0 \
     --hash=sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9 \
     --hash=sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb \
@@ -181,12 +192,14 @@ sqlparse==0.2.4 \
     --hash=sha256:d9cf190f51cbb26da0412247dfe4fb5f4098edb73db84e02f9fc21fdca31fed4 \
     # via sqltap
 sqltap==0.3.10 \
-    --hash=sha256:d3f62dfccc0022e1252f8dce516dc2437e7f859802ab1da26bce2ae0db78f77f
+    --hash=sha256:d3f62dfccc0022e1252f8dce516dc2437e7f859802ab1da26bce2ae0db78f77f \
+    # via -r development.in
 vim-debug==1.5.4 \
-    --hash=sha256:d29ead73364c403b38aede92315da714bbfe5ff5db0c19bb5d05609db41b90f6
-werkzeug==0.14.1 \
-    --hash=sha256:c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c \
-    --hash=sha256:d5da73735293558eb1651ee2fddc4d0dedcfa06538b8813a2e20011583c9e49b \
+    --hash=sha256:d29ead73364c403b38aede92315da714bbfe5ff5db0c19bb5d05609db41b90f6 \
+    # via -r development.in
+werkzeug==0.15.3 \
+    --hash=sha256:97660b282aa7e29f94f3fe378e5c7162d7ab9d601a8dbb1cbb2ffc8f0e54607d \
+    --hash=sha256:cfd1281b1748288e59762c0e174d64d8bcb2b70e7c57bc4a1203c8825af24ac3 \
     # via sqltap
 wmctrl==0.3 \
     --hash=sha256:d806f65ac1554366b6e31d29d7be2e8893996c0acbb2824bbf2b1f49cf628a13 \
