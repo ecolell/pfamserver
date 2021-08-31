@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import click
 click.disable_unicode_literals_warning = True
 
-from urllib import urlopen
+from urllib.request import urlopen
 from contextlib import closing
 import re
 import os
@@ -46,8 +46,9 @@ def last_available_version():
     """Get the last available version."""
     url = 'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D'
     with closing(urlopen(url)) as conn:
+        lines = list(line.decode("utf-8") for line in conn.readlines())
         hrefs = [
-            line for line in conn.readlines()
+            line for line in lines
             if "href=\"Pfam" in line
         ]
         versions = [
@@ -142,7 +143,7 @@ def download(version, ftp):
               default=last_available_version(),
               help='Version to load.')
 def load(version):
-    """Load the data into the database (be aware to apply into a clean database)."""
+    """Load the mysql into the database (be aware to apply into a clean database)."""
     files = [(t + '.txt.gz') for t in tables]
     root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../..'))
     click.echo(root)
@@ -189,7 +190,7 @@ def size(version):
               default=last_available_version(),
               help='Version to shrink.')
 def shrink(version):
-    """Shrink the data into the database removing unused columns."""
+    """Shrink the mysql into the database removing unused columns."""
     query = 'SELECT \'{table}->{column}\'; ' \
             'set @exist_Check := ( ' \
             '   select count(*) from information_schema.columns ' \
@@ -248,8 +249,8 @@ def dump(version):
     """Dump the database into a sql file."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
     commands = [
-        'mkdir -p data',
-        'sudo mysqldump --databases {db_name} > ./data/pfam{version}.sql'
+        'mkdir -p mysql',
+        'sudo mysqldump --databases {db_name} > ./mysql/pfam{version}.sql'
     ]
     run(commands, db_name=db_name, version=version)
 
@@ -263,14 +264,14 @@ def dump(version):
 def pack_dump(version):
     """Pack the dump of the database into a bzip2 file."""
     commands = [
-        'bzip2 -c ./data/pfam{version}.sql > ./data/pfam{version}.sql.bz2'
+        'bzip2 -c ./mysql/pfam{version}.sql > ./mysql/pfam{version}.sql.bz2'
     ]
     run(commands, version=version)
 
 
 @db.group()
 def shrinked():
-    """Shrinked data commands"""
+    """Shrinked mysql commands"""
     pass
 
 
@@ -291,9 +292,9 @@ def download(version):
     if version not in versions:
         click.echo('Version ' + version + ' is not available as a skrinked DB.')
         return None
-    filename = './data/pfam' + version + '.sql.bz2'
+    filename = './mysql/pfam' + version + '.sql.bz2'
     commands = [
-        'mkdir -p data',
+        'mkdir -p mysql',
         'bash ./pfamserver/commands/db_shrinked_downloader.sh {id} {filename}'
     ]
     click.echo('\n'.join(commands))
@@ -310,8 +311,8 @@ def download(version):
               help='Version to install.')
 def install(version):
     """Install shrinked file, continue on break (it could take a few hours)."""
-    filename = './data/pfam' + version + '.sql.bz2'
-    data_filename = './data/pfam' + version + '.sql'
+    filename = './mysql/pfam' + version + '.sql.bz2'
+    data_filename = './mysql/pfam' + version + '.sql'
     if not os.path.isfile(filename):
         click.echo('Version ' + version + ' wasn\'t downloaded as a shrinked DB.')
         return None

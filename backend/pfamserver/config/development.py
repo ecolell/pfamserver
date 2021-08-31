@@ -1,12 +1,10 @@
-from config.base import env, BaseConfig
+from pfamserver.config.base import env, BaseConfig
 import logging
 
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    TESTING = False
-    # BOOTSTRAP_SERVE_LOCAL = True
-    MAIL_ENABLED = True
+    WEBPACK_ASSETS_URL = env.str('WEBPACK_ASSETS_URL', 'http://localhost:5001/static/dist/')
 
     @staticmethod
     def init_app(app):

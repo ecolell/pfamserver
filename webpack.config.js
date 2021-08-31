@@ -9,7 +9,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 
 // paths
-const rootAssetPath = path.resolve(__dirname, './web');
+const rootAssetPath = path.resolve(__dirname, './frontend');
 
 // env variables
 const RUN_ENV = {
@@ -75,7 +75,7 @@ module.exports = {
         ]
     },
     output: {
-        path: __dirname + '/pfamserver/static/dist',
+        path: __dirname + '/backend/pfamserver/static/dist',
         publicPath: 'http://localhost:2992/assets/',
         filename: nodeEnv === RUN_ENV.DEV || nodeEnv === RUN_ENV.WEBPACK_DEV_SERVER
             ? '[name].[chunkhash:8].js'
@@ -89,7 +89,7 @@ module.exports = {
         moduleExtensions: ["-loader"]
     },
     module: {
-        loaders: [
+        rules: [
             {
                 enforce: 'pre',
                 test: /\.js$/,
@@ -106,6 +106,7 @@ module.exports = {
                 loader: "file-loader",
                 options: {
                     name: 'img/[name].[hash:8].[ext]',
+                    esModule: false,
                 }
             },
             {
@@ -180,7 +181,7 @@ module.exports = {
             filename: '[name].[hash:6].css',
             allChunks: true
         }),
-        new ManifestRevisionPlugin(path.join('pfamserver/static/', 'manifest.json'), {
+        new ManifestRevisionPlugin(path.join('backend/pfamserver/static/', 'manifest.json'), {
             rootAssetPath: rootAssetPath,
             ignorePaths: ['/src', '/test'],
             format: myCoolFormatter
@@ -207,16 +208,11 @@ module.exports = {
 
 //Configure /dist folder for non nn server environments
 if (nodeEnv !== RUN_ENV.WEBPACK_DEV_SERVER) {
-    module.exports.plugins.push(new webpack.optimize.UglifyJsPlugin({
-        compress: {
-            warnings: false
-        },
-        output: {
-            comments: false
-        }
-    }));
+    module.exports.optimization = {
+        minimize: true
+    };
     module.exports.output.publicPath = '/static/dist/';
-    module.exports.plugins.push(new CleanWebpackPlugin(['pfamserver/static/dist/'], {
+    module.exports.plugins.push(new CleanWebpackPlugin(['backend/mistic/static/dist/'], {
         verbose: true,
         dry: false
     }));

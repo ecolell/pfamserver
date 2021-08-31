@@ -41,6 +41,7 @@ pfam*.sql.bz2
 tmp/
 data/
 wget-log
+backend/pfamserver/static
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -77,3 +78,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# database
+db/mysql/*

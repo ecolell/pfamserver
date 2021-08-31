@@ -50,7 +50,8 @@ class BaseConfig(object):
     BASE_PATH = os.path.dirname(os.path.realpath(__file__))
     UPLOAD_FOLDER = os.path.join(BASE_PATH, 'static/')
 
-    WEBPACK_MANIFEST_PATH = './static/manifest.json'
+    WEBPACK_MANIFEST_PATH = env.str("WEBPACK_MANIFEST_PATH", "./static/manifest.json")
+    WEBPACK_ASSETS_URL = env.str("WEBPACK_ASSETS_URL", "/static/dist/")
 
     SEND_FILE_MAX_AGE_DEFAULT=3600
 

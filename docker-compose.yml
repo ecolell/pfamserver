@@ -1,0 +1,68 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: backend
+      target: backend_web
+    command: make api
+    restart: always
+    networks:
+      - intranet
+    links:
+      - db:db
+    volumes:
+      - ./backend:/home/pfamserver/stage
+    environment:
+      - PROJECT_NAME
+    env_file:
+      - backend/.env
+    user: ${CURRENT_UID}
+  web-dev:
+    build:
+      context: backend
+      target: backend_dev
+    restart: unless-stopped
+    networks:
+      - intranet
+    links:
+      - db:db
+    working_dir: /home/pfamserver/stage
+    entrypoint: bash
+    volumes:
+      - ./backend:/home/pfamserver/stage
+    env_file:
+      - backend/.env
+    user: ${CURRENT_UID}
+  db:
+    restart: always
+    image: mysql:8.0.26
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - intranet
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    env_file:
+      - db/.env
+  nginx:
+    image: nginx:1.13.5
+    networks:
+      - intranet
+      - traefik
+    links:
+      - web:web
+    volumes:
+      - ./backend/pfamserver/static:/var/www/static
+      - ./nginx/conf.d:/etc/nginx/conf.d
+  frontend:
+    image: node:8.11.1
+    working_dir: /usr/app
+    volumes:
+      - .:/usr/app
+
+networks:
+  intranet:
+    driver: bridge
+  traefik:
+    external:
+      name: pfamserver_traefik_gate

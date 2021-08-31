@@ -54,7 +54,7 @@ deploy_master:
   - pip install -r requirements_development.txt
   - git push -f heroku master
   - flask db upgrade
-  - flask data algorithms load
+  - flask mysql algorithms load
   only:
   - master
   tags:

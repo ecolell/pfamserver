@@ -13,10 +13,8 @@ def main_app(page):
     return render_template('index.html')
 
 
-"""
 @blueprint.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(blueprint.root_path, 'static'),
                                'favicon.ico',
                                mimetype='image/png')
-"""

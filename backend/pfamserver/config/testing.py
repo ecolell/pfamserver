@@ -1,4 +1,4 @@
-from config.base import env, BaseConfig
+from pfamserver.config.base import env, BaseConfig
 
 
 class TestingConfig(BaseConfig):

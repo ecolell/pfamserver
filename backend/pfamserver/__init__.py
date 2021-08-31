@@ -2,15 +2,14 @@ __version__ = '1.0.0'
 
 import sys
 import os
-from pfamserver import static
-from pfamserver.extensions import db, cache, collect, compress, mail, webpack, sentry
+from pfamserver.extensions import db, cache, collect, mail, webpack, sentry
 from flask import Flask
 from flask_restplus import apidoc
 
-from config.development import DevelopmentConfig
-from config.staging import StagingConfig
-from config.production import ProductionConfig
-from config.testing import TestingConfig
+from pfamserver.config.development import DevelopmentConfig
+from pfamserver.config.staging import StagingConfig
+from pfamserver.config.production import ProductionConfig
+from pfamserver.config.testing import TestingConfig
 from pfamserver.exceptions import SentryIgnoredError
 
 configs = {
@@ -52,10 +51,11 @@ def create_app():
 
 def register_blueprints(app):
     "Registers blueprints into app"
+    from pfamserver import public
     from pfamserver.api.v0 import api_v0
 
     prefix = app.config.get('ROOT_URL_PREFIX', '')
-    app.register_blueprint(static.blueprint)
+    app.register_blueprint(public.blueprint)
     app.register_blueprint(api_v0, url_prefix=prefix + '/api/v0')
 
     if app.config.get('DEBUG'):
@@ -70,7 +70,6 @@ def register_extensions(app):
 
     cache.init_app(app)
     collect.init_app(app)
-    compress.init_app(app)
     sentry.init_app(app)
     mail.init_app(app)
     webpack.init_app(app)
@@ -86,10 +85,6 @@ def register_middlewares(app):
     if app.config.get('PROFILE', None):
         from werkzeug.contrib.profiler import ProfilerMiddleware
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[20])
-
-    if app.config.get('PROFILE_SQL', None):
-        from sqltap.wsgi import SQLTapMiddleware
-        app.wsgi_app = SQLTapMiddleware(app.wsgi_app)
 
 
 def register_cli(app):

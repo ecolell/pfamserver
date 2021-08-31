@@ -1,0 +1,32 @@
+[flake8]
+ignore =
+    C901 # 'requires_auth' is too complex
+    E402 # module level import not at top of file
+    E711 # comparison to None should be 'if cond is not None:'
+    E712 # comparison to True should be 'if cond is True:' or 'if cond:'
+    F841 # local variable 'url' is assigned to but never used
+    FI10 # import “division” missing
+    FI11 # import “absolute_import” missing
+    FI12 # import “with_statement” missing
+    FI13 # import “print_function” missing
+    FI14 # import ”unicode_literals” missing
+    FI15 # import “generator_stop” missing
+    FI16 # import “nested_scopes” missing
+    FI17 # import “generators” missing
+    FI18 # import "annotations" missing
+    FI50 # import “division” present
+    FI51 # import “absolute_import” present
+    FI53 # import “print_function” present
+    FI54 # import “unicode_literals” present
+    FI90 # import does not exist
+    W503 # line break before binary operator
+exclude =
+    __pycache__
+    .git
+    .tox
+    node_modules
+    venv
+    e2e
+max-complexity = 10
+max-line-length = 140
+require-code = True

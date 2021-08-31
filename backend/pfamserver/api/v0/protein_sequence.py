@@ -26,7 +26,7 @@ class ProteinSequenceAPI(Resource):
     def get(self, sequence):
         sequence = sequence.upper().strip()
         output = sequence_service.get_pfams_from_sequence(sequence)
-        # data, errors = self.schema.dump(uniprot)
+        # mysql, errors = self.schema.dump(uniprot)
         data = {
             'query': sequence,
             'output': output
