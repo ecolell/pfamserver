@@ -42,6 +42,7 @@ tmp/
 data/
 wget-log
 backend/pfamserver/static
+backend/mysql
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
