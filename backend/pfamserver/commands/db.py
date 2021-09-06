@@ -232,7 +232,7 @@ def build_cache(version):
     """Build cache tables to improve the performance of some queries."""
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
     commands = [
-        'cat ./pfamserver/commands/db_build_cache.sql | sudo mysql -u root {db_name}'.format(
+        'cat /home/pfamserver/stage/pfamserver/commands/db_build_cache.sql | mysql -u root -h db --password="root" {db_name}'.format(
             db_name=db_name
         )
     ]
@@ -250,7 +250,7 @@ def dump(version):
     db_name = 'Pfam' + version[:2] + '_' + version[-1:]
     commands = [
         'mkdir -p mysql',
-        'sudo mysqldump --databases {db_name} > ./mysql/pfam{version}.sql'
+        'sudo mysqldump --databasecat  | s {db_name} > ./mysql/pfam{version}.sql'
     ]
     run(commands, db_name=db_name, version=version)
 
@@ -311,14 +311,14 @@ def download(version):
               help='Version to install.')
 def install(version):
     """Install shrinked file, continue on break (it could take a few hours)."""
-    filename = './mysql/pfam' + version + '.sql.bz2'
-    data_filename = './mysql/pfam' + version + '.sql'
+    filename = '/home/pfamserver/stage/mysql/pfam' + version + '.sql.bz2'
+    data_filename = '/home/pfamserver/stage/mysql/pfam' + version + '.sql'
     if not os.path.isfile(filename):
         click.echo('Version ' + version + ' wasn\'t downloaded as a shrinked DB.')
         return None
     commands = [
         'bzip2 -dk {filename}',
-        'cat {data_filename} | sudo mysql -u root'
+        'mysql -u root -h db --password="root" Pfam' + version.replace('.', '_') + ' < {data_filename}'
     ]
     click.echo('\n'.join(commands))
     run(commands,

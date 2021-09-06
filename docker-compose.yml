@@ -22,7 +22,6 @@ services:
     build:
       context: backend
       target: backend_dev
-    restart: unless-stopped
     networks:
       - intranet
     links:
@@ -37,6 +36,8 @@ services:
   db:
     restart: always
     image: mysql:8.0.26
+    security_opt:
+      - seccomp:unconfined
     command: --default-authentication-plugin=mysql_native_password
     networks:
       - intranet

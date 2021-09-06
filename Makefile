@@ -28,11 +28,11 @@ dev-init:
 # Docker images
 
 docker-build:
-	$(DC) build web web-dev
+	$(DC) build --no-cache web web-dev
 
 docker-upload:
-	docker pull ecolell/pfamserver-web:latest
-	docker pull ecolell/pfamserver-web:latest-dev
+	-docker pull ecolell/pfamserver-web:latest
+	-docker pull ecolell/pfamserver-web:latest-dev
 	docker build -t "ecolell/pfamserver-web:latest" --cache-from "ecolell/pfamserver-web:latest" --target backend_base backend
 	docker build -t ecolell/pfamserver-web:latest-dev --cache-from ecolell/pfamserver-web:latest-dev --target backend_dev backend
 	docker login --username=ecolell
@@ -102,20 +102,6 @@ stop:
 clean:
 	$(DC) down -v --remove-orphans
 
-# DB commands
-
-load-db-examples:
-	cp ./examples.sql ./backend/examples.sql
-	$(DC) run --rm web flask data jobs load -f /home/pfamserver/stage/examples.sql
-
-build-db: load-db-examples
-
-backup-db: dump-db
-	@echo "--> Extracting DB from docker compose."
-
-dump-db:
-	$(DC) run --rm web flask data jobs dump -f /home/pfamserver/stage/dumped.sql
-
 # Release commands
 
 rel-start:
@@ -125,17 +111,29 @@ rel-start:
 rel-end:
 	@echo "--> Release ready"
 
-up: # dump-db
+setup-libraries:
+	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) -e HMMER_VERSION=$(HMMER_VERSION) --entrypoint="make" --rm web setup-libraries
+
+
+shrinked-download:
+	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --rm web-dev shrinked-download
+
+shrinked-install:
+	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --use-aliases --rm web-dev shrinked-install
+
+shrinked-build-cache:
+	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --use-aliases --rm web-dev shrinked-build-cache
+
+setup-shrinked: shinked-download shrinked-install shrinked-build-cache
+
+up: setup-libraries
 	$(DC) up -d db
 	@sleep 3;
 
 	$(DC) up -d web nginx
 	# $(DC) scale web=4
 
-restore-db:
-	$(DC) run --rm web flask data jobs load -f /home/pfamserver/stage/dumped.sql
-
-bootup: rel-start clean docker-build build-frontend up rel-end
+bootup: rel-start clean docker-build build-frontend up setup-shrinked rel-end
 blue-green-release:
 	./deploy.sh
 

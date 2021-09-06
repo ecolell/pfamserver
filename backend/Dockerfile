@@ -13,7 +13,7 @@ RUN mkdir -p /home/pfamserver/requirements/
 RUN (curl -L https://packagecloud.io/github/git-lfs/gpgkey | apt-key add - ) && \
     (curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash) && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git-lfs postgresql && \
+    apt-get install -y --no-install-recommends git-lfs postgresql zlibc libbz2-dev bzip2 && \
     git lfs install && \
     rm -rf /var/lib/apt/lists/*
 
@@ -34,14 +34,16 @@ FROM backend_base as backend_web
 
 WORKDIR /home/pfamserver/stage
 
-ENV FLASK_ENV SQLALCHEMY_DATABASE_URI NODE_ENV SERVER_NAME FLASK_APP
+ENV FLASK_ENV SQLALCHEMY_DATABASE_URI NODE_ENV SERVER_NAME FLASK_APP PFAM_VERSION HMMER_VERSION
 
 EXPOSE 5000 4369
 
+FROM mysql:8.0.26 as mysql
 FROM backend_web as backend_dev
 
 WORKDIR /home/pfamserver/requirements
 RUN poetry install --no-interaction --no-ansi
+COPY --from=mysql /usr/bin/mysql /usr/bin/mysql
 
 
 FROM backend_worker as backend_dev_worker

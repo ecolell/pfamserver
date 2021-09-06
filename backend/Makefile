@@ -4,10 +4,6 @@ api:
 python-requirements-dev:
 	echo "To update python, libraries or algorithms versions need to rebuild the docker image."
 
-pipeline-database-test:
-	FLASK_ENV=development flask db upgrade
-	FLASK_ENV=development flask db downgrade
-
 pipeline-test:
 	FLASK_ENV=development py.test -s -v
 	pip install mypy
@@ -28,14 +24,20 @@ pipeline-quality:
 	FLASK_ENV=development pydocstyle pfamserver
 	FLASK_ENV=development radon cc -nb -a pfamserver
 
-db-migrate:
-	FLASK_ENV=development flask db migrate
+setup-libraries:
+	FLASK_ENV=development flask library hmmer install -v ${HMMER_VERSION}
+	FLASK_ENV=development flask library hmmer stockholm_index -v ${PFAM_VERSION}
+	FLASK_ENV=development flask library pfamscan install
+	FLASK_ENV=development flask library pfamscan index -v ${PFAM_VERSION}
 
-db-upgrade:
-	FLASK_ENV=development flask db upgrade
+shrinked-download:
+	FLASK_ENV=development flask db shrinked download -v ${PFAM_VERSION}
 
-db-downgrade:
-	FLASK_ENV=development flask db downgrade
+shrinked-install:
+	FLASK_ENV=development flask db shrinked install -v ${PFAM_VERSION}
+
+shrinked-build-cache:
+	FLASK_ENV=development flask db data build-cache -v ${PFAM_VERSION}
 
 update-setup-py:
 	pip install poetry2setup

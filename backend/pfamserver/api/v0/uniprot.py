@@ -26,7 +26,7 @@ class UniprotAPI(Resource):
     @cache.cached(timeout=3600)
     def get(self, uniprot):
         uniprot = uniprot_service.get_uniprot(uniprot)
-        data, errors = self.schema.dump(uniprot)
+        data = self.schema.dump(uniprot)
         return data, 200
 
 
@@ -39,7 +39,7 @@ class UniprotPfamsAPI(Resource):
     @cache.cached(timeout=3600)
     def get(self, uniprot):
         uniprot = uniprot_service.get_pfams_from_uniprot(uniprot)
-        data, errors = self.schema.dump(uniprot)
+        data = self.schema.dump(uniprot)
         return data, 200
 
 
@@ -52,7 +52,7 @@ class SequenceDescriptionAPI(Resource):
     @cache.cached(timeout=3600)
     def get(self, uniprot_id, seq_start, seq_end):
         pdbs = pdb_service.get_pdbs_from_uniprot_pfam_a_reg(uniprot_id, seq_start, seq_end)
-        output, errors = self.schema.dump(pdbs, many=True)
+        output = self.schema.dump(pdbs, many=True)
         data = {
             'query': {
                 'uniprot_id': uniprot_id,

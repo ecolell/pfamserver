@@ -45,6 +45,7 @@ gunicorn = "^20.1.0"
 types-six = "^0.1.7"
 types-requests = "^2.25.1"
 raven = "^6.10.0"
+PyMySQL = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.0"

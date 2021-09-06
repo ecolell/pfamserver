@@ -33,7 +33,7 @@ class PfamAAPI(Resource):
     @cache.cached(timeout=3600)
     def get(self, pfam):
         pfam = pfam_service.get_pfam(pfam)
-        data, errors = self.schema.dump(pfam)
+        data = self.schema.dump(pfam)
         return data, 200
 
 
