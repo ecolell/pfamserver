@@ -70,7 +70,7 @@
     "knockout.bootstrap.modal": "2.0.0",
     "less": "^2.3.1",
     "less-loader": "^4.0.3",
-    "lodash": "^4.13.1",
+    "lodash": "^4.17.21",
     "manifest-revision-webpack-plugin": "^0.4.0",
     "merge-files-webpack-plugin": "^1.1.2",
     "mini-toastr": "0.5.0",
