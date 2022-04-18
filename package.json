@@ -75,7 +75,7 @@
     "merge-files-webpack-plugin": "^1.1.2",
     "mini-toastr": "0.5.0",
     "node-gyp": "^3.6.2",
-    "node-sass": "^4.5.3",
+    "node-sass": "^7.0.0",
     "npm": "^5.6.0",
     "postcss-loader": "^2.0.10",
     "precss": "^3.1.0",
