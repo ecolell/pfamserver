@@ -55,11 +55,6 @@ services:
     volumes:
       - ./backend/pfamserver/static:/var/www/static
       - ./nginx/conf.d:/etc/nginx/conf.d
-  frontend:
-    image: node:8.11.1
-    working_dir: /usr/app
-    volumes:
-      - ./frontend:/usr/app
 
 networks:
   intranet:
