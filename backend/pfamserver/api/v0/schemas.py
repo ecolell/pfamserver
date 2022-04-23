@@ -1,14 +1,16 @@
-from . import api
-from marshmallow import Schema, fields
 from flask_restplus import inputs
+from flask_restplus.reqparse import RequestParser
+from marshmallow import Schema, fields
+
+from . import api
 
 
 class UniprotRegFullSchema(Schema):
     pfamA_acc = fields.Str()
-    description = fields.Str(attribute='pfamA.description')
+    description = fields.Str(attribute="pfamA.description")
     seq_start = fields.Int()
     seq_end = fields.Int()
-    num_full = fields.Str(attribute='pfamA.num_full')
+    num_full = fields.Str(attribute="pfamA.num_full")
 
 
 class UniprotSchema(Schema):
@@ -19,8 +21,8 @@ class UniprotSchema(Schema):
 
 
 class UniprotPfamsSchema(Schema):
-    query = fields.Str(attribute='uniprot_id')
-    output = fields.List(fields.Nested(UniprotRegFullSchema), attribute='pfams')
+    query = fields.Str(attribute="uniprot_id")
+    output = fields.List(fields.Nested(UniprotRegFullSchema), attribute="pfams")
 
 
 class PfamSchema(Schema):
@@ -36,15 +38,17 @@ class PdbPfamARegSchema(Schema):
     pdb_res_start = fields.Int()
     pdb_res_end = fields.Int()
     pfamA_acc = fields.Str()
-    title = fields.Str(attribute='pdb.title')
-    resolution = fields.Float(attribute='pdb.resolution')
-    method = fields.Str(attribute='pdb.method')
-    author = fields.Str(attribute='pdb.author')
-    date = fields.Str(attribute='pdb.date')
+    title = fields.Str(attribute="pdb.title")
+    resolution = fields.Float(attribute="pdb.resolution")
+    method = fields.Str(attribute="pdb.method")
+    author = fields.Str(attribute="pdb.author")
+    date = fields.Str(attribute="pdb.date")
 
 
-pfam_a_query = api.parser()
-pfam_a_query.add_argument('with_pdb', type=inputs.boolean, location='args', default=True)
+pfam_a_query = api.parser()  # type: RequestParser
+pfam_a_query.add_argument(
+    "with_pdb", type=inputs.boolean, location="args", default=True
+)
 
 
 class SequenceSchema(Schema):
@@ -52,7 +56,7 @@ class SequenceSchema(Schema):
 
 
 contact_us_query = api.parser()
-contact_us_query.add_argument('name', required=True)
-contact_us_query.add_argument('email', required=True)
-contact_us_query.add_argument('phone', required=True)
-contact_us_query.add_argument('message', required=True)
+contact_us_query.add_argument("name", required=True)
+contact_us_query.add_argument("email", required=True)
+contact_us_query.add_argument("phone", required=True)
+contact_us_query.add_argument("message", required=True)

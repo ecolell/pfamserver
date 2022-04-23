@@ -49,7 +49,9 @@ build-frontend:
 # Deployment targets
 
 pipeline-assets:
-	npm $(NPM_PROXY) install --no-audit && npm run build
+	$(DC) run --rm frontend rm -rf /usr/app/public
+	$(DC) run -e ACTIVE_ENV=production --rm frontend yarn install --no-audit
+	$(DC) run -e ACTIVE_ENV=production --rm frontend yarn build
 	mkdir -p backend/pfamserver/static
 	cp -rv static/* backend/pfamserver/static/
 	cp -rv backend/pfamserver/static public/

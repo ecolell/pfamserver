@@ -11,7 +11,7 @@ pipeline-test:
 
 lint-mypy:
 	pip install mypy
-	mypy .
+	mypy pfamserver tests
 
 pipeline-security:
 	FLASK_ENV=development bandit -x pfamserver/command -r pfamserver

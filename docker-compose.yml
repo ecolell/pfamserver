@@ -59,7 +59,7 @@ services:
     image: node:8.11.1
     working_dir: /usr/app
     volumes:
-      - .:/usr/app
+      - ./frontend:/usr/app
 
 networks:
   intranet:

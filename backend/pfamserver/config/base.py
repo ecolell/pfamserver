@@ -1,14 +1,12 @@
 import logging
 import os
-from datetime import timedelta
-import logging
 
 from environs import Env
 
 env = Env()
 
 
-class BaseConfig(object):
+class BaseConfig:
     # Serve bootstrap libs locally
     BOOTSTRAP_SERVE_LOCAL = True
 
@@ -19,24 +17,24 @@ class BaseConfig(object):
 
     # LOG CONFIG
     LOG_LEVEL = logging.DEBUG
-    LOG_FILE = '/tmp/flask_log.out'
+    LOG_FILE = "/tmp/flask_log.out"
 
     # Flask Toolbar
     DEBUG_TB_ENABLED = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     # Flask Security
-    SECRET_KEY = 'f49dc0a9de00d4e337e74b87bee8dbf806765ec73212ee7c9e6b1b5079a75eb7'
-    SECURITY_PASSWORD_HASH = 'sha512_crypt'
+    SECRET_KEY = "f49dc0a9de00d4e337e74b87bee8dbf806765ec73212ee7c9e6b1b5079a75eb7"
+    SECURITY_PASSWORD_HASH = "sha512_crypt"
 
     SECURITY_TRACKABLE = True
     SECURITY_RECOVERABLE = True
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
 
-    SQLALCHEMY_DATABASE_SCHEMA = 'public'
+    SQLALCHEMY_DATABASE_SCHEMA = "public"
     SQLALCHEMY_ECHO = False  # True to log queries
-    TABLE_CACHE_ENABLED = os.getenv('TABLE_CACHE_ENABLED', False)
+    TABLE_CACHE_ENABLED = os.getenv("TABLE_CACHE_ENABLED", False)
 
     # Pagination setting
     ITEMS_PER_PAGE = 10
@@ -45,33 +43,19 @@ class BaseConfig(object):
     # http://flask-sqlalchemy.pocoo.org/2.1/config/
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    COLLECT_STATIC_ROOT = os.environ.get('COLLECT_STATIC_ROOT', 'public/static')
+    COLLECT_STATIC_ROOT = os.environ.get("COLLECT_STATIC_ROOT", "public/static")
 
     BASE_PATH = os.path.dirname(os.path.realpath(__file__))
-    UPLOAD_FOLDER = os.path.join(BASE_PATH, 'static/')
+    UPLOAD_FOLDER = os.path.join(BASE_PATH, "static/")
 
-    WEBPACK_MANIFEST_PATH = env.str("WEBPACK_MANIFEST_PATH", "./static/manifest.json")
-    WEBPACK_ASSETS_URL = env.str("WEBPACK_ASSETS_URL", "/static/dist/")
+    SEND_FILE_MAX_AGE_DEFAULT = 3600
 
-    SEND_FILE_MAX_AGE_DEFAULT=3600
-
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'mysql+pymysql://root:root@db:3306/Pfam32_0')
-    PFAMSERVER_ROOT_PATH = os.getenv('PFAMSERVER_ROOT_PATH',
-                                     'http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/')
-
-    # FLASK MAIL CONFIG
-    MAIL_ENABLED = env.bool('MAIL_ENABLED', True)
-    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-    MAIL_USE_TLS = env.bool('MAIL_USE_TLS', False)
-    MAIL_USE_SSL = env.bool('MAIL_USE_SSL', True)
-    MAIL_PORT = os.environ.get('MAIL_PORT', 465)
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', 'SET_THIS_ON_CONSOLE')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'SET_THIS_ON_CONSOLE')
-    MAIL_DEFAULT_SENDER = 'Pfamserver No Reply <{email}>'.format(email=MAIL_USERNAME)
-
-    FEEDBACK_EMAIL = 'Feedback <mistic.leloir+pfamserver@gmail.com>'
-
-    SENTRY_CONFIG = {}
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "SQLALCHEMY_DATABASE_URI", "mysql+pymysql://root:root@db:3306/Pfam32_0"
+    )
+    PFAMSERVER_ROOT_PATH = os.getenv(
+        "PFAMSERVER_ROOT_PATH", "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/"
+    )
 
     @staticmethod
     def init_app(app):
