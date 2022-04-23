@@ -28,7 +28,9 @@ dev-init:
 # Docker images
 
 docker-build:
-	$(DC) build --no-cache web web-dev
+	$(MAKE) -C backend extract-requirements
+	$(DC) build web web-dev
+
 
 docker-upload:
 	-docker pull ecolell/pfamserver-web:latest
