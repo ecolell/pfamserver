@@ -59,14 +59,6 @@ six = ">=1.10.0"
 stevedore = ">=1.20.0"
 
 [[package]]
-name = "blinker"
-version = "1.4"
-description = "Fast, simple object-to-object and broadcast signaling"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "bump2version"
 version = "1.0.1"
 description = "Version-bump your software with a single command!"
@@ -285,17 +277,6 @@ python-versions = ">=3.5"
 Flask = "*"
 
 [[package]]
-name = "flask-collect"
-version = "1.3.2"
-description = "Flask-Collect -- Collect static files in Flask application"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-flask = ">=0.10.1"
-
-[[package]]
 name = "flask-dotenv"
 version = "0.1.0"
 description = "The .env file support for Flask"
@@ -304,18 +285,6 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
-Flask = "*"
-
-[[package]]
-name = "flask-mail"
-version = "0.9.1"
-description = "Flask extension for sending email"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-blinker = "*"
 Flask = "*"
 
 [[package]]
@@ -349,17 +318,6 @@ python-versions = ">= 2.7, != 3.0.*, != 3.1.*, != 3.2.*, != 3.3.*"
 [package.dependencies]
 Flask = ">=0.10"
 SQLAlchemy = ">=0.8.0"
-
-[[package]]
-name = "flask-webpack"
-version = "0.1.0"
-description = "Flask extension for managing assets with Webpack."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-Flask = "*"
 
 [[package]]
 name = "flask-wtf"
@@ -897,18 +855,6 @@ future = "*"
 mando = ">=0.6,<0.7"
 
 [[package]]
-name = "raven"
-version = "6.10.0"
-description = "Raven is a client for Sentry (https://getsentry.com)"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.extras]
-flask = ["Flask (>=0.8)", "blinker (>=1.1)"]
-tests = ["bottle", "celery (>=2.5)", "coverage (<4)", "exam (>=0.5.2)", "flake8 (==3.5.0)", "logbook", "mock", "nose", "pytz", "pytest (>=3.2.0,<3.3.0)", "pytest-timeout (==1.2.1)", "pytest-xdist (==1.18.2)", "pytest-pythonpath (==0.7.2)", "pytest-cov (==2.5.1)", "pytest-flake8 (==1.0.0)", "requests", "tornado (>=4.1,<5.0)", "tox", "webob", "webtest", "wheel", "anyjson", "zconfig", "Flask (>=0.8)", "blinker (>=1.1)", "Flask-Login (>=0.2.0)", "blinker (>=1.1)", "sanic (>=0.7.0)", "aiohttp"]
-
-[[package]]
 name = "requests"
 version = "2.26.0"
 description = "Python HTTP for Humans."
@@ -1240,7 +1186,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "81a94a8df8fe3e1146de631d8d5b5f09659892e50c508a9b1a61ed4fb6e7100f"
+content-hash = "a9390c5ef0b9f2c8209826bd50d05c177a21e4050948cf6e12252744aede9c83"
 
 [metadata.files]
 aniso8601 = [
@@ -1262,9 +1208,6 @@ attrs = [
 bandit = [
     {file = "bandit-1.7.0-py3-none-any.whl", hash = "sha256:216be4d044209fa06cf2a3e51b319769a51be8318140659719aa7a115c35ed07"},
     {file = "bandit-1.7.0.tar.gz", hash = "sha256:8a4c7415254d75df8ff3c3b15cfe9042ecee628a1e40b44c15a98890fbfc2608"},
-]
-blinker = [
-    {file = "blinker-1.4.tar.gz", hash = "sha256:471aee25f3992bd325afa3772f1063dbdbbca947a041b8b89466dc00d606f8b6"},
 ]
 bump2version = [
     {file = "bump2version-1.0.1-py2.py3-none-any.whl", hash = "sha256:37f927ea17cde7ae2d7baf832f8e80ce3777624554a653006c9144f8017fe410"},
@@ -1440,15 +1383,8 @@ flask-caching = [
     {file = "Flask-Caching-1.10.1.tar.gz", hash = "sha256:cf19b722fcebc2ba03e4ae7c55b532ed53f0cbf683ce36fafe5e881789a01c00"},
     {file = "Flask_Caching-1.10.1-py3-none-any.whl", hash = "sha256:bcda8acbc7508e31e50f63e9b1ab83185b446f6b6318bd9dd1d45626fba2e903"},
 ]
-flask-collect = [
-    {file = "Flask-Collect-1.3.2.tar.gz", hash = "sha256:8185b62703202c5b1240b7a463b4383cbe418c08ddad6f27b41eb4a39aca33e9"},
-    {file = "Flask_Collect-1.3.2-py2.py3-none-any.whl", hash = "sha256:d35d7cca1e085c9c092b87a2c93c5194602ce3f2c4e8aeb70e72516fc2954222"},
-]
 flask-dotenv = [
     {file = "Flask-DotEnv-0.1.0.tar.gz", hash = "sha256:dd8e3aa826913b24796addfabef518e4e2e6d1f64ff296980761252f2d18cb68"},
-]
-flask-mail = [
-    {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
 ]
 flask-restplus = [
     {file = "flask-restplus-0.13.0.tar.gz", hash = "sha256:a66e442d0bca08f389fc3d07b4d808fc89961285d12fb8013f7cf15516fa9f5c"},
@@ -1457,9 +1393,6 @@ flask-restplus = [
 flask-sqlalchemy = [
     {file = "Flask-SQLAlchemy-2.4.4.tar.gz", hash = "sha256:bfc7150eaf809b1c283879302f04c42791136060c6eeb12c0c6674fb1291fae5"},
     {file = "Flask_SQLAlchemy-2.4.4-py2.py3-none-any.whl", hash = "sha256:05b31d2034dd3f2a685cbbae4cfc4ed906b2a733cff7964ada450fd5e462b84e"},
-]
-flask-webpack = [
-    {file = "Flask-Webpack-0.1.0.tar.gz", hash = "sha256:aa56bf97253a07e09514e2ff6ff67497d8654a66a17c208394687a64528ddc74"},
 ]
 flask-wtf = [
     {file = "Flask-WTF-0.15.1.tar.gz", hash = "sha256:ff177185f891302dc253437fe63081e7a46a4e99aca61dfe086fb23e54fff2dc"},
@@ -1813,10 +1746,6 @@ pyyaml = [
 radon = [
     {file = "radon-5.1.0-py2.py3-none-any.whl", hash = "sha256:fa74e018197f1fcb54578af0f675d8b8e2342bd8e0b72bef8197bc4c9e645f36"},
     {file = "radon-5.1.0.tar.gz", hash = "sha256:cb1d8752e5f862fb9e20d82b5f758cbc4fb1237c92c9a66450ea0ea7bf29aeee"},
-]
-raven = [
-    {file = "raven-6.10.0-py2.py3-none-any.whl", hash = "sha256:44a13f87670836e153951af9a3c80405d36b43097db869a36e92809673692ce4"},
-    {file = "raven-6.10.0.tar.gz", hash = "sha256:3fa6de6efa2493a7c827472e984ce9b020797d0da16f1db67197bcc23c8fae54"},
 ]
 requests = [
     {file = "requests-2.26.0-py2.py3-none-any.whl", hash = "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24"},
