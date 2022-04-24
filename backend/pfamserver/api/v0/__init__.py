@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_restplus import Api
+from flask_restx import Api
 from pfamserver.api.v0.pfam import ns as pfam
 from pfamserver.api.v0.protein_sequence import ns as protein_sequence
 from pfamserver.api.v0.uniprot import ns as uniprot
@@ -17,7 +17,7 @@ api = Api(
     decorators=[csrf.exempt],
 )
 
-api.add_namespace(pfam.ns, path="/pfams")
-api.add_namespace(protein_sequence.ns, path="/protein_sequences")
-api.add_namespace(uniprot.ns, path="/uniprots")
-api.add_namespace(version.ns, path="/versions")
+api.add_namespace(pfam, path="/pfams")
+api.add_namespace(protein_sequence, path="/protein_sequences")
+api.add_namespace(uniprot, path="/uniprots")
+api.add_namespace(version, path="/versions")

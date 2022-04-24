@@ -12,7 +12,6 @@ MAKE=make
 UID:=1000:1000
 DC_BASE:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.yml"
 DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
-DC_DEV:=$(DC_BASE) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" web-dev
 
 # Dev initialization
 dev-init:
@@ -156,11 +155,6 @@ ps:
 
 tlogs:
 	@(CURRENT_UID=$(UID) docker-compose -f "docker-compose.traefik.yml" logs --tail=3 -f)
-
-# Services
-
-celery-purge:
-	$(DC_DEV) celery-purge
 
 # Cleanup and utils
 

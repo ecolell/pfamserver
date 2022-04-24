@@ -4,7 +4,6 @@ import os
 import sys
 
 from flask import Flask
-from flask_restplus import apidoc
 from pfamserver.config.development import DevelopmentConfig
 from pfamserver.config.production import ProductionConfig
 from pfamserver.config.staging import StagingConfig
@@ -51,9 +50,6 @@ def register_blueprints(app):
     prefix = app.config.get("ROOT_URL_PREFIX", "")
     app.register_blueprint(public.blueprint)
     app.register_blueprint(api_v0, url_prefix=prefix + "/api/v0")
-
-    if app.config.get("DEBUG"):
-        app.register_blueprint(apidoc.apidoc, url_prefix=prefix)
 
     return None
 

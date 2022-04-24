@@ -2,7 +2,7 @@ POETRY := docker run --rm -v $(PWD)/backend:/app ecolell/poetry:3.8-slim
 
 
 extract-requirements:
-	docker build -f Dockerfile.poetry --tag ecolell/poetry:3.8-slim --build-arg PORT=5000 .
+	# docker build -f Dockerfile.poetry --tag ecolell/poetry:3.8-slim --build-arg PORT=5000 .
 	$(POETRY) export -f requirements.txt --output requirements.txt
 	$(POETRY) export --dev -f requirements.txt -o requirements_dev.txt
 

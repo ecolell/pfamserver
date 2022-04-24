@@ -1,4 +1,4 @@
-from flask_restplus import Namespace, Resource
+from flask_restx import Namespace, Resource
 from pfamserver.extensions import cache
 from pfamserver.services import version_service
 

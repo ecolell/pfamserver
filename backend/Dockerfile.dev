@@ -1,0 +1,27 @@
+FROM python:3.8.10 AS backend_base
+MAINTAINER Eloy Adonis Colell <eloy.colell@gmail.com>
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p /home/pfamserver/requirements/
+
+WORKDIR /home/pfamserver/requirements
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-dev --no-interaction --no-ansi
+
+WORKDIR /home/pfamserver/stage
+
+FROM backend_base as backend_web
+
+WORKDIR /home/pfamserver/stage
+
+ENV FLASK_ENV SQLALCHEMY_DATABASE_URI NODE_ENV SERVER_NAME FLASK_APP PFAM_VERSION HMMER_VERSION
+
+EXPOSE 5000 4369
+
+FROM mysql:8.0.26 as mysql
+FROM backend_web as backend_dev
+
+WORKDIR /home/pfamserver/requirements
+RUN poetry install --no-interaction --no-ansi
+COPY --from=mysql /usr/bin/mysql /usr/bin/mysql

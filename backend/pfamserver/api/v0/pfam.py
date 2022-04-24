@@ -2,10 +2,11 @@ from base64 import b64encode
 from zlib import compress
 
 from flask import request
-from flask_restplus import Namespace, Resource
+from flask_restx import Namespace, Resource
 from pfamserver.api.v0 import schemas
 from pfamserver.extensions import cache
 from pfamserver.services import pfam_service
+from webargs.flaskparser import use_kwargs
 
 ns = Namespace("pfams")
 
@@ -40,7 +41,7 @@ class PfamASequenceDescriptionsAPI(Resource):
     @ns.response(200, "response")
     @ns.doc("Obtain a sequence_description list from a pfam.")
     @cache.cached(timeout=3600, key_prefix=make_cache_key)
-    @ns.expect(schemas.pfam_a_query)
+    @use_kwargs(schemas.PfamAQuery, location="args")
     def get(self, pfam):
         kwargs = schemas.pfam_a_query.parse_args()
         with_pdb = kwargs["with_pdb"]

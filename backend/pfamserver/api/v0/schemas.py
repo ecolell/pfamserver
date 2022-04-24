@@ -1,8 +1,4 @@
-from flask_restplus import inputs
-from flask_restplus.reqparse import RequestParser
 from marshmallow import Schema, fields
-
-from . import api
 
 
 class UniprotRegFullSchema(Schema):
@@ -45,18 +41,9 @@ class PdbPfamARegSchema(Schema):
     date = fields.Str(attribute="pdb.date")
 
 
-pfam_a_query = api.parser()  # type: RequestParser
-pfam_a_query.add_argument(
-    "with_pdb", type=inputs.boolean, location="args", default=True
-)
+class PfamAQuery(Schema):
+    with_pdb = fields.Bool(default=True)
 
 
 class SequenceSchema(Schema):
     pass
-
-
-contact_us_query = api.parser()
-contact_us_query.add_argument("name", required=True)
-contact_us_query.add_argument("email", required=True)
-contact_us_query.add_argument("phone", required=True)
-contact_us_query.add_argument("message", required=True)
