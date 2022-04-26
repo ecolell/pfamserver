@@ -1,35 +1,33 @@
-from __future__ import unicode_literals
-
-from sqlalchemy.orm.exc import NoResultFound
-from flask import current_app
-from pfamserver.models import PfamA
-from pfamserver.extensions import db
-from pfamserver.exceptions import SentryIgnoredError
-from merry import Merry
-from subprocess import Popen as run, PIPE
-import re
 import os
-from pfamserver.services import version_service
+import re
 import uuid
 from builtins import str as text
+from subprocess import PIPE
+from subprocess import Popen as run
+
+from merry import Merry
+from pfamserver.extensions import db
+from pfamserver.models import PfamA
+from pfamserver.services import version_service
+from sqlalchemy.orm.exc import NoResultFound
 
 merry = Merry()
 
-os.environ["PERL5LIB"] = os.path.abspath('./PfamScan')
-os.environ["PATH"] = os.path.abspath('.') + ':' + os.environ["PATH"]
+os.environ["PERL5LIB"] = os.path.abspath("./PfamScan")
+os.environ["PATH"] = os.path.abspath(".") + ":" + os.environ["PATH"]
 
 
 class SequenceServiceError(Exception):
-    message = ''
+    message = ""
 
     def __init__(self, message):
-        super(SequenceServiceError, self).__init__()
+        super().__init__()
         self.message = message
 
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise SequenceServiceError('PfamA doesn''t exist.')
+    raise SequenceServiceError("PfamA doesn" "t exist.")
 
 
 @merry._try
@@ -48,13 +46,13 @@ def id_generator():
 
 
 def pfamscan(seq):
-    hmmdata_path = os.path.abspath(os.path.join('./', version_service.version()))
-    pfamscan_bin = os.path.abspath('./PfamScan/pfam_scan.pl')
-    tmp_path = os.path.abspath('./tmp')
-    pfamscan_call = pfamscan_bin + ' -dir ' + hmmdata_path
+    hmmdata_path = os.path.abspath(os.path.join("./", version_service.version()))
+    pfamscan_bin = os.path.abspath("./PfamScan/pfam_scan.pl")
+    tmp_path = os.path.abspath("./tmp")
+    pfamscan_call = pfamscan_bin + " -dir " + hmmdata_path
 
     fasta_path = os.path.join(tmp_path, id_generator() + ".fasta")
-    with open(fasta_path, 'w') as outstream:
+    with open(fasta_path, "w") as outstream:
         outstream.write(">user_sequence\n" + seq)
 
     cmd = pfamscan_call.split() + ["-fasta", fasta_path]
@@ -70,13 +68,14 @@ def parse_pfamscan(text):
             "pfamA_acc": t[0].group(3),
             "seq_start": int(t[0].group(1)),
             "seq_end": int(t[0].group(2)),
-            "num_full": t[1].num_full
+            "num_full": t[1].num_full,
         }
-        for t in zip(matches, pfams)]
+        for t in zip(matches, pfams)
+    ]
 
 
 def get_pfams_from_sequence(seq):
-    sequence = r'^[AC-IK-Y]*\r*$'
+    sequence = r"^[AC-IK-Y]*\r*$"
     if re.match(sequence, seq):
         output = parse_pfamscan(pfamscan(seq))
     else:

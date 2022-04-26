@@ -1,41 +1,37 @@
-from __future__ import unicode_literals
-
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import or_
-
-from pfamserver.models import Uniprot, UniprotRegFull, PfamA
-from pfamserver.extensions import db
-from pfamserver.exceptions import SentryIgnoredError
 from merry import Merry
+from pfamserver.extensions import db
+from pfamserver.models import PfamA, Uniprot, UniprotRegFull
+from sqlalchemy import or_
+from sqlalchemy.orm.exc import NoResultFound
 
 merry = Merry()
 
 
 class UniprotServiceError(Exception):
-    message = ''
+    message = ""
 
     def __init__(self, message):
-        super(UniprotServiceError, self).__init__()
+        super().__init__()
         self.message = message
 
 
 @merry._except(NoResultFound)
 def handle_no_result_found(e):
-    raise UniprotServiceError('Uniprot doesn''t exist.')
+    raise UniprotServiceError("Uniprot doesn" "t exist.")
 
 
-def query_uniprot(uniprot):
+def query_uniprot(uniprot: str):
     uniprot = uniprot.upper()
     query = db.session.query(Uniprot)
     query = query.join(Uniprot.pfams)
-    query = query.filter(or_(
-        Uniprot.uniprot_id == uniprot,
-        Uniprot.uniprot_acc == uniprot))
+    query = query.filter(
+        or_(Uniprot.uniprot_id == uniprot, Uniprot.uniprot_acc == uniprot)
+    )
     return query
 
 
 @merry._try
-def get_uniprot(uniprot):
+def get_uniprot(uniprot: str):
     return query_uniprot(uniprot).one()
 
 

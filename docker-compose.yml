@@ -57,6 +57,15 @@ services:
     volumes:
       - ./backend/pfamserver/static:/var/www/static
       - ./nginx/conf.d:/etc/nginx/conf.d
+  phpmyadmin:
+    image: phpmyadmin
+    networks:
+      - intranet
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
 
 networks:
   intranet:
