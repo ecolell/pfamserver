@@ -136,6 +136,9 @@ up: setup-libraries
 	$(DC) up -d web nginx
 	# $(DC) scale web=4
 
+up-db-admin:
+	$(DC) up -d phpmyadmin
+
 bootup: rel-start clean docker-build build-frontend up setup-shrinked rel-end
 blue-green-release:
 	./deploy.sh
@@ -159,7 +162,7 @@ tlogs:
 # Cleanup and utils
 
 logs:
-	$(DC) logs -f
+	$(DC) logs -f nginx web
 
 cleanup-docker:
 	docker stop $(shell docker ps -a -q)
