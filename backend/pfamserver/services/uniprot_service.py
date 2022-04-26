@@ -32,7 +32,6 @@ def uniprot_query_filter(uniprot, query):
     query = query.filter(
         or_(Uniprot.uniprot_id == uniprot, Uniprot.uniprot_acc == uniprot)
     )
-
     return query
 
 
