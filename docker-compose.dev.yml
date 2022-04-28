@@ -1,0 +1,34 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: backend
+      target: backend_dev
+    restart: always
+    working_dir: /home/pfamserver/stage
+    networks:
+      - testingnet
+    links:
+      - db:db
+    volumes:
+      - ./backend:/home/pfamserver/stage
+    env_file:
+      - backend/.env
+    user: ${CURRENT_UID}
+  db:
+    restart: always
+    image: mysql:8.0.26
+    security_opt:
+      - seccomp:unconfined
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - testingnet
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    env_file:
+      - db/.env
+
+networks:
+  testingnet:
+    driver: bridge

@@ -12,6 +12,7 @@ MAKE=make
 UID:=1000:1000
 DC_BASE:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.yml"
 DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
+DC_DEV:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.dev.yml"
 
 # Dev initialization
 dev-init:
@@ -40,42 +41,17 @@ docker-upload:
 	docker push ecolell/pfamserver-web:latest
 	docker push ecolell/pfamserver-web:latest-dev
 
-# Frontend
-
-build-frontend:
-	$(DC) run --rm frontend rm -rf /usr/app/backend/pfamserver/static/dist
-	$(DC) run --rm frontend npm install --no-audit
-	$(DC) run --rm frontend npm run build
-
 # Deployment targets
-
-pipeline-assets:
-	$(DC) run --rm frontend rm -rf /usr/app/public
-	$(DC) run -e ACTIVE_ENV=production --rm frontend yarn install --no-audit
-	$(DC) run -e ACTIVE_ENV=production --rm frontend yarn build
-	mkdir -p backend/pfamserver/static
-	cp -rv static/* backend/pfamserver/static/
-	cp -rv backend/pfamserver/static public/
 
 pipeline-database-test:
 	FLASK_APP=backend/flasky.py MIGRATION_DIR=backend/pfamserver/models/migrations $(MAKE) -C backend pipeline-database-test
 
 # Testing targets
 
-mock-assets:
-	-mkdir -p ./backend/pfamserver/static
-	echo '{"assets":{},"publicPath":""}' > backend/pfamserver/static/manifest.json
-
-mock-traefik-gate:
-	-docker network create pfamserver_traefik_gate
-
-unmock-traefik-gate:
-	-docker network remove pfamserver_traefik_gate
-
-pipeline-backend-test: mock-assets mock-traefik-gate
+pipeline-backend-test:
 	touch backend/.env
-	$(DC) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" gitlab-web-dev pipeline-test
-	$(MAKE) unmock-traefik-gate
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
+	# $(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
 
 pipeline-backend-security: mock-traefik-gate
 	touch backend/.env
@@ -139,7 +115,7 @@ up: setup-libraries
 up-db-admin:
 	$(DC) up -d phpmyadmin
 
-bootup: rel-start clean docker-build build-frontend up setup-shrinked rel-end
+bootup: rel-start clean docker-build up setup-shrinked rel-end
 blue-green-release:
 	./deploy.sh
 

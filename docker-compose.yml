@@ -20,21 +20,6 @@ services:
     env_file:
       - backend/.env
     user: ${CURRENT_UID}
-  web-dev:
-    build:
-      context: backend
-      target: backend_dev
-    networks:
-      - intranet
-    links:
-      - db:db
-    working_dir: /home/pfamserver/stage
-    entrypoint: bash
-    volumes:
-      - ./backend:/home/pfamserver/stage
-    env_file:
-      - backend/.env
-    user: ${CURRENT_UID}
   db:
     restart: always
     image: mysql:8.0.26
