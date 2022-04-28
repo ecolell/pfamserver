@@ -51,7 +51,9 @@ pipeline-database-test:
 pipeline-backend-test:
 	touch backend/.env
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
-	# $(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
+	$(DC_DEV) up -d db
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
+	$(DC_DEV) down -d db
 
 pipeline-backend-security: mock-traefik-gate
 	touch backend/.env

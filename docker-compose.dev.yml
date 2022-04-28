@@ -26,8 +26,11 @@ services:
       - testingnet
     volumes:
       - ./db/mysql:/var/lib/mysql
-    env_file:
-      - db/.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=Pfam32_0
+      - MYSQL_USER=pfamserver
+      - MYSQL_PASSWORD=pfamserver
 
 networks:
   testingnet:
