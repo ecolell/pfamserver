@@ -20,4 +20,4 @@ api = Api(
 api.add_namespace(pfam, path="/pfams")
 api.add_namespace(protein_sequence, path="/protein_sequences")
 api.add_namespace(uniprot, path="/uniprots")
-api.add_namespace(version, path="/versions")
+api.add_namespace(version, path="/version")

@@ -1,5 +1,4 @@
 import pytest
-import re
 
 
 @pytest.fixture(scope="function")
@@ -8,16 +7,7 @@ def main_app_template():
 <html lang="en">
 
 <head>
-    <link rel="shortcut icon" href="/static/favicon.ico">
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KB5R6HC');</script>
-    <!-- End Google Tag Manager -->
-
-    <meta name="google-site-verification" content="GI8mhuV576ACMG70ypzNxitXHQwlyNQj8Twzu0v5mlU" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,22 +16,60 @@ def main_app_template():
 
     <title>pfamserver</title>
 
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-
-
-    <![endif]-->
-    <link rel="stylesheet" href="http://localhost:2992/assets/main.2cd6ed.css">
-
 </head>
 
-<body id="page-top" class="index">
-<!-- Google Tag Manager (noscript) -->
-<!--<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KB5R6HC"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>-->
-<!-- End Google Tag Manager (noscript) -->
-    <script src="http://localhost:2992/assets/main.b65365e8.js"></script>
-
+<body id="page-top">
+<div>
+    <h2>Examples</h2>
+    <div>
+        <div>
+            <a href="/api/v0/uniprots/egfr_human">1. Uniprot description</a>
+        </div>
+        <div>
+            <a href="/api/v0/uniprots/egfr_human/pfams">2. Available pfam for a uniprot</a>
+        </div>
+        <div>
+            <a href="/api/v0/pfams/pf00131">3. Pfam description</a>
+        </div>
+        <div>
+            <a href="/api/v0/pfams/pf00131/sequence_descriptions?with_pdb=false">4. Pfam known sequences</a>
+        </div>
+        <div>
+            <a href="/api/v0/pfams/pf00131/sequence_descriptions">5. Pfam known sequences with known PDB</a>
+        </div>
+        <div>
+            <a href="/api/v0/pfams/pf00131/stockholm">6. Pfam MSA in stockholm format</a>
+        </div>
+        <div>
+            <a href="/api/v0/uniprots/egfr_human/505-637/pdbs">7. vailable pdbs for a sequence</a>
+        </div>
+        <div>
+            <a href="/api/v0/protein_sequences/DNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPSGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA">8. Pfam from a partial protein sequence</a>
+        </div>
+        <div>
+            <a href="/api/v0/version">9. Version</a>
+        </div>
+    </div>
+</div>
+<div>
+    <h2>Mantainers</h2>
+    <div>
+        <div>
+            <a href="https://www.linkedin.com/in/eloy-adonis-colell-43902720/?locale=en_US">Eloy Colell</a>
+        </div>
+        <div>
+            <a href="mailto:cmb@leloir.org.ar">Cristina Marino Buslje</a>
+        </div>
+        <div>
+            <a href="mailto:fsimonetti@leloir.org.ar">Franco Simonetti</a>
+        </div>
+        <div>
+            <a href="mailto:jiserte@leloir.org.ar">Javier Iserte</a>
+        </div>
+    </div>
+</div>
 </body>
-</html>""".split('\n')
+</html>
+""".split(
+        "\n"
+    )
