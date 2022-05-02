@@ -44,7 +44,7 @@ def get_uniprot(query_string: str):
 
 
 @merry._try
-def get_pfams_from_uniprot(uniprot):
+def get_pfams_from_uniprot(uniprot: str):
     query = query_uniprot_and_pfams_included(uniprot)
     query = query.filter(UniprotRegFull.uniprot_acc == Uniprot.uniprot_acc)
     query = query.filter(PfamA.pfamA_acc == UniprotRegFull.pfamA_acc)
