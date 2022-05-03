@@ -56,23 +56,17 @@ pipeline-backend-test:
 	$(DC_DEV) down db
 
 pipeline-backend-mypy:
-	touch backend/.env
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
 
-pipeline-backend-security: mock-traefik-gate
-	touch backend/.env
-	$(DC) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" gitlab-web-dev pipeline-security
-	$(MAKE) unmock-traefik-gate
+pipeline-backend-security:
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=development bandit -x pfamserver/command -r pfamserver
 
-pipeline-backend-safety: mock-traefik-gate
-	touch backend/.env
-	$(DC) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" gitlab-web-dev pipeline-safety
-	$(MAKE) unmock-traefik-gate
+pipeline-backend-safety:
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=development safety check --full-report
 
-pipeline-backend-quality: mock-traefik-gate
-	touch backend/.env
-	$(DC) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" gitlab-web-dev pipeline-quality
-	$(MAKE) unmock-traefik-gate
+pipeline-backend-quality:
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web pydocstyle pfamserver
+	# $(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web --entrypoint="bash" radon cc -nb -a pfamserver
 
 pipeline-backend: pipeline-backend-mypy pipeline-backend-test pipeline-backend-safety pipeline-backend-security pipeline-backend-quality
 

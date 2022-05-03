@@ -23,5 +23,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Mypy analysis
+      run: make pipeline-backend-mypy
+
     - name: Test over 3.8.10
       run: make pipeline-backend-test
+
+    - name: Evaluate quality
+      run: make pipeline-backend-quality
