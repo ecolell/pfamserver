@@ -50,3 +50,13 @@ def pfam_a_pf00757():
         num_full=1146,
         description="Furin-like cysteine rich region",
     )
+
+
+@pytest.fixture
+def pfam_a_pf00131():
+    return PfamAFactory(
+        pfamA_acc="PF00131",
+        pfamA_id="Metallothio",
+        num_full=480,
+        description="Metallothionein",
+    )

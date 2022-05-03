@@ -21,7 +21,7 @@ repos:
     -   id: debug-statements
     -   id: detect-private-key
     -   id: name-tests-test
-        exclude: ^(backend/tests/fixtures)
+        exclude: ^(backend/tests/fixtures|backend/tests/factories.py)
         args:
         - --django
 -   repo: https://github.com/pre-commit/mirrors-isort

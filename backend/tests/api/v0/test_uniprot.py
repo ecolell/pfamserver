@@ -15,7 +15,9 @@ def test_get_uniprot_pfams(db, client, uniprot_reg_full_egfr_human):
     assert data["message"] == "Uniprot doesn" "t exist."
 
 
-def test_get_reference_sequences_pdbs(db, client):
+def test_get_reference_sequences_pdbs(
+    client, pdb_pfam_a_reg_mt2_human_1mhu, pdb_pfam_a_reg_mt2_human_2mhu
+):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
     res = client.get("/api/v0/uniprots/MT2_HUMAN/1-61/pdbs", headers=headers)
     assert res.status_code == 200
@@ -24,7 +26,7 @@ def test_get_reference_sequences_pdbs(db, client):
     assert len(data["output"]) == 2
 
 
-def test_get_uniprots(db, client):
+def test_get_uniprots(db, client, uniprot_egfr_human):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
 
     res = client.get("/api/v0/uniprots/egfr_human", headers=headers)

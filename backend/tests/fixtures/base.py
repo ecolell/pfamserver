@@ -26,10 +26,10 @@ def session_db(request, session_app):
                 con.execute(table.delete())
             trans.commit()
 
-    teardown()
+    # teardown()
     _db.create_all()
 
-    request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return _db
 
 
@@ -48,7 +48,7 @@ def app(request, session_app):
     if request.cls:
         request.cls.app = app
         request.cls.client = app.test_client(use_cookies=True)
-    request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return app
 
 
@@ -89,7 +89,7 @@ def testdb(session_db, request, session_app):
 
         engine.dispose()
 
-    request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return app
 
 
@@ -109,5 +109,5 @@ def db(testdb, app, request):
         app.db.session.rollback()
         app.db.session.close()
 
-    request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return app.db

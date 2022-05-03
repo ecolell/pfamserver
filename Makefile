@@ -49,11 +49,15 @@ pipeline-database-test:
 # Testing targets
 
 pipeline-backend-test:
+	$(DC_DEV) up -d db
+	sleep 2;
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=development web py.test -s -v
+	# -k test_get_pfams_from_uniprot
+	$(DC_DEV) down db
+
+pipeline-backend-mypy:
 	touch backend/.env
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
-	$(DC_DEV) up -d db
-	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
-	$(DC_DEV) down -d db
 
 pipeline-backend-security: mock-traefik-gate
 	touch backend/.env
@@ -70,7 +74,7 @@ pipeline-backend-quality: mock-traefik-gate
 	$(DC) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage --entrypoint="make" gitlab-web-dev pipeline-quality
 	$(MAKE) unmock-traefik-gate
 
-pipeline-backend: pipeline-backend-test pipeline-backend-safety pipeline-backend-security pipeline-backend-quality
+pipeline-backend: pipeline-backend-mypy pipeline-backend-test pipeline-backend-safety pipeline-backend-security pipeline-backend-quality
 
 pipeline-test-e2e: release-dev maintenance-off
 	$(DC) run --rm e2e
@@ -157,3 +161,4 @@ check-commands:
 
 check-env:
 	env
+$(DC_DEV) up -d -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=development db
