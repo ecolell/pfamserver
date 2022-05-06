@@ -27,7 +27,7 @@ jobs:
         python-version: 3.x
     - run: pip install --upgrade pip
     - run: pip install mypy==v0.902
-    - run: mypy pfamserver tests
+    - run: cd backend && mypy pfamserver tests
   quality:
     name: Quality
     runs-on: ${{ matrix.operating-system }}
@@ -42,5 +42,5 @@ jobs:
         python-version: 3.x
     - run: pip install --upgrade pip
     - run: pip install docstyle radon
-    - run: pydocstyle pfamserver
-    - run: radon cc -nb -a pfamserver
+    - run: cd backend && pydocstyle pfamserver
+    - run: cd backend && radon cc -nb -a pfamserver
