@@ -49,6 +49,7 @@ pipeline-database-test:
 # Testing targets
 
 pipeline-backend-test:
+	touch ./backend/.env
 	$(DC_DEV) up -d db
 	sleep 2;
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=development web py.test -s -v
