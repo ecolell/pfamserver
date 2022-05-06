@@ -109,5 +109,5 @@ def db(testdb, app, request):
         app.db.session.rollback()
         app.db.session.close()
 
-    # request.addfinalizer(teardown)
+    request.addfinalizer(teardown)
     return app.db
