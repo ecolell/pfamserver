@@ -23,15 +23,6 @@ class BaseConfig:
     DEBUG_TB_ENABLED = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
-    # Flask Security
-    SECRET_KEY = "f49dc0a9de00d4e337e74b87bee8dbf806765ec73212ee7c9e6b1b5079a75eb7"
-    SECURITY_PASSWORD_HASH = "sha512_crypt"
-
-    SECURITY_TRACKABLE = True
-    SECURITY_RECOVERABLE = True
-    SECURITY_SEND_REGISTER_EMAIL = False
-    SECURITY_SEND_PASSWORD_CHANGE_EMAIL = False
-
     SQLALCHEMY_DATABASE_SCHEMA = "public"
     SQLALCHEMY_ECHO = False  # True to log queries
     TABLE_CACHE_ENABLED = os.getenv("TABLE_CACHE_ENABLED", False)
