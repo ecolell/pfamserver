@@ -53,7 +53,7 @@ pipeline-backend-test:
 	sleep 2;
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
 	# -k test_get_pfams_from_uniprot
-	$(DC_DEV) down db
+	# $(DC_DEV) down db
 
 pipeline-backend-mypy:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests

@@ -76,7 +76,5 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Start containers
-      run: docker-compose -f "docker-compose.dev.yml" up -d --build db
-    - name: Start containers
-      run: docker-compose -f "docker-compose.dev.yml" up -d --build db
+    - name: Run tests
+      run: make pipeline-backend-test
