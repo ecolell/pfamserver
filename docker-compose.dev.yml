@@ -13,8 +13,6 @@ services:
       - db:db
     volumes:
       - ./backend:/home/pfamserver/stage
-    env_file:
-      - backend/.env
     user: ${CURRENT_UID}
   db:
     restart: always
