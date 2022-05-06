@@ -1,14 +1,5 @@
 name: Backend workflow
 on:
-  push:
-    branches:
-      - '*'
-      - '*/*'
-      - '**'
-      - '!master'
-      - '!production'
-    paths-ignore:
-      - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
