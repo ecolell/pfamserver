@@ -1,11 +1,11 @@
-name: Backend workflow
+name: backend
 on:
   pull_request:
     paths-ignore:
       - '**.md'
 jobs:
   mypy:
-    name: Mypy
+    name: mypy
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -20,7 +20,7 @@ jobs:
     - run: pip install mypy==v0.902
     - run: cd backend && mypy pfamserver tests
   quality:
-    name: Quality
+    name: quality
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
@@ -36,7 +36,7 @@ jobs:
     - run: cd backend && pydocstyle pfamserver
     - run: cd backend && radon cc -nb -a pfamserver
   security:
-    name: Security
+    name: security
     runs-on: ${{ matrix.operating-system }}
     continue-on-error: true
     strategy:
@@ -52,7 +52,7 @@ jobs:
     - run: pip install bandit
     - run: cd backend && bandit -x pfamserver/command -r pfamserver
   safety:
-    name: Safety
+    name: safety
     runs-on: ${{ matrix.operating-system }}
     continue-on-error: true
     strategy:
@@ -68,7 +68,7 @@ jobs:
     - run: pip install safety
     - run: cd backend && safety check --full-report
   test:
-    name: Test
+    name: test
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
