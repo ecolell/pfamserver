@@ -1,3 +1,4 @@
+"""Pfamserver service."""
 __version__ = "1.0.0"
 
 import os
@@ -20,6 +21,7 @@ configs = {
 
 
 def create_app():
+    """Build backend app."""
     config_name = os.getenv("FLASK_ENV", "default")
     config = configs.get(config_name)
     if config is None:
@@ -43,7 +45,7 @@ def create_app():
 
 
 def register_blueprints(app):
-    "Registers blueprints into app"
+    """Register blueprints into app."""
     from pfamserver import public
     from pfamserver.api.v0 import api_v0
 
@@ -55,6 +57,7 @@ def register_blueprints(app):
 
 
 def register_extensions(app):
+    """Register extensions into app."""
     db.init_app(app)
     app.db = db  # Should not be necessary, but was put here to support existing code.
 
@@ -62,8 +65,7 @@ def register_extensions(app):
 
 
 def register_middlewares(app):
-    """Middleware registration"""
-
+    """Register middleware into app."""
     if app.config.get("PROXY_FIX"):
         from werkzeug.contrib.fixers import ProxyFix
 
@@ -76,6 +78,7 @@ def register_middlewares(app):
 
 
 def register_cli(app):
+    """Register CLI commands into app."""
     from pfamserver.commands.library import library as library_command
     from pfamserver.commands.db import db as db_command
 

@@ -66,7 +66,7 @@ pipeline-backend-safety:
 
 pipeline-backend-quality:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web pydocstyle pfamserver
-	# $(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web --entrypoint="bash" radon cc -nb -a pfamserver
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web radon cc -nb -a pfamserver
 
 pipeline-backend: pipeline-backend-mypy pipeline-backend-test pipeline-backend-safety pipeline-backend-security pipeline-backend-quality
 
