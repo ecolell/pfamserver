@@ -41,6 +41,6 @@ jobs:
       with:
         python-version: 3.x
     - run: pip install --upgrade pip
-    - run: pip install docstyle radon
+    - run: pip install pydocstyle radon
     - run: cd backend && pydocstyle pfamserver
     - run: cd backend && radon cc -nb -a pfamserver
