@@ -44,3 +44,48 @@ jobs:
     - run: pip install pydocstyle radon
     - run: cd backend && pydocstyle pfamserver
     - run: cd backend && radon cc -nb -a pfamserver
+  security:
+    name: Security
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install bandit
+    - run: cd backend && bandit -x pfamserver/command -r pfamserver
+  safety:
+    name: Safety
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install safety
+    - run: cd backend && safety check --full-report
+  test:
+    name: Test
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Start containers
+      run: docker-compose -f "docker-compose.dev.yml" up -d --build db
+    - name: Start containers
+      run: docker-compose -f "docker-compose.dev.yml" up -d --build db
