@@ -17,7 +17,6 @@ class BaseConfig:
 
     # LOG CONFIG
     LOG_LEVEL = logging.DEBUG
-    LOG_FILE = os.getenv("LOG_FILE", "/tmp/flask_log.out")
 
     # Flask Toolbar
     DEBUG_TB_ENABLED = False
