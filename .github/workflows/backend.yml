@@ -77,4 +77,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Run tests
-      run: make pipeline-backend-test
+      run: make pipeline-backend-test > pytest-coverage.txt
+    - name: Coverage
+      uses: coroo/pytest-coverage-commentator@v1.0.2
+      with:
+        pytest-coverage: pytest-coverage.txt
