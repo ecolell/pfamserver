@@ -1,5 +1,5 @@
-from subprocess import PIPE
-from subprocess import Popen as run
+from subprocess import PIPE  # nosec
+from subprocess import Popen as run  # nosec
 
 from flask import current_app
 from merry import Merry
@@ -125,4 +125,4 @@ def get_stockholm_from_pfam(pfam):
         "./{version}/Pfam-A.full".format(version=version_service.version()),
         pfamA_acc,
     ]
-    return run(cmd, stdout=PIPE).communicate()[0]
+    return run(cmd, stdout=PIPE).communicate()[0]  # nosec

@@ -2,8 +2,8 @@ import os
 import re
 import uuid
 from builtins import str as text
-from subprocess import PIPE
-from subprocess import Popen as run
+from subprocess import PIPE  # nosec
+from subprocess import Popen as run  # nosec
 
 from merry import Merry
 from pfamserver.extensions import db
@@ -56,7 +56,7 @@ def pfamscan(seq):
         outstream.write(">user_sequence\n" + seq)
 
     cmd = pfamscan_call.split() + ["-fasta", fasta_path]
-    return run(cmd, stdout=PIPE).communicate()[0]
+    return run(cmd, stdout=PIPE).communicate()[0]  # nosec
 
 
 def parse_pfamscan(text):
