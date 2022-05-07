@@ -51,7 +51,7 @@ pipeline-database-test:
 pipeline-backend-test:
 	$(DC_DEV) up -d db
 	sleep 2;
-	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
+	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v > pytest-coverage.txt
 	# -k test_get_pfams_from_uniprot
 	# $(DC_DEV) down db
 
