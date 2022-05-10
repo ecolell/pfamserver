@@ -56,7 +56,7 @@ def uniprot_reg_full_mt2_human_section2(
     pfam_a_pf00131,
 ):
     return UniprotRegFullFactory(
-        auto_uniprot_reg_full=2,
+        auto_uniprot_reg_full=3,
         pfamA=pfam_a_pf00131,
         uniprot=uniprot_mt2_human,
         seq_start=361,
