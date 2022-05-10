@@ -2,7 +2,9 @@ import pytest
 from pfamserver.services import uniprot_service as service
 
 
-def test_get_pfams_from_uniprot(db, uniprot_reg_full_mt2_human):
+def test_get_pfams_from_uniprot(
+    db, uniprot_reg_full_mt2_human_section1, uniprot_reg_full_mt2_human_section2
+):
     uniprot = service.get_pfams_from_uniprot("mt2_human")
     assert len(uniprot.pfams) == 6
 
