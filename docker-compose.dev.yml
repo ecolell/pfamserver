@@ -23,7 +23,7 @@ services:
     networks:
       - testingnet
     volumes:
-      - ./db/mysql:/var/lib/mysql
+      - ./db/mysql_test:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=Pfam32_0
