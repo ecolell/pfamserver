@@ -29,7 +29,8 @@ dev-init:
 
 docker-build:
 	$(MAKE) -C backend extract-requirements
-	$(DC) build web web-dev
+	$(DC) build web
+	$(DC_DEV) build web
 
 
 docker-upload:
@@ -49,11 +50,8 @@ pipeline-database-test:
 # Testing targets
 
 pipeline-backend-test:
-	$(DC_DEV) up -d db
-	sleep 2;
-	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web py.test -s -v
-	# -k test_get_pfams_from_uniprot
-	# $(DC_DEV) down db
+	mkdir -p db/mysql_test
+	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s -v
 
 pipeline-backend-mypy:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
@@ -114,6 +112,10 @@ up: setup-libraries
 
 up-db-admin:
 	$(DC) up -d phpmyadmin
+
+down-db-admin:
+	$(DC) stop phpmyadmin
+	$(DC) rm phpmyadmin
 
 bootup: rel-start clean docker-build up setup-shrinked rel-end
 blue-green-release:
