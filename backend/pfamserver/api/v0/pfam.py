@@ -42,9 +42,7 @@ class PfamASequenceDescriptionsAPI(Resource):
     @ns.doc("Obtain a sequence_description list from a pfam.")
     @cache.cached(timeout=3600, key_prefix=make_cache_key)
     @use_kwargs(schemas.PfamAQuery, location="querystring")
-    def get(self, pfam):
-        kwargs = schemas.pfam_a_query.parse_args()
-        with_pdb = kwargs["with_pdb"]
+    def get(self, pfam, with_pdb=True):
         sequence_descriptions = pfam_service.get_sequence_descriptions_from_pfam(
             pfam, with_pdb
         )
