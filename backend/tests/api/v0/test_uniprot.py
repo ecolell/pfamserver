@@ -17,9 +17,7 @@ def test_get_uniprot_pfams(
     assert data["message"] == "Uniprot doesn" "t exist."
 
 
-def test_get_reference_sequences_pdbs(
-    client, pdb_pfam_a_reg_mt2_human_1mhu, pdb_pfam_a_reg_mt2_human_2mhu
-):
+def test_get_reference_sequences_pdbs(client, pdb_pfam_a_reg_mt2_human):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
     res = client.get("/api/v0/uniprots/MT2_HUMAN/1-61/pdbs", headers=headers)
     assert res.status_code == 200

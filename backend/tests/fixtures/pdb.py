@@ -1,10 +1,10 @@
 import pytest
-from tests.factories import Pdb
+from tests.factories import PdbFactory
 
 
 @pytest.fixture
 def pdb_1mhu(db):
-    return Pdb(
+    return PdbFactory(
         pdb_id="1MHU",
         title="""THE THREE-DIMENSIONAL STRUCTURE OF HUMAN [113CD7] METALLOTHIONEIN-2
         IN SOLUTION DETERMINED BY NUCLEAR MAGNETIC RESONANCE SPECTROSCOPY""",
@@ -17,7 +17,7 @@ def pdb_1mhu(db):
 
 @pytest.fixture
 def pdb_2mhu(db):
-    return Pdb(
+    return PdbFactory(
         pdb_id="2MHU",
         title="""THE THREE-DIMENSIONAL STRUCTURE OF HUMAN [113CD7] METALLOTHIONEIN-2
         IN SOLUTION DETERMINED BY NUCLEAR MAGNETIC RESONANCE SPECTROSCOPY""",
