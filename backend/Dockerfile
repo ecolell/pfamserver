@@ -1,8 +1,20 @@
+FROM perl:5.30.0-slim AS perl_base
 FROM python:3.8.10-slim AS backend_base
 LABEL maintainer="Eloy Adonis Colell <eloy.colell@gmail.com>"
 
-ENV PYTHONUNBUFFERED True
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y gcc
+COPY --from=perl_base /usr/local/lib/perl5 /usr/local/lib/perl5
+COPY --from=perl_base /usr/local/bin/perl /usr/local/bin/perl
+COPY --from=perl_base /usr/local/bin/cpan /usr/local/bin/cpan
+COPY --from=perl_base /usr/local/bin/cpanm /usr/local/bin/cpanm
+COPY --from=perl_base /usr/bin/make /usr/bin/make
+ENV PERL5LIB="/usr/local/lib/site_perl:$PERL5LIB"
+RUN echo $PATH
+RUN echo $PERL5LIB
+RUN cpanm -v Moose IPC::Run
 
+ENV PYTHONUNBUFFERED True
 RUN mkdir -p /home/pfamserver/stage/
 
 WORKDIR /home/pfamserver/stage

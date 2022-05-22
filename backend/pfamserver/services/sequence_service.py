@@ -13,8 +13,20 @@ from sqlalchemy.orm.exc import NoResultFound
 
 merry = Merry()
 
-os.environ["PERL5LIB"] = os.path.abspath("./PfamScan")
-os.environ["PATH"] = os.path.abspath(".") + ":" + os.environ["PATH"]
+os.environ["PERL5LIB"] = (
+    os.path.abspath("./Pfam35.0/PfamScan")
+    + ":"
+    + os.path.abspath("./Pfam35.0")
+    + ":"
+    + os.path.abspath(".")
+)  # TODO
+os.environ["PATH"] = (
+    os.path.abspath("./Pfam35.0")
+    + ":"
+    + os.path.abspath(".")
+    + ":"
+    + os.environ["PATH"]
+)
 
 
 class SequenceServiceError(Exception):
@@ -45,22 +57,28 @@ def id_generator():
     return text(uuid.uuid4())
 
 
-def pfamscan(seq):
-    hmmdata_path = os.path.abspath(os.path.join("./", version_service.version()))
-    pfamscan_bin = os.path.abspath("./PfamScan/pfam_scan.pl")
-    tmp_path = os.path.abspath("./tmp")
-    pfamscan_call = pfamscan_bin + " -dir " + hmmdata_path
+def guarantee_tmp_folder(tmp):
+    if not os.path.exists(tmp):
+        os.makedirs(tmp)
 
-    fasta_path = os.path.join(tmp_path, id_generator() + ".fasta")
+
+def pfamscan(seq):
+    HMMDATA_PATH = os.path.abspath(os.path.join("./", version_service.version()))
+    PFAMSCAN_BIN = os.path.join(HMMDATA_PATH, "PfamScan", "pfam_scan.pl")
+    TMP_PATH = os.path.abspath("./tmp")
+    PFAMSCAN_BASE_CALL = PFAMSCAN_BIN + " -dir " + HMMDATA_PATH
+    guarantee_tmp_folder(TMP_PATH)
+    fasta_path = os.path.join(TMP_PATH, id_generator() + ".fasta")
     with open(fasta_path, "w") as outstream:
         outstream.write(">user_sequence\n" + seq)
 
-    cmd = pfamscan_call.split() + ["-fasta", fasta_path]
+    cmd = PFAMSCAN_BASE_CALL.split() + ["-fasta", fasta_path]
     return run(cmd, stdout=PIPE).communicate()[0]  # nosec
 
 
 def parse_pfamscan(text):
-    matches = [is_pfam_match(line) for line in text.split("\n") if is_pfam_match(line)]
+    lines = text.decode("unicode_escape").split("\n")
+    matches = [is_pfam_match(line) for line in lines if is_pfam_match(line)]
     pfams = [get_pfam_from_pfamacc(m.group(3)) for m in matches]
     return [
         {

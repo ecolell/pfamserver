@@ -5,6 +5,8 @@
 assert-command-present = $(if $(shell which $1),,$(error '$1' missing and needed for this build))
 
 # SHELL += -x
+PFAM_VERSION=35.0
+HMMER_VERSION=3.2.1
 
 MAKE=make
 # UID:=$(shell id -u):$(shell id -g)
@@ -13,6 +15,8 @@ UID:=1000:1000
 DC_BASE:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.yml"
 DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
 DC_DEV:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.dev.yml"
+DOCKER:=docker run --rm -v "$(PWD)/backend:/work"
+DBASH:=$(DOCKER) bash:4.4
 
 # Dev initialization
 dev-init:
@@ -26,8 +30,47 @@ dev-init:
 
 
 # Docker images
+hmmer:
+	$(DBASH) rm /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz
+	$(DBASH) wget http://eddylab.org/software/hmmer/hmmer-$(HMMER_VERSION).tar.gz -P /work/Pfam$(PFAM_VERSION)
+	$(DBASH) tar xvzf /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz -C /work/Pfam$(PFAM_VERSION)
+	$(DOCKER) -w /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION) \
+		gcc:4.9 ./configure
+	$(DOCKER) -w /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION) \
+		gcc:4.9 make
 
-docker-build:
+
+preflight-stockholm: hmmer
+	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/Pfam-A.hmm.gz -P /work/Pfam$(PFAM_VERSION)
+	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/Pfam-A.hmm.dat.gz -P /work/Pfam$(PFAM_VERSION)
+	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.gz
+	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.dat.gz
+	$(DOCKER) gcc:4.9 /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION)/src/hmmpress /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm
+	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/Pfam-A.full.gz -P /work/Pfam$(PFAM_VERSION)
+	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.full.gz
+	$(DBASH) sed -i -E "s/(#=GF AC   [A-Z0-9]+)\\.(.+)/\\1\\n#=GF DC   Revision: \\2/g" /work/Pfam$(PFAM_VERSION)/Pfam-A.full
+
+
+hmm-index: preflight-stockholm
+	$(DOCKER) \
+		gcc:4.9rm /work/Pfam$(PFAM_VERSION)/Pfam-A.full.ssi
+	$(DOCKER) \
+		gcc:4.9 /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION)/easel/miniapps/esl-afetch --index /work/Pfam$(PFAM_VERSION)/Pfam-A.full
+
+
+pfamscan: hmm-index
+	$(DBASH) mkdir -p /work/Pfam$(PFAM_VERSION)/PfamScan
+	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/Tools/PfamScan.tar.gz -P /work/Pfam$(PFAM_VERSION)
+	$(DBASH) tar xvzf /work/Pfam$(PFAM_VERSION)/PfamScan.tar.gz -C /work/Pfam$(PFAM_VERSION)
+	$(DBASH) mkdir -p /work/tmp
+	$(DOCKER) -w /work/Pfam$(PFAM_VERSION)/ \
+		bash:4.4 ln -s ./hmmer-$(HMMER_VERSION)/src/hmmscan hmmscan
+
+
+pre-flight: pfamscan
+
+
+docker-build: pre-flight
 	$(MAKE) -C backend extract-requirements
 	$(DC) build web
 	$(DC_DEV) build web
@@ -51,7 +94,7 @@ pipeline-database-test:
 
 pipeline-backend-test:
 	mkdir -p db/mysql_test
-	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s -v
+	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s -v -k test_get_pfams_from_sequence
 
 pipeline-backend-mypy:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests

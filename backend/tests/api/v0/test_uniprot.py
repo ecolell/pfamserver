@@ -1,9 +1,7 @@
 import json
 
 
-def test_get_uniprot_pfams(
-    db, client, uniprot_reg_full_mt2_human_section1, uniprot_reg_full_mt2_human_section2
-):
+def test_get_uniprot_pfams(db, client, uniprot_reg_full_mt2_human):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
     res = client.get("/api/v0/uniprots/mt2_human/pfams", headers=headers)
     assert res.status_code == 200
