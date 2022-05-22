@@ -77,6 +77,7 @@ def pfamscan(seq):
 
 
 def parse_pfamscan(text):
+    print(text)
     lines = text.decode("unicode_escape").split("\n")
     matches = [is_pfam_match(line) for line in lines if is_pfam_match(line)]
     pfams = [get_pfam_from_pfamacc(m.group(3)) for m in matches]

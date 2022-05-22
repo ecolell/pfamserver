@@ -42,24 +42,25 @@ def test_get_pfams_from_sequence(
     assert "num_full" in results[4]
 
 
-def test_get_pfams_from_invalid_sequence(app, egfr_human_partial_sequence):
+def test_get_pfams_from_invalid_sequence(
+    db, egfr_human_partial_sequence, uniprot_reg_full_egfr_human
+):
     sequence = egfr_human_partial_sequence
-    with app.app_context():
-        results = service.get_pfams_from_sequence(sequence)
-        assert len(results) == 2
-        assert results[0]["seq_end"] == 61
-        assert results[0]["seq_start"] == 1
-        assert results[0]["pfamA_acc"] == "PF14843"
-        assert results[0]["description"] == "Growth factor receptor domain IV"
-        assert "num_full" in results[0]
-        assert results[1]["seq_end"] == 392
-        assert results[1]["seq_start"] == 136
-        assert results[1]["pfamA_acc"] == "PF07714"
-        assert results[1]["description"] == "Protein tyrosine kinase"
-        assert "num_full" in results[1]
+    results = service.get_pfams_from_sequence(sequence)
+    assert len(results) == 2
+    assert results[0]["seq_end"] == 61
+    assert results[0]["seq_start"] == 1
+    assert results[0]["pfamA_acc"] == "PF14843"
+    assert results[0]["description"] == "Growth factor receptor domain IV"
+    assert "num_full" in results[0]
+    assert results[1]["seq_end"] == 392
+    assert results[1]["seq_start"] == 136
+    assert results[1]["pfamA_acc"] == "PF07714"
+    assert results[1]["description"] == "Protein tyrosine kinase"
+    assert "num_full" in results[1]
 
-        sequence = sequence[:30] + "\n" + sequence[31:]
-        assert service.get_pfams_from_sequence(sequence) == []
+    sequence = sequence[:30] + "\n" + sequence[31:]
+    assert service.get_pfams_from_sequence(sequence) == []
 
 
 def test_get_pfam_from_pfamacc(db, pfam_a_pf00131):
