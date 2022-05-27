@@ -22,11 +22,13 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     networks:
       - testingnet
+    ports:
+      - "3306:3306"
     volumes:
       - ./db/mysql_test:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=Pfam32_0
+      - MYSQL_DATABASE=Pfam35_0
       - MYSQL_USER=pfamserver
       - MYSQL_PASSWORD=pfamserver
 
