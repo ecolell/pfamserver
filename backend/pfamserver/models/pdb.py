@@ -1,13 +1,11 @@
-from __future__ import unicode_literals
+import sqlalchemy as sqla
 from pfamserver.database import db
 
 
 class Pdb(db.Model):
-    pdb_id = db.Column(
-        db.String(5),
-        primary_key=True)
-    title = db.Column(db.UnicodeText)
-    method = db.Column(db.UnicodeText)
-    resolution = db.Column(db.Numeric)
-    author = db.Column(db.UnicodeText)
-    date = db.Column(db.UnicodeText)
+    pdb_id = sqla.Column(sqla.String(5), primary_key=True)
+    title = sqla.Column(sqla.UnicodeText)
+    method = sqla.Column(sqla.UnicodeText)
+    resolution = sqla.Column(sqla.Numeric)
+    author = sqla.Column(sqla.UnicodeText)
+    date = sqla.Column(sqla.UnicodeText)

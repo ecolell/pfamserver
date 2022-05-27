@@ -1,14 +1,9 @@
-from __future__ import unicode_literals
-from pfamserver.database import db, Base
+import sqlalchemy as sqla
+from pfamserver.database import Base
 
 
 class PfamA(Base):
-    pfamA_acc = db.Column(
-        db.String(7),
-        primary_key=True)
-    pfamA_id = db.Column(
-        db.String(16),
-        index=True,
-        unique=True)
-    description = db.Column(db.UnicodeText)
-    num_full = db.Column(db.Integer)
+    pfamA_acc = sqla.Column(sqla.String(7), primary_key=True)
+    pfamA_id = sqla.Column(sqla.String(16), index=True, unique=True)
+    description = sqla.Column(sqla.UnicodeText)
+    num_full = sqla.Column(sqla.Integer)

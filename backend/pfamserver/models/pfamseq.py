@@ -1,11 +1,7 @@
-from __future__ import unicode_literals
-from pfamserver.database import db, Base
+import sqlalchemy as sqla
+from pfamserver.database import Base
 
 
 class Pfamseq(Base):
-    pfamseq_acc = db.Column(
-        db.String(10),
-        primary_key=True)
-    pfamseq_id = db.Column(
-        db.String(16),
-        index=True)
+    pfamseq_acc = sqla.Column(sqla.String(10), primary_key=True)
+    pfamseq_id = sqla.Column(sqla.String(16), index=True)

@@ -1,27 +1,33 @@
+from typing import TYPE_CHECKING
+
+import sqlalchemy as sqla
 from pfamserver.database import db
-from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.dialects.mysql import INTEGER
+
+if TYPE_CHECKING:
+    from pfamserver.models.uniprot_reg_full import UniprotRegFull  # noqa: F401
+    from pfamserver.models.pdb import Pdb  # noqa: F401
 
 
 class PdbPfamAReg(db.Model):
     __tablename__ = "pdb_pfamA_reg"
 
-    # auto_pfamA_reg_full = db.Column(
-    #    db.Integer,
-    #    primary_key=True)
-    auto_uniprot_reg_full = db.Column(
-        INTEGER(unsigned=True), db.ForeignKey("uniprot_reg_full.auto_uniprot_reg_full")
+    auto_uniprot_reg_full = sqla.Column(
+        INTEGER(unsigned=True),
+        sqla.ForeignKey("uniprot_reg_full.auto_uniprot_reg_full"),
     )
-    uniprot_reg_full = db.relationship("UniprotRegFull", backref=db.backref("pdbs"))
-    pdb_id = db.Column(db.String(5), db.ForeignKey("pdb.pdb_id"))
-    pdb = db.relationship("Pdb", backref=db.backref("pfams"))
-    chain = db.Column(db.String(4), index=True)
-    pfamA_acc = db.Column(db.String(7), index=True)
-    pfamseq_acc = db.Column(db.String(10), index=True)
-    pdb_res_start = db.Column(db.Integer, index=True)
-    pdb_res_end = db.Column(db.Integer, index=True)
+    uniprot_reg_full = sqla.orm.relationship(
+        "UniprotRegFull", backref=sqla.orm.backref("pdbs")
+    )
+    pdb_id = sqla.Column(sqla.String(5), sqla.ForeignKey("pdb.pdb_id"))
+    pdb = sqla.orm.relationship("Pdb", backref=sqla.orm.backref("pfams"))
+    chain = sqla.Column(sqla.String(4), index=True)
+    pfamA_acc = sqla.Column(sqla.String(7), index=True)
+    pfamseq_acc = sqla.Column(sqla.String(10), index=True)
+    pdb_res_start = sqla.Column(sqla.Integer, index=True)
+    pdb_res_end = sqla.Column(sqla.Integer, index=True)
 
     __table_args__ = (
-        PrimaryKeyConstraint("auto_uniprot_reg_full", "pdb_id"),
+        sqla.PrimaryKeyConstraint("auto_uniprot_reg_full", "pdb_id"),
         {},
     )  # type: tuple

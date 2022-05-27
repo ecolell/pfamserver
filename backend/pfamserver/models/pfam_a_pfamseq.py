@@ -1,16 +1,16 @@
+import sqlalchemy as sqla
 from pfamserver.database import db
-from sqlalchemy import PrimaryKeyConstraint
 
 
 class PfamAPfamseq(db.Model):
     __tablename__ = "pfamA_pfamseq"
 
-    pfamseq_id = db.Column(db.String(40), index=True)
-    pfamA_acc = db.Column(db.String(7), index=True)
-    pfamseq_acc = db.Column(db.String(10), index=True)
-    has_pdb = db.Column(db.Boolean, default=False)
+    pfamseq_id = sqla.Column(sqla.String(40), index=True)
+    pfamA_acc = sqla.Column(sqla.String(7), index=True)
+    pfamseq_acc = sqla.Column(sqla.String(10), index=True)
+    has_pdb = sqla.Column(sqla.Boolean, default=False)
 
     __table_args__ = (
-        PrimaryKeyConstraint("pfamseq_id", "pfamA_acc", "pfamseq_acc"),
+        sqla.PrimaryKeyConstraint("pfamseq_id", "pfamA_acc", "pfamseq_acc"),
         {},
     )  # type: tuple
