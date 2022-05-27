@@ -42,7 +42,7 @@ class BaseConfig:
 
     PFAM_VERSION = os.getenv("PFAM_VERSION", "35.0")
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "SQLALCHEMY_DATABASE_URI", "mysql+pymysql://root:root@db:3306/Pfam32_0"
+        "SQLALCHEMY_DATABASE_URI", "mysql+pymysql://root:root@db:3306/Pfam35_0"
     )
     PFAMSERVER_ROOT_PATH = os.getenv(
         "PFAMSERVER_ROOT_PATH", "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/"
