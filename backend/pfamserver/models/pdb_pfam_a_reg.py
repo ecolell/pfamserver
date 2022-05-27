@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 import sqlalchemy as sqla
-from pfamserver.database import db
+from pfamserver.database import Model
 from sqlalchemy.dialects.mysql import INTEGER
 
 if TYPE_CHECKING:
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from pfamserver.models.pdb import Pdb  # noqa: F401
 
 
-class PdbPfamAReg(db.Model):
+class PdbPfamAReg(Model):
     __tablename__ = "pdb_pfamA_reg"
 
     auto_uniprot_reg_full = sqla.Column(

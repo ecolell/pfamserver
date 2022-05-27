@@ -1,8 +1,8 @@
 import sqlalchemy as sqla
-from pfamserver.database import db
+from pfamserver.database import Model
 
 
-class Pdb(db.Model):
+class Pdb(Model):
     pdb_id = sqla.Column(sqla.String(5), primary_key=True)
     title = sqla.Column(sqla.UnicodeText)
     method = sqla.Column(sqla.UnicodeText)

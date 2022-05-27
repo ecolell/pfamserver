@@ -1,13 +1,8 @@
-from __future__ import unicode_literals
-from pfamserver.database import db, Base
+import sqlalchemy as sqla
+from pfamserver.database import Base
 
 
 class Uniprot(Base):
-    uniprot_acc = db.Column(
-        db.String(10),
-        primary_key=True)
-    uniprot_id = db.Column(
-        db.String(16),
-        index=True,
-        unique=True)
-    description = db.Column(db.UnicodeText)
+    uniprot_acc = sqla.Column(sqla.String(10), primary_key=True)
+    uniprot_id = sqla.Column(sqla.String(16), index=True, unique=True)
+    description = sqla.Column(sqla.UnicodeText)

@@ -1,8 +1,8 @@
 import sqlalchemy as sqla
-from pfamserver.database import db
+from pfamserver.database import Model
 
 
-class PfamAPfamseq(db.Model):
+class PfamAPfamseq(Model):
     __tablename__ = "pfamA_pfamseq"
 
     pfamseq_id = sqla.Column(sqla.String(40), index=True)

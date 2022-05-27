@@ -1,8 +1,8 @@
 import sqlalchemy as sqla
-from pfamserver.database import db
+from pfamserver.database import Model
 
 
-class PfamARegFullSignificant(db.Model):
+class PfamARegFullSignificant(Model):
     __tablename__ = "pfamA_reg_full_significant"
 
     pfamA_acc = sqla.Column(sqla.String(7), index=True)

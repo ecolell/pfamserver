@@ -1,19 +1,25 @@
 """Database abstract classes."""
-import sqlalchemy as sa
+from typing import Any
+
+import sqlalchemy as sqla
 
 from .extensions import db
+
+Model: Any = db.Model
 
 
 class TimestampMixin:
     """Mixin to add timestamp columns to SQLAlchemy models."""
 
-    created = sa.Column(sa.types.DateTime(timezone=True), default=sa.func.now())
-    updated = sa.Column(
-        sa.types.DateTime(timezone=True), default=sa.func.now(), onupdate=sa.func.now()
+    created = sqla.Column(sqla.types.DateTime(timezone=True), default=sqla.func.now())
+    updated = sqla.Column(
+        sqla.types.DateTime(timezone=True),
+        default=sqla.func.now(),
+        onupdate=sqla.func.now(),
     )
 
 
-class Base(TimestampMixin, db.Model):
+class Base(TimestampMixin, Model):
     """Base Class for SQLAlchemy models."""
 
     __abstract__ = True
