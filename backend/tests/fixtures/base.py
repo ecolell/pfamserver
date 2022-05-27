@@ -5,8 +5,7 @@ import pytest
 from pfamserver import create_app
 
 
-@pytest.fixture(scope="session")
-def prepare_db():
+def raw_query(query: str):
     mydb = mysql.connector.connect(
         host="db",
         user="root",
@@ -14,15 +13,17 @@ def prepare_db():
         database="sys",
     )
     cursor = mydb.cursor(buffered=True)
-    cursor.execute("CREATE DATABASE IF NOT EXISTS Pfam35_0;")
+    cursor.execute(query)
     mydb.commit()
     mydb.disconnect()
 
 
 @pytest.fixture(scope="session")
-def session_app(prepare_db):
+def session_app():
+    raw_query("CREATE DATABASE IF NOT EXISTS Pfam35_0;")
     app = create_app()
-    return app
+    yield app
+    raw_query("DROP DATABASE IF EXISTS Pfam35_0;")
 
 
 @pytest.fixture(scope="class")
