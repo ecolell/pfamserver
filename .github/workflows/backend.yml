@@ -18,6 +18,7 @@ jobs:
         python-version: 3.x
     - run: pip install --upgrade pip
     - run: pip install mypy==v0.902
+    - run: pip install sqlalchemy-stubs==^0.4
     - run: cd backend && mypy pfamserver tests
   quality:
     name: quality
