@@ -19,7 +19,7 @@ class UniprotRegFull(Model):
     seq_end = sqla.Column(sqla.Integer)
     in_full = sqla.Column(sqla.Integer, index=True)
 
-    __table_args__ = (
-        sqla.PrimaryKeyConstraint("pfamA_acc", "uniprot_acc", "seq_start", "in_full"),
-        {},
-    )  # type: tuple
+    # __table_args__ = (
+    #    sqla.PrimaryKeyConstraint("pfamA_acc", "uniprot_acc", "seq_start", "in_full"),
+    #    {},
+    # )  # type: tuple
