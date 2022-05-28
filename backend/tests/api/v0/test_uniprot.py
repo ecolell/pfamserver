@@ -7,7 +7,15 @@ def test_get_uniprot_pfams(db, client, uniprot_reg_full_mt2_human):
     assert res.status_code == 200
     data = json.loads(res.get_data(as_text=True))
     assert data["query"] == "MT2_HUMAN"
-    assert len(data["output"]) == 2
+    assert data["output"] == [
+        {
+            "num_full": "480",
+            "description": "Metallothionein",
+            "seq_start": 1,
+            "pfamA_acc": "PF00131",
+            "seq_end": 61,
+        }
+    ]
 
     res = client.get("/api/v0/uniprots/invalid_uniprot/pfams", headers=headers)
     assert res.status_code == 400
