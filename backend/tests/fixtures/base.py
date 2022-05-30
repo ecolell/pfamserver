@@ -65,12 +65,12 @@ def client(app):
 @pytest.fixture(scope="class")
 def testdb(session_app):
     """Establish an application context before running the tests."""
-    app = session_app
-    app.db.create_all()
-    yield app.db
-    app.db.session.remove()
-    engine = app.db.get_engine(app)
-    metadata = app.db.Model.metadata
+    db = session_app.db
+    db.create_all()
+    yield db
+    db.session.remove()
+    engine = db.get_engine(app)
+    metadata = db.Model.metadata
 
     with closing(engine.connect()) as con:
         trans = con.begin()
@@ -86,8 +86,8 @@ def db(app, testdb):
     """
     SetUp before each test is run: push a context and use subtransactions.
     """
-    app.db.session.begin(subtransactions=True)
+    testdb.session.begin(subtransactions=True)
 
-    yield app.db
+    yield testdb
 
-    app.db.session.rollback()
+    testdb.session.rollback()
