@@ -69,7 +69,7 @@ def testdb(session_app):
     db.create_all()
     yield db
     db.session.remove()
-    engine = db.get_engine(app)
+    engine = db.get_engine(session_app)
     metadata = db.Model.metadata
 
     with closing(engine.connect()) as con:
