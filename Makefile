@@ -45,15 +45,16 @@ preflight-stockholm: hmmer
 	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/Pfam-A.hmm.dat.gz -P /work/Pfam$(PFAM_VERSION)
 	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.gz
 	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.dat.gz
+	$(DBASH) rm -f /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.h3i
+	$(DBASH) rm -f /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm.h3m
 	$(DOCKER) gcc:4.9 /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION)/src/hmmpress /work/Pfam$(PFAM_VERSION)/Pfam-A.hmm
 	$(DBASH) wget -c ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/Pfam-A.full.gz -P /work/Pfam$(PFAM_VERSION)
 	$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/Pfam-A.full.gz
 	$(DBASH) sed -i -E "s/(#=GF AC   [A-Z0-9]+)\\.(.+)/\\1\\n#=GF DC   Revision: \\2/g" /work/Pfam$(PFAM_VERSION)/Pfam-A.full
 
 
-hmm-index: preflight-stockholm
-	$(DOCKER) \
-		gcc:4.9rm /work/Pfam$(PFAM_VERSION)/Pfam-A.full.ssi
+hmm-index: #preflight-stockholm
+	$(DBASH) rm -f /work/Pfam$(PFAM_VERSION)/Pfam-A.full.ssi
 	$(DOCKER) \
 		gcc:4.9 /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION)/easel/miniapps/esl-afetch --index /work/Pfam$(PFAM_VERSION)/Pfam-A.full
 
@@ -64,7 +65,7 @@ pfamscan: hmm-index
 	$(DBASH) tar xvzf /work/Pfam$(PFAM_VERSION)/PfamScan.tar.gz -C /work/Pfam$(PFAM_VERSION)
 	$(DBASH) mkdir -p /work/tmp
 	$(DOCKER) -w /work/Pfam$(PFAM_VERSION)/ \
-		bash:4.4 ln -s ./hmmer-$(HMMER_VERSION)/src/hmmscan hmmscan
+		bash:4.4 ln -s -f ./hmmer-$(HMMER_VERSION)/src/hmmscan hmmscan
 
 
 pre-flight: pfamscan
