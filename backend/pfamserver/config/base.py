@@ -41,6 +41,7 @@ class BaseConfig:
     SEND_FILE_MAX_AGE_DEFAULT = 3600
 
     PFAM_VERSION = os.getenv("PFAM_VERSION", "35.0")
+    HMMER_VERSION = os.getenv("HMMER_VERSION", "3.2.1")
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "SQLALCHEMY_DATABASE_URI", "mysql+pymysql://root:root@db:3306/Pfam35_0"
     )

@@ -60,7 +60,7 @@ class PfamAStockholmAPI(Resource):
     @ns.response(200, "response")
     @ns.doc("Obtain a sequence_description list from a pfam.")
     @cache.cached(timeout=3600, key_prefix=make_cache_key)
-    def get(self, pfam):
+    def get(self, pfam: str):
         stockholm = pfam_service.get_stockholm_from_pfam(pfam)
-        data = {"query": pfam, "output": b64encode(compress(stockholm))}
+        data = {"query": pfam, "output": b64encode(compress(stockholm)).decode("utf-8")}
         return data, 200

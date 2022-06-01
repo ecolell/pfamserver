@@ -9,3 +9,7 @@ def version():
     if "." not in ver:
         ver = f"Pfam{current_app.config.get('PFAM_VERSION')}"
     return ver
+
+
+def hmmer_version():
+    return current_app.config.get("HMMER_VERSION")

@@ -115,14 +115,16 @@ def get_sequence_descriptions_from_pfam(pfam, with_pdb):
 
 
 @merry._try
-def get_stockholm_from_pfam(pfam):
+def get_stockholm_from_pfam(pfam: str):
+    PFAM_VERSION = version_service.version()
+    HMMER_VERSION = version_service.hmmer_version()
     query = get_pfam_acc_from_pfam(pfam)
-    query = query.options(Load(PfamA).load_only("pfamA_acc"))
+    query = query.options(Load(PfamA).load_only("pfamA_acc"))  # type: ignore
     pfamA_acc = query.one().pfamA_acc
-    fetch_call = "./esl-afetch"
+    fetch_call = f"./{PFAM_VERSION}/hmmer-{HMMER_VERSION}/esl-afetch"
     cmd = [
         fetch_call,
-        "./{version}/Pfam-A.full".format(version=version_service.version()),
+        f"./{PFAM_VERSION}/Pfam-A.full",
         pfamA_acc,
     ]
     return run(cmd, stdout=PIPE).communicate()[0]  # nosec
