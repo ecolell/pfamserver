@@ -1,4 +1,5 @@
 import pytest
+from pfamserver.services import pfam_service
 from tests.factories import PfamAFactory
 
 
@@ -60,3 +61,12 @@ def pfam_a_pf00131():
         num_full=480,
         description="Metallothionein",
     )
+
+
+@pytest.fixture
+def mock_pfam_a_pf00131_stockholm(mocker):
+    with open("./tests/fixtures/data/pf00131.sto", "rb") as f:
+        a = f.read()
+    m = mocker.patch.object(pfam_service, "get_stockholm_from_pfam")
+    m.return_value = a
+    return a

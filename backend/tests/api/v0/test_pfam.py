@@ -62,7 +62,7 @@ def test_get_pfams_reference_sequences(
     app.config["TABLE_CACHE_ENABLED"] = False
 
 
-def test_get_pfams_stockholm(db, client, pfam_a_pf00131):
+def test_get_pfams_stockholm(db, client, pfam_a_pf00131, mock_pfam_a_pf00131_stockholm):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
     res = client.get("/api/v0/pfams/pf00131/stockholm", headers=headers)
     assert res.status_code == 200
@@ -70,6 +70,8 @@ def test_get_pfams_stockholm(db, client, pfam_a_pf00131):
     assert data["query"] == "pf00131"
     assert len(data["output"]) >= 14896
 
+
+def test_get_pfams_stockholm_invalid(db, client):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
     res = client.get("/api/v0/pfams/invalid/stockholm", headers=headers)
     assert res.status_code == 400
