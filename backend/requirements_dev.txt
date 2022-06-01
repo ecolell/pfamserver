@@ -587,6 +587,9 @@ sqlalchemy==1.3.24 \
     --hash=sha256:ee5f5188edb20a29c1cc4a039b074fdc5575337c9a68f3063449ab47757bb064 \
     --hash=sha256:09083c2487ca3c0865dc588e07aeaa25416da3d95f7482c07e92f47e080aa17b \
     --hash=sha256:ebbb777cbf9312359b897bf81ba00dae0f5cb69fba2a18265dcc18a6f5ef7519
+sqlalchemy-stubs==0.4 \
+    --hash=sha256:c665d6dd4482ef642f01027fa06c3d5e91befabb219dc71fc2a09e7d7695f7ae \
+    --hash=sha256:5eec7aa110adf9b957b631799a72fef396b23ff99fe296df726645d01e312aa5
 sqlalchemy-utils==0.37.8 \
     --hash=sha256:a6aaee154f798be4e479af0ceffaa5034d35fcf6f40707c0947d21bde64e05e5 \
     --hash=sha256:b1bf67d904fed16b16ef1dc07f03e5e93a6b23899f920f6b41c09be45fbb85f2
