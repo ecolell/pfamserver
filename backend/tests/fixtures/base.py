@@ -1,29 +1,22 @@
+import os
 from contextlib import closing
 
-import mysql.connector
 import pytest
 from pfamserver import create_app
-
-
-def raw_query(query: str):
-    mydb = mysql.connector.connect(
-        host="db",
-        user="root",
-        passwd="root",
-        database="sys",
-    )
-    cursor = mydb.cursor(buffered=True)
-    cursor.execute(query)
-    mydb.commit()
-    mydb.disconnect()
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 
 @pytest.fixture(scope="session")
 def session_app():
-    raw_query("CREATE DATABASE IF NOT EXISTS Pfam35_0;")
+    db_uri = os.getenv(
+        "SQLALCHEMY_DATABASE_URI", "mysql+pymysql://root:root@db:3306/Pfam35_0"
+    )
+    if not database_exists(db_uri):
+        create_database(db_uri)
+    print("Using {db_uri} for tests".format(db_uri=db_uri))
     app = create_app()
     yield app
-    raw_query("DROP DATABASE IF EXISTS Pfam35_0;")
+    drop_database(db_uri)
 
 
 @pytest.fixture(scope="class")
