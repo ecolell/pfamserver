@@ -57,7 +57,7 @@ def test_get_pfams_pf00131_reference_sequences(
 
 @pytest.mark.parametrize("table_cache_enabled", [True, False])
 def test_get_pfams_pf01030_reference_sequences(
-    app, client, pfamseq_pf01030, table_cache_enabled
+    app, client, pfamseq_pf01030, pfam_a_pfamseq_pf01030, table_cache_enabled
 ):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
 

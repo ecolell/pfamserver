@@ -28,6 +28,6 @@ class PdbPfamAReg(Model):
     pdb_res_end = sqla.Column(sqla.Integer, index=True)
 
     __table_args__ = (
-        sqla.PrimaryKeyConstraint("auto_uniprot_reg_full", "pdb_id"),
+        sqla.PrimaryKeyConstraint("auto_uniprot_reg_full", "pdb_id", "chain"),
         {},
     )  # type: tuple

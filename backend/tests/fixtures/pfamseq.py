@@ -505,7 +505,7 @@ def pfamseq_pf00131(pfam_a_pf00131, pdb_pfam_a_reg_pf00131):
 
 
 @pytest.fixture
-def pfamseq_pf01030(pfam_a_pf01030):
+def pfamseq_pf01030(pfam_a_pf01030, pdb_pfam_a_reg_pf01030):
     data = [
         ("A0A261CE05", 126, 236, 1),
         ("A0A261CE05", 406, 475, 1),
