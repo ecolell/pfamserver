@@ -1,7 +1,15 @@
 import factory
 from faker import Factory
 from pfamserver.database import db
-from pfamserver.models import Pdb, PdbPfamAReg, PfamA, Uniprot, UniprotRegFull
+from pfamserver.models import (
+    Pdb,
+    PdbPfamAReg,
+    PfamA,
+    PfamARegFullSignificant,
+    Pfamseq,
+    Uniprot,
+    UniprotRegFull,
+)
 
 faker = Factory.create()
 
@@ -21,6 +29,18 @@ class UniprotRegFullFactory(factory.alchemy.SQLAlchemyModelFactory):
 class PfamAFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = PfamA
+        sqlalchemy_session = db.session
+
+
+class PfamARegFullSignificantFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = PfamARegFullSignificant
+        sqlalchemy_session = db.session
+
+
+class PfamseqFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = Pfamseq
         sqlalchemy_session = db.session
 
 

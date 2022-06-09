@@ -1,5 +1,5 @@
 import pytest
-from tests.factories import UniprotRegFullFactory
+from tests.factories import UniprotFactory, UniprotRegFullFactory
 
 
 @pytest.fixture
@@ -63,3 +63,31 @@ def uniprot_reg_full_mt3_human(
         seq_end=68,
         in_full=1,
     )
+
+
+@pytest.fixture
+def uniprot_reg_full_pfam_a_pf00131(db, pfam_a_pf00131):
+    data = [
+        (337061767, "P25713", 1, 68, 1),
+        (337061779, "P28184", 1, 68, 1),
+        (337061979, "P02795", 1, 61, 1),
+        (337061993, "P18055", 1, 62, 1),
+        (337062085, "P02802", 1, 61, 1),
+        (337062186, "P04355", 1, 61, 1),
+        (337062415, "P62339", 1, 60, 1),
+    ]
+    for d in data:
+        UniprotFactory(
+            uniprot_acc=d[1], uniprot_id=f"{d[1]}_key", description="something"
+        )
+    return [
+        UniprotRegFullFactory(
+            auto_uniprot_reg_full=d[0],
+            pfamA=pfam_a_pf00131,
+            uniprot_acc=d[1],
+            seq_start=d[2],
+            seq_end=d[3],
+            in_full=d[4],
+        )
+        for d in data
+    ]

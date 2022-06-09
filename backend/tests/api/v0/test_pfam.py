@@ -24,8 +24,8 @@ def test_get_pfams(db, client, pfam_a_pf00131, pfam_a_pf01030):
 
 
 @pytest.mark.parametrize("table_cache_enabled", [True, False])
-def test_get_pfams_reference_sequences(
-    app, client, pfam_a_pf00131, pfam_a_pf01030, table_cache_enabled
+def test_get_pfams_pf00131_reference_sequences(
+    app, client, pfamseq_pf00131, table_cache_enabled
 ):
     headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
 
@@ -34,7 +34,7 @@ def test_get_pfams_reference_sequences(
     assert res.status_code == 200
     data = json.loads(res.get_data(as_text=True))
     assert data["query"] == "pf00131"
-    assert len(data["output"]) >= 6
+    assert len(data["output"]) == 6
 
     res = client.get(
         "/api/v0/pfams/pf00131/sequence_descriptions?with_pdb=true", headers=headers
@@ -42,7 +42,7 @@ def test_get_pfams_reference_sequences(
     assert res.status_code == 200
     data = json.loads(res.get_data(as_text=True))
     assert data["query"] == "pf00131"
-    assert len(data["output"]) >= 6
+    assert len(data["output"]) == 6
 
     res = client.get(
         "/api/v0/pfams/pf00131/sequence_descriptions?with_pdb=false", headers=headers
@@ -50,8 +50,18 @@ def test_get_pfams_reference_sequences(
     assert res.status_code == 200
     data = json.loads(res.get_data(as_text=True))
     assert data["query"] == "pf00131"
-    assert len(data["output"]) >= 345
+    assert len(data["output"]) == 480
 
+    app.config["TABLE_CACHE_ENABLED"] = False
+
+
+@pytest.mark.parametrize("table_cache_enabled", [True, False])
+def test_get_pfams_pf01030_reference_sequences(
+    app, client, pfamseq_pf01030, table_cache_enabled
+):
+    headers = [("Accept", "application/json"), ("Content-Type", "application/json")]
+
+    app.config["TABLE_CACHE_ENABLED"] = table_cache_enabled
     res = client.get(
         "/api/v0/pfams/PF01030/sequence_descriptions?with_pdb=false", headers=headers
     )

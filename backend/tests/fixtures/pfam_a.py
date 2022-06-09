@@ -4,7 +4,7 @@ from tests.factories import PfamAFactory
 
 
 @pytest.fixture
-def pfam_a_pf01030():
+def pfam_a_pf01030(db):
     return PfamAFactory(
         pfamA_acc="PF01030",
         pfamA_id="Recep_L_domain",
@@ -14,7 +14,7 @@ def pfam_a_pf01030():
 
 
 @pytest.fixture
-def pfam_a_pf07714():
+def pfam_a_pf07714(db):
     return PfamAFactory(
         pfamA_acc="PF07714",
         pfamA_id="Pkinase_Tyr",
@@ -24,7 +24,7 @@ def pfam_a_pf07714():
 
 
 @pytest.fixture
-def pfam_a_pf00069():
+def pfam_a_pf00069(db):
     return PfamAFactory(
         pfamA_acc="PF00069",
         pfamA_id="Pkinase",
@@ -34,7 +34,7 @@ def pfam_a_pf00069():
 
 
 @pytest.fixture
-def pfam_a_pf14843():
+def pfam_a_pf14843(db):
     return PfamAFactory(
         pfamA_acc="PF14843",
         pfamA_id="GF_recep_IV",
@@ -44,7 +44,7 @@ def pfam_a_pf14843():
 
 
 @pytest.fixture
-def pfam_a_pf00757():
+def pfam_a_pf00757(db):
     return PfamAFactory(
         pfamA_acc="PF00757",
         pfamA_id="Furin-like",
@@ -54,7 +54,7 @@ def pfam_a_pf00757():
 
 
 @pytest.fixture
-def pfam_a_pf00131():
+def pfam_a_pf00131(db):
     return PfamAFactory(
         pfamA_acc="PF00131",
         pfamA_id="Metallothio",
@@ -64,7 +64,7 @@ def pfam_a_pf00131():
 
 
 @pytest.fixture
-def mock_pfam_a_pf00131_stockholm(mocker):
+def mock_pfam_a_pf00131_stockholm(db, mocker):
     with open("./tests/fixtures/data/pf00131.sto", "rb") as f:
         a = f.read()
     m = mocker.patch.object(pfam_service, "get_stockholm_from_pfam")
