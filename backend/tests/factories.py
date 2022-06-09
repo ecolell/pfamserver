@@ -5,6 +5,7 @@ from pfamserver.models import (
     Pdb,
     PdbPfamAReg,
     PfamA,
+    PfamAPfamseq,
     PfamARegFullSignificant,
     Pfamseq,
     Uniprot,
@@ -29,6 +30,12 @@ class UniprotRegFullFactory(factory.alchemy.SQLAlchemyModelFactory):
 class PfamAFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = PfamA
+        sqlalchemy_session = db.session
+
+
+class PfamAPfamseqFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = PfamAPfamseq
         sqlalchemy_session = db.session
 
 
