@@ -78,16 +78,14 @@ def test_get_sequence_descriptions_from_pfam(
     app.config["TABLE_CACHE_ENABLED"] = False
 
 
-def test_get_stockholm_from_pfam(db):
+def test_get_stockholm_from_pfam_pf00131(
+    db, pfam_a_pf00131, mock_pfam_a_pf00131_stockholm
+):
     stockholm = service.get_stockholm_from_pfam("pf00131")
     assert len(stockholm) >= 71033  # bytes
 
-    stockholm = service.get_stockholm_from_pfam("pf01031")
-    assert len(stockholm) >= 7756361  # bytes
 
-    stockholm = service.get_stockholm_from_pfam("pf00132")
-    assert len(stockholm) >= 16128081  # bytes
-
+def test_get_stockholm_from_pfam_not_mocked(db, pfam_a_pf00131):
     with pytest.raises(service.PfamServiceError) as exc:
         service.get_stockholm_from_pfam("fake_code")
     assert exc.value.message == "PfamA doesn" "t exist."
