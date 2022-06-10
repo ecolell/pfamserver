@@ -80,7 +80,6 @@ def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
         Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc,
     )
     query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
-    print("1 ----->", query.count())
 
     if with_pdb:
         subquery2 = db.session.query(PdbPfamAReg)
@@ -89,11 +88,9 @@ def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
             .distinct()
             .subquery()
         )
-        print("2 ----->", query.count())
         query = query.filter(
             PfamARegFullSignificant.pfamseq_acc == subquery2.c.pfamseq_acc
         )
-        print("3 ----->", query.count())
 
     query = query.filter(PfamARegFullSignificant.in_full)
     query = query.options(
@@ -106,7 +103,6 @@ def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
 
 
 def get_sequence_descriptions_from_pfam(pfam: str, with_pdb: bool):
-    print("0 ----->", current_app.config.get("TABLE_CACHE_ENABLED"))
     if current_app.config.get("TABLE_CACHE_ENABLED"):
         sequence_descriptions = get_sequence_descriptions_from_pfam_with_join_table(
             pfam, with_pdb
@@ -115,7 +111,6 @@ def get_sequence_descriptions_from_pfam(pfam: str, with_pdb: bool):
         sequence_descriptions = get_sequence_descriptions_from_pfam_without_join_table(
             pfam, with_pdb
         )
-    print("=============")
     return sequence_descriptions
 
 
