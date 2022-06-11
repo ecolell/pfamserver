@@ -3,7 +3,7 @@ from tests.factories import PdbFactory, PdbPfamARegFactory
 
 
 @pytest.fixture
-def pdb_pfam_a_reg_pf00131(db, pfam_a_pf00131, uniprot_reg_full_pfam_a_pf00131):
+def pdb_pfam_a_reg_pf00131(db, pfam_a_pf00131, uniprot_reg_full_pfam_a_pf00131_full):
     # auto_uniprot, pdb_id, pfamseq_acc, chain, res_start, res_end
     data = [
         [337061767, "2FJ4", "P25713", "A", 32, 68],
