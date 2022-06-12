@@ -34,7 +34,6 @@ def create_app():
 
     register_extensions(app)
     register_blueprints(app)
-    register_cli(app)
 
     register_middlewares(app)
 

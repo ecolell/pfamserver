@@ -84,3 +84,15 @@ def db(app, testdb):
     yield testdb
 
     testdb.session.rollback()
+
+
+@pytest.fixture(scope="class")
+def load_input():
+    def loader(filename):
+        path = os.path.dirname(os.path.abspath(__file__))
+        with open("{:}/data/{:}".format(path, filename), "rb") as f:
+            data = f.read()
+
+        return data
+
+    return loader

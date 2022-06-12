@@ -64,9 +64,8 @@ def pfam_a_pf00131(db):
 
 
 @pytest.fixture
-def mock_pfam_a_pf00131_stockholm(db, mocker):
-    with open("./tests/fixtures/data/pf00131.sto", "rb") as f:
-        a = f.read()
+def mock_pfam_a_pf00131_stockholm(db, load_input, mocker):
+    content = load_input("pf00131.sto")
     m = mocker.patch.object(pfam_service, "get_stockholm_from_pfam")
-    m.return_value = a
-    return a
+    m.return_value = content
+    return content

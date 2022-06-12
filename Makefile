@@ -97,7 +97,7 @@ pipeline-backend-test:
 	mkdir -p db/mysql_test
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s -v
-	$(DC_DEV) down db
+	$(DC_DEV) down
 
 pipeline-backend-mypy:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
