@@ -90,7 +90,7 @@ def db(app, testdb):
 def load_input():
     def loader(filename):
         path = os.path.dirname(os.path.abspath(__file__))
-        with open("{:}/data/{:}".format(path, filename), "rb") as f:
+        with open("{:}/input-samples/{:}".format(path, filename), "rb") as f:
             data = f.read()
 
         return data
