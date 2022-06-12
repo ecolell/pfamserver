@@ -94,7 +94,7 @@ pipeline-database-test:
 # Testing targets
 
 pipeline-backend-test:
-	mkdir -p db/mysql_test
+	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s -v
 	$(DC_DEV) down
