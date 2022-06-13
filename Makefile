@@ -96,12 +96,11 @@ pipeline-database-test:
 
 # Testing targets
 
-pipeline-backend-test: docker-build-dev
+pipeline-backend-test:
 	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s > pytest-coverage.txt
 	$(DC_DEV) down
-	cat pytest-coverage.txt
 
 pipeline-backend-mypy:
 	$(DC_DEV) run --rm -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage web mypy pfamserver tests
