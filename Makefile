@@ -71,10 +71,14 @@ pfamscan: hmm-index
 pre-flight: pfamscan
 
 
+docker-build-dev:
+	$(MAKE) -C backend extract-requirements
+	$(DC_DEV) build web
+
+
 docker-build: pre-flight
 	$(MAKE) -C backend extract-requirements
 	$(DC) build web
-	$(DC_DEV) build web
 
 
 docker-upload:
@@ -88,7 +92,7 @@ docker-upload:
 
 # Deployment targets
 
-pipeline-database-test:
+pipeline-database-test: docker-build-dev
 	FLASK_APP=backend/flasky.py MIGRATION_DIR=backend/pfamserver/models/migrations $(MAKE) -C backend pipeline-database-test
 
 # Testing targets
