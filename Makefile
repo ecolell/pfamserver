@@ -92,12 +92,12 @@ docker-upload:
 
 # Deployment targets
 
-pipeline-database-test: docker-build-dev
+pipeline-database-test:
 	FLASK_APP=backend/flasky.py MIGRATION_DIR=backend/pfamserver/models/migrations $(MAKE) -C backend pipeline-database-test
 
 # Testing targets
 
-pipeline-backend-test:
+pipeline-backend-test: docker-build-dev
 	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s > pytest-coverage.txt
