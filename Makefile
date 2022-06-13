@@ -72,7 +72,6 @@ pre-flight: pfamscan
 
 
 docker-build-dev:
-	$(MAKE) -C backend extract-requirements
 	$(DC_DEV) build web
 
 
