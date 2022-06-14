@@ -9,8 +9,8 @@ COPY --from=perl_base /usr/local/bin/perl /usr/local/bin/perl
 COPY --from=perl_base /usr/local/bin/cpan /usr/local/bin/cpan
 COPY --from=perl_base /usr/local/bin/cpanm /usr/local/bin/cpanm
 COPY --from=perl_base /usr/bin/make /usr/bin/make
-COPY --from=perl_base /usr/bin/perl /usr/bin/perl
-COPY --from=perl_base /usr/bin/perl /usr/bin/cpanm
+# COPY --from=perl_base /usr/bin/perl /usr/bin/perl
+# COPY --from=perl_base /usr/bin/perl /usr/bin/cpanm
 ENV PERL5LIB="/usr/local/lib/site_perl:$PERL5LIB"
 RUN echo $PATH
 RUN echo $PERL5LIB
