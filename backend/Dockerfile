@@ -1,5 +1,5 @@
-FROM perl:5.30.0 AS perl_base
-FROM python:3.8.10 AS backend_base
+FROM perl:5.30-slim AS perl_base
+FROM python:3.8.10-slim AS backend_base
 LABEL maintainer="Eloy Adonis Colell <eloy.colell@gmail.com>"
 
 ARG DEBIAN_FRONTEND=noninteractive
