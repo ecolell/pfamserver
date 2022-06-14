@@ -78,8 +78,6 @@ def register_middlewares(app):
 
 def register_cli(app):
     """Register CLI commands into app."""
-    from pfamserver.commands.library import library as library_command
     from pfamserver.commands.db import db as db_command
 
-    app.cli.add_command(library_command)
     app.cli.add_command(db_command)
