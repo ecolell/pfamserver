@@ -72,11 +72,11 @@ pre-flight: pfamscan
 
 
 docker-build-dev:
-	$(DC_DEV) build web
+	$(DC_DEV) --verbose --log-level DEBUG build web
 
 
-docker-build: pre-flight
-	$(MAKE) -C backend extract-requirements
+docker-build: # pre-flight
+	# $(MAKE) -C backend extract-requirements
 	$(DC) build web
 
 
@@ -96,7 +96,7 @@ pipeline-database-test:
 
 # Testing targets
 
-pipeline-backend-test:
+pipeline-backend-test: docker-build-dev
 	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s > pytest-coverage.txt
