@@ -11,9 +11,8 @@ COPY --from=perl_base /usr/local/bin/cpanm /usr/local/bin/cpanm
 COPY --from=perl_base /usr/bin/make /usr/bin/make
 COPY --from=perl_base /usr/bin/perl /usr/bin/perl
 COPY --from=perl_base /usr/bin/perl /usr/bin/cpanm
-COPY --from=perl_base /lib/x86_64-linux-gnu/ /lib/x86_64-linux-gnu/
-#COPY --from=perl_base /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
-#COPY --from=perl_base /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
+COPY --from=perl_base /lib/x86_64-linux-gnu/libcrypt.so.1 /lib/x86_64-linux-gnu/libcrypt.so.1
+COPY --from=perl_base /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
 ENV PERL5LIB="/usr/local/lib/site_perl:$PERL5LIB"
 RUN echo $PATH
 RUN echo $PERL5LIB
