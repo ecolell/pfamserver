@@ -1,56 +1,62 @@
-# Preparing DB for distribution
+# EMBL-EBI released a new PFAM version!!
 
-## Preparing the shrinked database
+Since **pfamserver** only use only 7 tables from PFAM database, the process consist of building structure (1), downloading data files (2), loading data files into mysql database (3), cropping not used columns from database (4), construct join table to improve performance (5), and dump the destiled database into a compact file to simplify distribution into the many servers around there (6).
 
-To deploy the database structure you should execute:
+The used tables are:
 
-    flask db shrinked download -v 32.0
-    flask db shrinked install -v 32.0
-    flask db data build_cache -v 32.0
+    * pfamA
+    * pfamseq
+    * uniprot
+    * pdb
+    * pdb_pfamA_reg
+    * uniprot_reg_full
+    * pfamA_reg_full_significant
 
-On the frontend side, it was tested with:
+Since it is a good practise to keep raw downloaded files from previous versions, each version has a folder inside backend folder.
 
-    node@6.11.0
-    npm@5.1.0
-    yarn@0.27.5
 
-To get those versions on osx, you need to run:
+## 1. Preparing the database structure
 
-    sudo port install node npm3
+The first step is to prepare the database structure. To do so, a software developer should use the **testingnet** database available on the docker-compose.dev.yml file.
 
-And to get those version on a ubuntu server, you need to run:
+The command
 
-    sudo apt-get install nodejs npm
+    make db-structure
 
-Then in both systems you need to run:
+should download an **\<table\>.sql.gz** file, extract it, apply **\<table\>.sql** structure to the database and remove it; for each table in the list.
 
-    sudo npm install -g n
-    sudo n 6.11.0
-    sudo npm install -g npm@5.1.0
-    sudo npm install -g yarn@0.27.5
-    npm install .
 
-## Shrinking process
+## 2. Downloading the database data
 
-To download a specific database version from the [ebi.ac.uk] server, use the commands:
+The second step is to download the PFAM database content from the FTP server. Since some of the tables contains big amounts of data:
 
-    workon pfamserver
-    pip install -r requirements.txt
-    flask db structure build -v 32.0
-    flask db data download -v 32.0
-    flask db data load -v 32.0
+    * pfamA (9 MB)
+    * pfamseq (18 GB)
+    * uniprot (57 GB)
+    * pdb (8 MB)
+    * pdb_pfamA_reg (7 MB)
+    * uniprot_reg_full (6 GB)
+    * pfamA_reg_full_significant (4 GB)
 
-To shrink it and pack it (it could take a day):
+it is required to have at least 85 GB of free disk space to be able to download, and a few GB more in order to uncompress each file and inject it into the mysql database.
 
-    flask db data shrink -v 32.0
-    flask db dump -v 32.0
-    flask db pack_dump -v 32.0
+On the other hand, take into account that the download could take a few days since with good internet connections the download speed could be limited by the FTP server.
 
-To make the shrink available:
+The command
 
-    1. Upload the file into the proper `Google Drive account`.
-    2. Update the `pfamserver/commands/db.py` file. Set the reationship between `pfam_version` and `google_drive_object_id` into the `versions` dictionary.
-    3. Push the changes to the main repository.
-    4. Test it using:
+    make db-data-download
 
-        flask db shrinked download -v 32.0
+
+should download an **\<table\>.txt.gz** file for each table in the list.
+
+
+## 3. Loading the downloaded content into mysql
+
+
+## 4. Cropping not used columns
+
+
+## 5. Construct join table to improve performance (cache table)
+
+
+## 6. Dump destiled data, compact and upload into Mistic's google drive.
