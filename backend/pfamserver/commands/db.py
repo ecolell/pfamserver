@@ -132,31 +132,6 @@ def load(version):
     type=click.STRING,
     multiple=False,
     default=last_available_version(),
-    help="Version to measure size.",
-)
-def size(version):
-    """Get database size."""
-    db_name = "Pfam" + version[:2] + "_" + version[-1:]
-    query = (
-        "SELECT table_schema, "
-        "ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) 'DB Size in GB' "
-        "FROM information_schema.tables "
-        "GROUP BY table_schema HAVING table_schema='{db_name}';".format(db_name=db_name)
-    )
-    commands = [
-        'sudo mysql -u root {db_name} -e "{query}"'.format(query=query, db_name=db_name)
-    ]
-    run(commands)
-
-
-@data.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
     help="Version to shrink.",
 )
 def shrink(version):
