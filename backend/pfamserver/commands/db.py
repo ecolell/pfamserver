@@ -60,41 +60,6 @@ def last_available_version():
     default=last_available_version(),
     help="Version to install.",
 )
-@click.option("--ftp", is_flag=True, help="Force to use ftp.")
-def build(version, ftp):
-    """Get download commands."""
-    protocol = "ftp" if ftp else "http"
-    url = "wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/database_files/{file} -O ./Pfam{version}/{file}"
-    files = [t + ".sql.gz" for t in tables]
-    commands = [
-        url.format(version=version, file=filename, protocol=protocol)
-        for filename in files
-    ]
-    commands = ["mkdir -p Pfam{version}"] + commands
-    commands += [
-        "gunzip -c Pfam{version}/{f_in} > Pfam{version}/{f_out}".format(
-            version=version, f_in=f, f_out=f[:-3]
-        )
-        for f in files
-    ]
-    commands += [
-        'echo "CREATE DATABASE IF NOT EXISTS {db_name}" | sudo mysql -u root',
-        "cat Pfam{version}/*.sql | sudo mysql -u root {db_name}",
-    ]
-    db_name = "Pfam" + version[:2] + "_" + version[-1:]
-    run(commands, version=version, db_name=db_name)
-
-
-@structure.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
-    help="Version to install.",
-)
 def clean(version):
     """Clean database."""
     db_name = "Pfam" + version[:2] + "_" + version[-1:]
@@ -112,31 +77,6 @@ def clean(version):
 def data():
     """Data commands"""
     pass
-
-
-@data.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
-    help="Version to download.",
-)
-@click.option("--ftp", is_flag=True, help="Force to use ftp.")
-def data_download(version, ftp):
-    """Download files, continue on break (it could take more than a day)."""
-    protocol = "ftp" if ftp else "http"
-    url = "wget -c {protocol}://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam{version}/database_files/{file} -O ./Pfam{version}/{file}"
-    files = [t + ".txt.gz" for t in tables]
-    commands = ["mkdir -p Pfam{version}"]
-    commands += [
-        url.format(version=version, file=filename, protocol=protocol)
-        for filename in files
-    ]
-    click.echo("\n".join(commands))
-    run(commands, version=version)
 
 
 @data.command()

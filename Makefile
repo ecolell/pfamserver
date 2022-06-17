@@ -17,6 +17,7 @@ DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
 DC_DEV:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.dev.yml"
 DOCKER:=docker run --rm -v "$(PWD)/backend:/work"
 DBASH:=$(DOCKER) bash:4.4
+TABLES:=pfamA pfamseq uniprot pdb pdb_pfamA_reg uniprot_reg_full pfamA_reg_full_significant
 
 # Dev initialization
 dev-init:
@@ -29,7 +30,8 @@ dev-init:
 	@echo "   pre-commit install"
 
 
-# Docker images
+# PFAMSCAN and HMMER preparation
+
 hmmer:
 	$(DBASH) rm /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz
 	$(DBASH) wget http://eddylab.org/software/hmmer/hmmer-$(HMMER_VERSION).tar.gz -P /work/Pfam$(PFAM_VERSION)
@@ -70,6 +72,43 @@ pfamscan: hmm-index
 
 pre-flight: pfamscan
 
+
+# EMBL-EBI PFAM DB destilation
+
+MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver/backend:/work" -w /work/Pfam$(PFAM_VERSION)/mysql --network=pfamserver_testingnet mysql:8.0.26
+DB_NAME:=Pfam$(subst .,_,$(PFAM_VERSION))
+
+
+db-structure:
+	@$(DC_DEV) up -d db
+	@$(MYSQL_SHELL) bash -c 'echo "CREATE DATABASE IF NOT EXISTS $(DB_NAME)" | mysql -u root -proot -h db'
+	@$(DBASH) mkdir -p /work/Pfam$(PFAM_VERSION)/mysql
+	@for table in $(TABLES); do \
+		$(DBASH) echo Building $$table structure; \
+		$(DBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.sql.gz -O /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql.gz; \
+		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql.gz; \
+		$(MYSQL_SHELL) bash -c "cat /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql | mysql -u root -proot -h db $(DB_NAME)"; \
+		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql; \
+	done
+
+db-data-download:
+	@$(DC_DEV) up -d db
+	@for table in $(TABLES); do \
+		$(DBASH) echo Downloading $$table data; \
+		$(DBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.txt.gz -O /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
+	done
+
+db-data-load:
+	@$(DC_DEV) up -d db
+	@for table in $(TABLES); do \
+		$(DBASH) echo Loading $$table data; \
+		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
+		$(MYSQL_SHELL) mysql -u root -proot $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
+		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt; \
+	done
+
+
+# Docker images
 
 docker-build-dev:
 	$(DC_DEV) --verbose --log-level DEBUG build web
