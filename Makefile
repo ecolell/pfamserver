@@ -78,6 +78,10 @@ pre-flight: pfamscan
 MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver/backend:/work" -w /work/Pfam$(PFAM_VERSION)/mysql --network=pfamserver_testingnet mysql:8.0.26
 DB_NAME:=Pfam$(subst .,_,$(PFAM_VERSION))
 
+db-check-version:
+	@$(DBASH) echo Current version: $(PFAM_VERSION)
+	@$(DBASH) echo Available version: `wget -q -O - "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D" | \
+			sed -n 's/.*href="Pfam\([0-9]\+\).\([0-9]\+\).*/\1.\2/p' | sort -V | tail -n 1`
 
 db-structure:
 	@$(DC_DEV) up -d db
