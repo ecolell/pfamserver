@@ -52,11 +52,40 @@ should download an **\<table\>.txt.gz** file for each table in the list.
 
 ## 3. Loading the downloaded content into mysql
 
+The third step is to uncompress, load into the mysql table and remove uncompressed files.
+
+The command
+
+    make db-data-load
+
+
+should ontain a **\<table\>.txt** from a **\<table\>.txt.gz**, load it into the right table, and remove the uncompressed to optimize disk space.
+
 
 ## 4. Cropping not used columns
+
+The forth step is to remove not used columns from mysql database.
+
+The command
+
+    make db-data-cropp
+
+leave only useful columns and reduce database size making the useful part of PFAM more portable.
 
 
 ## 5. Construct join table to improve performance (cache table)
 
+The fifth step is to create and fill a join table used to improve the performance when try to get the list of sequences (with and without PDB) for a specific pfam.
 
-## 6. Dump destiled data, compact and upload into Mistic's google drive.
+The command
+
+    make db-data-cache
+
+
+## 6. Dump destiled data, compact and upload into Google Drive.
+
+The last step is to extract the shrinked database, compact it and upload into Mistic2's Google Drive, and keep the link into this repository.
+
+The command
+
+    make db-data-pack
