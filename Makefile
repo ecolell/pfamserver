@@ -83,6 +83,16 @@ db-check-version:
 	@$(DBASH) echo Available version: `wget -q -O - "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D" | \
 			sed -n 's/.*href="Pfam\([0-9]\+\).\([0-9]\+\).*/\1.\2/p' | sort -V | tail -n 1`
 
+
+db-check-size:
+	@$(DC_DEV) up -d db
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+	SELECT table_schema, \
+        ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) 'DB Size in GB' \
+        FROM information_schema.tables \
+        GROUP BY table_schema HAVING table_schema='$(DB_NAME)'; \
+	"
+
 db-structure:
 	@$(DC_DEV) up -d db
 	@$(MYSQL_SHELL) bash -c 'echo "CREATE DATABASE IF NOT EXISTS $(DB_NAME)" | mysql -u root -proot -h db'
