@@ -92,7 +92,6 @@ db-structure:
 	done
 
 db-data-download:
-	@$(DC_DEV) up -d db
 	@for table in $(TABLES); do \
 		$(DBASH) echo Downloading $$table data; \
 		$(DBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.txt.gz -O /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
@@ -106,6 +105,19 @@ db-data-load:
 		$(MYSQL_SHELL) mysql -u root -proot $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
 		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt; \
 	done
+
+
+db-data-cropp:
+	@echo Remove not used columns
+	@$(DC_DEV) up -d db
+
+db-data-cache:
+	@echo Create join table.
+	@$(DC_DEV) up -d db
+
+db-data-pack:
+	@echo Dump database, gziped, and update Makefile Google Drive
+	@$(DC_DEV) up -d db
 
 
 # Docker images
