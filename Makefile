@@ -86,7 +86,7 @@ db-check-version:
 
 db-check-size:
 	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e  \
 	SELECT table_schema, \
         ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) 'DB Size in GB' \
         FROM information_schema.tables \
@@ -116,14 +116,136 @@ db-data-load:
 	@for table in $(TABLES); do \
 		$(DBASH) echo Loading $$table data; \
 		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
-		$(MYSQL_SHELL) mysql -u root -proot $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
+		$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
 		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt; \
 	done
 
 
+UNUSED_COLUMNS:= \
+	pdb:keywords \
+	pdb_pfamA_reg:auto_pdb_reg \
+	pdb_pfamA_reg:pdb_start_icode \
+	pdb_pfamA_reg:pdb_end_icode \
+	pdb_pfamA_reg:seq_start \
+	pdb_pfamA_reg:seq_end \
+	pdb_pfamA_reg:hex_color \
+	pdb_pfamA_reg:hex_color \
+	pfamA:previous_id \
+	pfamA:author \
+	pfamA:deposited_by \
+	pfamA:seed_source \
+	pfamA:type \
+	pfamA:comment \
+	pfamA:sequence_GA \
+	pfamA:domain_GA \
+	pfamA:sequence_TC \
+	pfamA:domain_TC \
+	pfamA:sequence_NC \
+	pfamA:domain_NC \
+	pfamA:buildMethod \
+	pfamA:model_length \
+	pfamA:searchMethod \
+	pfamA:msv_lambda \
+	pfamA:msv_mu \
+	pfamA:viterbi_lambda \
+	pfamA:viterbi_mu \
+	pfamA:forward_lambda \
+	pfamA:forward_tau \
+	pfamA:num_seed \
+	pfamA:version \
+	pfamA:number_archs \
+	pfamA:number_species \
+	pfamA:number_structures \
+	pfamA:number_ncbi \
+	pfamA:number_meta \
+	pfamA:average_length \
+	pfamA:percentage_id \
+	pfamA:average_coverage \
+	pfamA:change_status \
+	pfamA:seed_consensus \
+	pfamA:full_consensus \
+	pfamA:number_shuffled_hits \
+	pfamA:number_uniprot \
+	pfamA:rp_seed \
+	pfamA:number_rp15 \
+	pfamA:number_rp35 \
+	pfamA:number_rp55 \
+	pfamA:number_rp75 \
+	pfamA_reg_full_significant:auto_pfamA_reg_full \
+	pfamA_reg_full_significant:ali_start \
+	pfamA_reg_full_significant:ali_end \
+	pfamA_reg_full_significant:model_start \
+	pfamA_reg_full_significant:model_end \
+	pfamA_reg_full_significant:domain_bits_score \
+	pfamA_reg_full_significant:domain_evalue_score \
+	pfamA_reg_full_significant:sequence_bits_score \
+	pfamA_reg_full_significant:sequence_evalue_score \
+	pfamA_reg_full_significant:cigar \
+	pfamA_reg_full_significant:tree_order \
+	pfamA_reg_full_significant:domain_order \
+	pfamseq:seq_version \
+	pfamseq:crc64 \
+	pfamseq:md5 \
+	pfamseq:evidence \
+	pfamseq:length \
+	pfamseq:species \
+	pfamseq:taxonomy \
+	pfamseq:is_fragment \
+	pfamseq:sequence \
+	pfamseq:ncbi_taxid \
+	pfamseq:auto_architecture \
+	pfamseq:treefam_acc \
+	pfamseq:swissprot \
+	uniprot:seq_version \
+	uniprot:crc64 \
+	uniprot:md5 \
+	uniprot:evidence \
+	uniprot:species \
+	uniprot:taxonomy \
+	uniprot:is_fragment \
+	uniprot:sequence \
+	uniprot:ncbi_taxid \
+	uniprot:ref_proteome \
+	uniprot:complete_proteome \
+	uniprot:treefam_acc \
+	uniprot:rp15 \
+	uniprot:rp35 \
+	uniprot:rp55 \
+	uniprot:rp75 \
+	uniprot_reg_full:ali_start \
+	uniprot_reg_full:ali_end \
+	uniprot_reg_full:model_start \
+	uniprot_reg_full:model_end \
+	uniprot_reg_full:domain_bits_score \
+	uniprot_reg_full:domain_evalue_score \
+	uniprot_reg_full:sequence_bits_score \
+	uniprot_reg_full:sequence_evalue_score
+
+
 db-data-cropp:
-	@echo Remove not used columns
 	@$(DC_DEV) up -d db
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+		UPDATE uniprot SET created=updated; \
+		UPDATE pfamseq SET created=updated; \
+		UPDATE pfamA SET created=updated; \
+	"
+	@$(foreach TABLECOLUMN, $(UNUSED_COLUMNS), \
+        $(eval table = $(word 1,$(subst :, ,$(TABLECOLUMN)))) \
+        $(eval column = $(word 2,$(subst :, ,$(TABLECOLUMN)))) \
+		$(DBASH) echo Removing $(column) from $(table); \
+		$(DBASH) echo mysql -u root -proot -h db $(DB_NAME) -e " \
+			set @exist_Check := ( \
+				select count(*) from information_schema.columns \
+				where table_name='$(table)' \
+				and column_name='$(column)' \
+				and table_schema=database() \
+			) ; \
+			set @sqlstmt := if(@exist_Check>0,'ALTER TABLE $(table) DROP COLUMN $(column);' , 'select 1') ; \
+			prepare stmt from @sqlstmt ; \
+			execute stmt ; \
+		"; \
+    )
+
 
 db-data-cache:
 	@echo Create join table.
