@@ -113,10 +113,11 @@ db-data-download:
 
 db-data-load:
 	@$(DC_DEV) up -d db
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e"SET GLOBAL local_infile=1;"
 	@for table in $(TABLES); do \
 		$(DBASH) echo Loading $$table data; \
 		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
-		$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
+		$(MYSQL_SHELL) mysql --local_infile=1 -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/mysql/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
 		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt; \
 	done
 
