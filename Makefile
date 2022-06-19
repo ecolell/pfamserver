@@ -86,7 +86,7 @@ db-check-version:
 
 db-check-size:
 	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e  \
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
 	SELECT table_schema, \
         ROUND(SUM(data_length + index_length) / 1024 / 1024 / 1024, 1) 'DB Size in GB' \
         FROM information_schema.tables \
