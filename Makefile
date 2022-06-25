@@ -17,6 +17,7 @@ DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
 DC_DEV:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.dev.yml"
 DOCKER:=docker run --rm -v "$(PWD)/backend:/work"
 DBASH:=$(DOCKER) bash:4.4
+SBASH:=docker run --rm -v "$(PWD)/db:/work" bash:4.4
 TABLES:=pfamA pfamseq uniprot pdb pdb_pfamA_reg uniprot_reg_full pfamA_reg_full_significant
 
 # Dev initialization
@@ -75,12 +76,12 @@ pre-flight: pfamscan
 
 # EMBL-EBI PFAM DB destilation
 
-MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver/backend:/work" -w /work/Pfam$(PFAM_VERSION)/mysql --network=pfamserver_testingnet mysql:8.0.26
+MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver/db:/work" -w /work/Pfam$(PFAM_VERSION) --network=pfamserver_testingnet mysql:8.0.26
 DB_NAME:=Pfam$(subst .,_,$(PFAM_VERSION))
 
 db-check-version:
-	@$(DBASH) echo Current version: $(PFAM_VERSION)
-	@$(DBASH) echo Available version: `wget -q -O - "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D" | \
+	@$(SBASH) echo Current version: $(PFAM_VERSION)
+	@$(SBASH) echo Available version: `wget -q -O - "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D" | \
 			sed -n 's/.*href="Pfam\([0-9]\+\).\([0-9]\+\).*/\1.\2/p' | sort -V | tail -n 1`
 
 
@@ -96,29 +97,19 @@ db-check-size:
 db-structure:
 	@$(DC_DEV) up -d db
 	@$(MYSQL_SHELL) bash -c 'echo "CREATE DATABASE IF NOT EXISTS $(DB_NAME)" | mysql -u root -proot -h db'
-	@$(DBASH) mkdir -p /work/Pfam$(PFAM_VERSION)/mysql
+	@$(SBASH) mkdir -p /work/Pfam$(PFAM_VERSION)
 	@for table in $(TABLES); do \
-		$(DBASH) echo Building $$table structure; \
-		$(DBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.sql.gz -O /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql.gz; \
-		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql.gz; \
-		$(MYSQL_SHELL) bash -c "cat /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql | mysql -u root -proot -h db $(DB_NAME)"; \
-		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.sql; \
+		$(SBASH) echo Building $$table structure; \
+		$(SBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.sql.gz -O /work/Pfam$(PFAM_VERSION)/$$table.sql.gz; \
+		$(SBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/$$table.sql.gz; \
+		$(MYSQL_SHELL) bash -c "cat /work/Pfam$(PFAM_VERSION)/$$table.sql | mysql -u root -proot -h db $(DB_NAME)"; \
+		$(SBASH) rm /work/Pfam$(PFAM_VERSION)/$$table.sql; \
 	done
 
 db-data-download:
 	@for table in $(TABLES); do \
-		$(DBASH) echo Downloading $$table data; \
-		$(DBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.txt.gz -O /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
-	done
-
-db-data-load:
-	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e"SET GLOBAL local_infile=1;"
-	@for table in $(TABLES); do \
-		$(DBASH) echo Loading $$table data; \
-		$(DBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt.gz; \
-		$(MYSQL_SHELL) mysql --local_infile=1 -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/mysql/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
-		$(DBASH) rm /work/Pfam$(PFAM_VERSION)/mysql/$$table.txt; \
+		$(SBASH) echo Downloading $$table data; \
+		$(SBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.txt.gz -O /work/Pfam$(PFAM_VERSION)/$$table.txt.gz; \
 	done
 
 
@@ -129,7 +120,6 @@ UNUSED_COLUMNS:= \
 	pdb_pfamA_reg:pdb_end_icode \
 	pdb_pfamA_reg:seq_start \
 	pdb_pfamA_reg:seq_end \
-	pdb_pfamA_reg:hex_color \
 	pdb_pfamA_reg:hex_color \
 	pfamA:previous_id \
 	pfamA:author \
@@ -223,22 +213,57 @@ UNUSED_COLUMNS:= \
 	uniprot_reg_full:sequence_evalue_score
 
 
-db-data-cropp:
+db-data-load-and-cropp:
+	@$(DC_DEV) up -d db
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e"SET GLOBAL local_infile=1;"
+	@for table in $(TABLES); do \
+		$(SBASH) echo Loading $$table data; \
+		$(SBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/$$table.txt.gz; \
+		$(MYSQL_SHELL) mysql --local_infile=1 -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
+		$(foreach TABLECOLUMN, $(UNUSED_COLUMNS), \
+			$(eval a_table = $(word 1,$(subst :, ,$(TABLECOLUMN)))) \
+			$(eval column = $(word 2,$(subst :, ,$(TABLECOLUMN)))) \
+			$(SBASH) echo Removing $(column) from $(a_table); \
+			$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+				set @exist_Check := ( \
+					select count(*) from information_schema.columns \
+					where table_name='$(a_table)' \
+					and '$(a_table)'='$$table' \
+					and column_name='$(column)' \
+					and table_schema=database() \
+				) ; \
+				set @sqlstmt := if(@exist_Check>0,'ALTER TABLE $(a_table) DROP COLUMN $(column);' , 'select 1') ; \
+				prepare stmt from @sqlstmt ; \
+				execute stmt ; \
+			"; \
+		) \
+		$(SBASH) rm /work/Pfam$(PFAM_VERSION)/$$table.txt; \
+	done
+	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+		UPDATE uniprot SET created=updated; \
+		UPDATE pfamseq SET created=updated; \
+		UPDATE pfamA SET created=updated; \
+	"
+
+db-data-setcreated:
 	@$(DC_DEV) up -d db
 	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
 		UPDATE uniprot SET created=updated; \
 		UPDATE pfamseq SET created=updated; \
 		UPDATE pfamA SET created=updated; \
 	"
+
+db-data-cropp:
+	@$(DC_DEV) up -d db
 	@$(foreach TABLECOLUMN, $(UNUSED_COLUMNS), \
         $(eval table = $(word 1,$(subst :, ,$(TABLECOLUMN)))) \
         $(eval column = $(word 2,$(subst :, ,$(TABLECOLUMN)))) \
-		$(DBASH) echo Removing $(column) from $(table); \
-		$(DBASH) echo mysql -u root -proot -h db $(DB_NAME) -e " \
+		$(SBASH) echo Removing $(column) from $(table); \
+		$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
 			set @exist_Check := ( \
 				select count(*) from information_schema.columns \
 				where table_name='$(table)' \
-				and column_name='$(column)' \
+				and column_namjkjkjjjjjkjkjje='$(column)' \
 				and table_schema=database() \
 			) ; \
 			set @sqlstmt := if(@exist_Check>0,'ALTER TABLE $(table) DROP COLUMN $(column);' , 'select 1') ; \

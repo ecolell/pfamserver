@@ -12,7 +12,7 @@ The used tables are:
     * uniprot_reg_full
     * pfamA_reg_full_significant
 
-Since it is a good practise to keep raw downloaded files from previous versions, each version has a folder inside backend folder.
+Since it is a good practise to keep raw downloaded files from previous versions, each version has a folde r inside backend folder.
 
 
 ## 1. Preparing the database structure
@@ -38,7 +38,7 @@ The second step is to download the PFAM database content from the FTP server. Si
     * uniprot_reg_full (6 GB)
     * pfamA_reg_full_significant (4 GB)
 
-it is required to have at least 85 GB of free disk space to be able to download, and a few GB more in order to uncompress each file and inject it into the mysql database.
+it is required to have at least 85 GB of free disk space to be able to download, and around 400 GB more in order to uncompress each file and inject it into the mysql database.
 
 On the other hand, take into account that the download could take a few days since with good internet connections the download speed could be limited by the FTP server.
 
@@ -52,7 +52,7 @@ should download an **\<table\>.txt.gz** file for each table in the list.
 
 ## 3. Loading the downloaded content into mysql
 
-The third step is to uncompress, load into the mysql table and remove uncompressed files.
+The third step is to uncompress, load into the mysql table and remove uncompressed files. Since uniprot.txt uncompressed take (160 GB on disk and even more into the Mysql DB), you probably needs an extra 430GB in order to be able to load the 7 tables into the mysql database.
 
 The command
 
