@@ -263,7 +263,7 @@ db-data-cropp:
 			set @exist_Check := ( \
 				select count(*) from information_schema.columns \
 				where table_name='$(table)' \
-				and column_namjkjkjjjjjkjkjje='$(column)' \
+				and column_name='$(column)' \
 				and table_schema=database() \
 			) ; \
 			set @sqlstmt := if(@exist_Check>0,'ALTER TABLE $(table) DROP COLUMN $(column);' , 'select 1') ; \
