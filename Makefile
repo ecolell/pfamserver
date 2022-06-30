@@ -253,25 +253,6 @@ db-data-setcreated:
 		UPDATE pfamA SET created=updated; \
 	"
 
-db-data-cropp:
-	@$(DC_DEV) up -d db
-	@$(foreach TABLECOLUMN, $(UNUSED_COLUMNS), \
-        $(eval table = $(word 1,$(subst :, ,$(TABLECOLUMN)))) \
-        $(eval column = $(word 2,$(subst :, ,$(TABLECOLUMN)))) \
-		$(SBASH) echo Removing $(column) from $(table); \
-		$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
-			set @exist_Check := ( \
-				select count(*) from information_schema.columns \
-				where table_name='$(table)' \
-				and column_name='$(column)' \
-				and table_schema=database() \
-			) ; \
-			set @sqlstmt := if(@exist_Check>0,'ALTER TABLE $(table) DROP COLUMN $(column);' , 'select 1') ; \
-			prepare stmt from @sqlstmt ; \
-			execute stmt ; \
-		"; \
-    )
-
 
 db-data-cache:
 	@echo Create join table.

@@ -1,10 +1,6 @@
 import os
-import re
-from contextlib import closing
-from urllib.request import urlopen
 
 import click
-from pfamserver.commands.unused_columns import unused_columns
 
 click.disable_unicode_literals_warning = True
 
@@ -27,53 +23,6 @@ tables = [
 
 
 @db.group()
-def structure():
-    """Structure commands"""
-    pass
-
-
-def run(cmds, **kwargs):
-    cmd = " && ".join(["({:})".format(c) for c in cmds]).format(**kwargs)
-    click.echo("Running:\n{}".format(cmd))
-    os.system(cmd)
-
-
-def last_available_version():
-    """Get the last available version."""
-    url = "http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/?C=M;O=D"
-    with closing(urlopen(url)) as conn:
-        lines = list(line.decode("utf-8") for line in conn.readlines())
-        hrefs = [line for line in lines if 'href="Pfam' in line]
-        versions = [
-            re.sub('^.+href="Pfam([0-9.]+).+\n$', r"\1", links) for links in hrefs
-        ]
-    return versions[0]
-
-
-@structure.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
-    help="Version to install.",
-)
-def clean(version):
-    """Clean database."""
-    db_name = "Pfam" + version[:2] + "_" + version[-1:]
-    if click.confirm(
-        "Do you want to remove database {db_name}?".format(db_name=db_name)
-    ):
-        commands = [
-            'echo "DROP DATABASE IF EXISTS {db_name}" | sudo mysql -u root',
-        ]
-        run(commands, version=version, db_name=db_name)
-        click.echo("Ok done!")
-
-
-@db.group()
 def data():
     """Data commands"""
     pass
@@ -86,95 +35,7 @@ def data():
     "version",
     type=click.STRING,
     multiple=False,
-    default=last_available_version(),
-    help="Version to load.",
-)
-def load(version):
-    """Load the mysql into the database (be aware to apply into a clean database)."""
-    files = [(t + ".txt.gz") for t in tables]
-    root = os.path.abspath(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "../..")
-    )
-    click.echo(root)
-    commands = ["mkdir -p Pfam{version}"]
-    loader = [
-        "sudo mysql -u root {db_name} -e \"LOAD DATA LOCAL INFILE '{root}/Pfam{version}/{f_out}'",
-        "INTO TABLE {table} CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';\"",
-    ]
-    command = " && ".join(
-        [
-            "gunzip -c Pfam{version}/{f_in} > Pfam{version}/{f_out}",
-            " ".join(loader),
-            "rm Pfam{version}/{f_out}",
-        ]
-    )
-    db_name = "Pfam" + version[:2] + "_" + version[-1:]
-    commands += [
-        command.format(
-            version=version,
-            f_in=filename,
-            f_out=filename[:-3],
-            root=root,
-            table=table,
-            db_name=db_name,
-        )
-        for (filename, table) in zip(files, tables)
-    ]
-    click.echo("\n".join(commands))
-    run(commands, version=version)
-
-
-@data.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
-    help="Version to shrink.",
-)
-def shrink(version):
-    """Shrink the mysql into the database removing unused columns."""
-    query = (
-        "SELECT '{table}->{column}'; "
-        "set @exist_Check := ( "
-        "   select count(*) from information_schema.columns "
-        "   where table_name='{table}' "
-        "   and column_name='{column}' "
-        "   and table_schema=database()  "
-        ") ; "
-        "set @sqlstmt := if(@exist_Check>0,'ALTER TABLE {table} DROP COLUMN {column};' , 'select 1') ; "
-        "prepare stmt from @sqlstmt ; "
-        "execute stmt ;"
-    )
-    db_name = "Pfam" + version[:2] + "_" + version[-1:]
-    superquery = [
-        query.format(db_name=db_name, table=table, column=column)
-        for (table, columns) in unused_columns.items()
-        for column in columns
-    ]
-    queries = [
-        "UPDATE uniprot SET created=updated;",
-        "UPDATE pfamseq SET created=updated;",
-        "UPDATE pfamA SET created=updated;",
-        "".join(superquery),
-    ]
-    commands = [
-        'sudo mysql -u root {db_name} -e "{query}"'.format(query=q, db_name=db_name)
-        for q in queries
-    ]
-    run(commands)
-
-
-@data.command()
-@click.option(
-    "--version",
-    "-v",
-    "version",
-    type=click.STRING,
-    multiple=False,
-    default=last_available_version(),
+    default="35.0",
     help="Version to build the cache.",
 )
 def build_cache(version):
@@ -185,7 +46,7 @@ def build_cache(version):
             db_name=db_name
         )
     ]
-    run(commands)
+    # run(commands)
 
 
 @db.command()
@@ -195,7 +56,7 @@ def build_cache(version):
     "version",
     type=click.STRING,
     multiple=False,
-    default=last_available_version(),
+    default="35.0",
     help="Version to dump.",
 )
 def dump(version):
@@ -205,7 +66,7 @@ def dump(version):
         "mkdir -p mysql",
         "sudo mysqldump --databasecat  | s {db_name} > ./mysql/pfam{version}.sql",
     ]
-    run(commands, db_name=db_name, version=version)
+    # run(commands, db_name=db_name, version=version)
 
 
 @db.command()
@@ -215,7 +76,7 @@ def dump(version):
     "version",
     type=click.STRING,
     multiple=False,
-    default=last_available_version(),
+    default="35.0",
     help="Version to dump.",
 )
 def pack_dump(version):
@@ -243,7 +104,7 @@ versions = {
     "version",
     type=click.STRING,
     multiple=False,
-    default=last_available_version(),
+    default="35.0",
     help="Version to install.",
 )
 def shrinked_download(version):
@@ -257,7 +118,7 @@ def shrinked_download(version):
         "bash ./pfamserver/commands/db_shrinked_downloader.sh {id} {filename}",
     ]
     click.echo("\n".join(commands))
-    run(commands, id=versions[version], filename=filename)
+    # run(commands, id=versions[version], filename=filename)
 
 
 @shrinked.command()
@@ -267,7 +128,7 @@ def shrinked_download(version):
     "version",
     type=click.STRING,
     multiple=False,
-    default=last_available_version(),
+    default="35.0",
     help="Version to install.",
 )
 def install(version):
@@ -284,4 +145,4 @@ def install(version):
         + " < {data_filename}",
     ]
     click.echo("\n".join(commands))
-    run(commands, filename=filename, data_filename=data_filename)
+    # run(commands, filename=filename, data_filename=data_filename)
