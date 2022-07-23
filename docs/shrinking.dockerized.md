@@ -75,7 +75,7 @@ leave only useful columns and reduce database size making the useful part of PFA
 
 ## 5. Construct join table to improve performance (cache table)
 
-The fifth step is to create and fill a join table used to improve the performance when try to get the list of sequences (with and without PDB) for a specific pfam.
+The fifth step is to create a view to improve the performance when try to get the list of sequences (with and without PDB) for a specific pfam.
 
 The command
 
@@ -89,3 +89,7 @@ The last step is to extract the shrinked database, compact it and upload into Mi
 The command
 
     make db-data-pack
+
+generates the **./db/pfam<version>.sql.bz2** file that should be uploaded into Google Drive.
+
+Last, Makefile should be updated using the new GOOGLE_DRIVE_ID and PFAM_VERSION.
