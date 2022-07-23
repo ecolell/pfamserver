@@ -6,6 +6,7 @@ assert-command-present = $(if $(shell which $1),,$(error '$1' missing and needed
 
 # SHELL += -x
 PFAM_VERSION=35.0
+GOOGLE_DRIVE_ID=1OLyCAVesvCnNVZko6U1BnryncBtdnVnB
 HMMER_VERSION=3.2.1
 
 MAKE=make
@@ -76,7 +77,7 @@ pre-flight: pfamscan
 
 # EMBL-EBI PFAM DB destilation
 
-MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver/db:/work" -w /work/Pfam$(PFAM_VERSION) --network=pfamserver_testingnet mysql:8.0.26
+MYSQL_SHELL:=docker run --rm -it -e MYSQL_ROOT_PASSWORD=root -v "/home/eloy/version/git/pfamserver:/work" -w /work/db/Pfam$(PFAM_VERSION) --network=pfamserver_testingnet mysql:8.0.26
 DB_NAME:=Pfam$(subst .,_,$(PFAM_VERSION))
 
 db-check-version:
@@ -96,13 +97,13 @@ db-check-size:
 
 db-structure:
 	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) bash -c 'echo "CREATE DATABASE IF NOT EXISTS $(DB_NAME)" | mysql -u root -proot -h db'
+	@$(MYSQL_SHELL) bash -c 'echo "CREATE DATABASE IF NOT EXISTS $(DB_NAME)" | mysql --defaults-extra-file=/work/db/config.cnf'
 	@$(SBASH) mkdir -p /work/Pfam$(PFAM_VERSION)
 	@for table in $(TABLES); do \
 		$(SBASH) echo Building $$table structure; \
 		$(SBASH) wget -c http://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam$(PFAM_VERSION)/database_files/$$table.sql.gz -O /work/Pfam$(PFAM_VERSION)/$$table.sql.gz; \
 		$(SBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/$$table.sql.gz; \
-		$(MYSQL_SHELL) bash -c "cat /work/Pfam$(PFAM_VERSION)/$$table.sql | mysql -u root -proot -h db $(DB_NAME)"; \
+		$(MYSQL_SHELL) bash -c "cat /work/db/Pfam$(PFAM_VERSION)/$$table.sql | mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME)"; \
 		$(SBASH) rm /work/Pfam$(PFAM_VERSION)/$$table.sql; \
 	done
 
@@ -215,16 +216,16 @@ UNUSED_COLUMNS:= \
 
 db-data-load-and-cropp:
 	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e"SET GLOBAL local_infile=1;"
+	@$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME) -e"SET GLOBAL local_infile=1;"
 	@for table in $(TABLES); do \
 		$(SBASH) echo Loading $$table data; \
 		$(SBASH) gunzip -fk /work/Pfam$(PFAM_VERSION)/$$table.txt.gz; \
-		$(MYSQL_SHELL) mysql --local_infile=1 -u root -proot -h db $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
+		$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf --local_infile=1 $(DB_NAME) -e "LOAD DATA LOCAL INFILE '/work/db/Pfam$(PFAM_VERSION)/$$table.txt' INTO TABLE $$table CHARACTER SET latin1 COLUMNS TERMINATED BY '\\t' LINES TERMINATED BY '\\n';"; \
 		$(foreach TABLECOLUMN, $(UNUSED_COLUMNS), \
 			$(eval a_table = $(word 1,$(subst :, ,$(TABLECOLUMN)))) \
 			$(eval column = $(word 2,$(subst :, ,$(TABLECOLUMN)))) \
 			$(SBASH) echo Removing $(column) from $(a_table); \
-			$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+			$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME) -e " \
 				set @exist_Check := ( \
 					select count(*) from information_schema.columns \
 					where table_name='$(a_table)' \
@@ -239,7 +240,7 @@ db-data-load-and-cropp:
 		) \
 		$(SBASH) rm /work/Pfam$(PFAM_VERSION)/$$table.txt; \
 	done
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+	@$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME) -e " \
 		UPDATE uniprot SET created=updated; \
 		UPDATE pfamseq SET created=updated; \
 		UPDATE pfamA SET created=updated; \
@@ -247,20 +248,41 @@ db-data-load-and-cropp:
 
 db-data-setcreated:
 	@$(DC_DEV) up -d db
-	@$(MYSQL_SHELL) mysql -u root -proot -h db $(DB_NAME) -e " \
+	@$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME) -e " \
 		UPDATE uniprot SET created=updated; \
 		UPDATE pfamseq SET created=updated; \
 		UPDATE pfamA SET created=updated; \
 	"
 
-
 db-data-cache:
 	@echo Create join table.
 	@$(DC_DEV) up -d db
+	$(MYSQL_SHELL) mysql --defaults-extra-file=/work/db/config.cnf $(DB_NAME) -e "`cat db_view_cache.sql`"
+
+
+DBBASH:=docker run --rm -v "$(PWD):/work" bash:4.4
+GNUWGET:=docker run --rm -v "$(PWD):/work" cirrusci/wget:latest
+
 
 db-data-pack:
 	@echo Dump database, gziped, and update Makefile Google Drive
 	@$(DC_DEV) up -d db
+	$(MYSQL_SHELL) mysqldump --defaults-extra-file=/work/db/config.cnf --databases $(DB_NAME) > ./db/pfam$(PFAM_VERSION).sql
+	$(DBBASH) bzip2 -k /work/db/pfam$(PFAM_VERSION).sql
+
+db-shrinked-download:
+	@echo Downloading Pfam $(PFAM_VERSION) from Google Drive
+	@$(DBBASH) rm -f /work/pfam$(PFAM_VERSION).sql.bz2
+	@$(GNUWGET) wget --save-cookies /work/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$(GOOGLE_DRIVE_ID)" -O-
+	@$(GNUWGET) wget --load-cookies /work/cookies.txt -c "https://docs.google.com/uc?export=download&confirm=t&id=$(GOOGLE_DRIVE_ID)" -O /work/pfam$(PFAM_VERSION).sql.bz2
+
+db-shrinked-setup: # db-shrinked-download
+	@echo Unziping and loading into database
+	@$(DBBASH) bzip2 -dk /work/pfam$(PFAM_VERSION).sql.bz2
+	@$(DBBASH) mv /work/pfam$(PFAM_VERSION).sql /work/db/pfam$(PFAM_VERSION).sql
+	docker run --rm -it -v "$(PWD):/work" --network=$(PROJECT_NAME)_intranet mysql:8.0.26 \
+		bash -c "mysql -u root -proot -h db < /work/db/pfam$(PFAM_VERSION).sql"
+
 
 
 # Docker images
@@ -331,22 +353,7 @@ rel-start:
 rel-end:
 	@echo "--> Release ready"
 
-setup-libraries:
-	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) -e HMMER_VERSION=$(HMMER_VERSION) --entrypoint="make" --rm web setup-libraries
-
-
-shrinked-download:
-	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --rm web-dev shrinked-download
-
-shrinked-install:
-	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --use-aliases --rm web-dev shrinked-install
-
-shrinked-build-cache:
-	$(DC) run -e PFAM_VERSION=$(PFAM_VERSION) --entrypoint="make" --use-aliases --rm web-dev shrinked-build-cache
-
-setup-shrinked: shinked-download shrinked-install shrinked-build-cache
-
-up: setup-libraries
+up: pre-flight
 	$(DC) up -d db
 	@sleep 3;
 
@@ -360,7 +367,9 @@ down-db-admin:
 	$(DC) stop phpmyadmin
 	$(DC) rm phpmyadmin
 
-bootup: rel-start clean docker-build up setup-shrinked rel-end
+# clean docker-build
+
+bootup: rel-start  up db-shrinked-setup rel-end
 blue-green-release:
 	./deploy.sh
 
