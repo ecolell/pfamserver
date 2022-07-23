@@ -10,15 +10,8 @@ else
     OLD="blue"
 fi
 
-echo "Backup "$OLD" cloud"
-PROJECT_NAME=$OLD make backup-db || true
 echo "Starting "$ENV" cloud"
-if test -z "$blue" && test -z "$green"
-then
-    PROJECT_NAME=$ENV make bootup
-else
-    PROJECT_NAME=$ENV make release-bootup
-fi
+PROJECT_NAME=$ENV make bootup
 
 echo "Change redirect from "$OLD" to "$ENV
 curl -XPUT "http://localhost:8081/api/providers/rest" -d '{
