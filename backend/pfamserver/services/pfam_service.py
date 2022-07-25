@@ -43,16 +43,18 @@ def get_pfam_acc_from_pfam(code):
 
 
 @merry._try
-def get_pfam(pfam):
-    return get_pfam_acc_from_pfam(pfam).one()
+def get_pfam(pfam, only_pfamA_Acc: bool = False):
+    query = get_pfam_acc_from_pfam(pfam)
+    if only_pfamA_Acc:
+        query = query.options(Load(PfamA).load_only("pfamA_acc"))  # type: ignore
+    return query.one()
 
 
 def get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb):
-    subquery = get_pfam_acc_from_pfam(pfam)
-    subquery = subquery.distinct().subquery()
+    pfamA = get_pfam(pfam, only_pfamA_Acc=True)
 
     query = db.session.query(PfamAPfamseq.pfamseq_id)
-    query = query.filter(PfamAPfamseq.pfamA_acc == subquery.c.pfamA_acc)
+    query = query.filter(PfamAPfamseq.pfamA_acc == pfamA.pfamA_acc)
 
     if with_pdb:
         query = query.filter(PfamAPfamseq.has_pdb == 1)
@@ -63,8 +65,7 @@ def get_sequence_descriptions_from_pfam_with_join_table(pfam, with_pdb):
 
 
 def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
-    subquery = get_pfam_acc_from_pfam(pfam)
-    subquery = subquery.distinct().subquery()
+    pfamA = get_pfam(pfam, only_pfamA_Acc=True)
 
     query = db.session.query(
         concat(
@@ -79,12 +80,12 @@ def get_sequence_descriptions_from_pfam_without_join_table(pfam, with_pdb):
         PfamARegFullSignificant,
         Pfamseq.pfamseq_acc == PfamARegFullSignificant.pfamseq_acc,
     )
-    query = query.filter(PfamARegFullSignificant.pfamA_acc == subquery.c.pfamA_acc)
+    query = query.filter(PfamARegFullSignificant.pfamA_acc == pfamA.pfamA_acc)
 
     if with_pdb:
         subquery2 = db.session.query(PdbPfamAReg)
         subquery2 = (
-            subquery2.filter(PdbPfamAReg.pfamA_acc == subquery.c.pfamA_acc)
+            subquery2.filter(PdbPfamAReg.pfamA_acc == pfamA.pfamA_acc)
             .distinct()
             .subquery()
         )
