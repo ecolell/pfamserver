@@ -17,6 +17,7 @@ services:
       - ./backend:/home/pfamserver/stage
     environment:
       - PROJECT_NAME
+    scale: 4
     env_file:
       - backend/.env
     user: ${CURRENT_UID}
@@ -42,6 +43,11 @@ services:
     volumes:
       - ./backend/pfamserver/static:/var/www/static
       - ./nginx/conf.d:/etc/nginx/conf.d
+  redis-cache:
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - intranet
   phpmyadmin:
     image: phpmyadmin
     networks:
