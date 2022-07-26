@@ -1,27 +1,85 @@
-name: Backend workflow
+name: backend
 on:
-  push:
-    branches:
-      - '*'
-      - '*/*'
-      - '**'
-      - '!master'
-      - '!production'
-    paths-ignore:
-      - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
 jobs:
-  run:
-    name: Run
+  mypy:
+    name: mypy
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest]
+        operating-system: [ubuntu-latest]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Test over 3.8.10
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install mypy==v0.902
+    - run: pip install sqlalchemy-stubs==0.4
+    - run: cd backend && mypy pfamserver tests
+  quality:
+    name: quality
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install pydocstyle radon
+    - run: cd backend && pydocstyle pfamserver
+    - run: cd backend && radon cc -nb -a pfamserver
+  security:
+    name: security
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install bandit
+    - run: cd backend && bandit -x pfamserver/command -r pfamserver
+  safety:
+    name: safety
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - run: pip install --upgrade pip
+    - run: pip install safety
+    - run: cd backend && safety check --full-report
+  test:
+    name: test
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Run tests
       run: make pipeline-backend-test
+    - name: Coverage
+      uses: coroo/pytest-coverage-commentator@v1.0.2
+      with:
+        pytest-coverage: pytest-coverage.txt

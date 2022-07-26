@@ -1,0 +1,19 @@
+FROM python:3.8.10-slim
+
+ENV HOME=/usr/local/lib
+
+# COPY poetry-entrypoint.sh /usr/local/bin/poetry-entrypoint
+
+RUN apt-get update && apt-get install --no-install-recommends -y curl \
+    && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -o get-poetry.py \
+    && python get-poetry.py --version 1.0.5 \
+    && rm get-poetry.py \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PATH=$HOME/.poetry/bin:$PATH
+
+WORKDIR /app
+
+ENTRYPOINT ["poetry"]
+
+CMD ["poetry", "--help"]

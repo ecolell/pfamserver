@@ -1,0 +1,66 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: backend
+      args:
+        PORT: 5000
+      target: backend_web
+    command: gunicorn wsgi:app -R --error-logfile=- --access-logfile=- --reload --worker-class=gevent --bind=0.0.0.0:5000
+    restart: always
+    networks:
+      - intranet
+    links:
+      - db:db
+    volumes:
+      - ./backend:/home/pfamserver/stage
+    environment:
+      - PROJECT_NAME
+    scale: 4
+    env_file:
+      - backend/.env
+    user: ${CURRENT_UID}
+  db:
+    restart: always
+    image: mysql:8.0.26
+    security_opt:
+      - seccomp:unconfined
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - intranet
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    env_file:
+      - db/.env
+  nginx:
+    image: nginx:1.13.5
+    networks:
+      - intranet
+      - traefik
+    links:
+      - web:web
+    volumes:
+      - ./backend/pfamserver/static:/var/www/static
+      - ./nginx/conf.d:/etc/nginx/conf.d
+  redis-cache:
+    image: "redis:alpine"
+    command: redis-server
+    networks:
+      - intranet
+  phpmyadmin:
+    image: phpmyadmin
+    networks:
+      - intranet
+    restart: always
+    ports:
+      - 8082:80
+    environment:
+      - PMA_ARBITRARY=1
+
+networks:
+  intranet:
+    driver: bridge
+  traefik:
+    external:
+      name: pfamserver_traefik_gate

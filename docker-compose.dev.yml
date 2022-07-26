@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: backend
+      target: backend_dev
+    restart: always
+    working_dir: /home/pfamserver/stage
+    networks:
+      - testingnet
+    links:
+      - db:db
+    volumes:
+      - ./backend:/home/pfamserver/stage
+    user: ${CURRENT_UID}
+  db:
+    restart: always
+    image: mysql:8.0.26
+    security_opt:
+      - seccomp:unconfined
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - testingnet
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/mysql_test:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=Pfam35_0
+      - MYSQL_USER=pfamserver
+      - MYSQL_PASSWORD=pfamserver
+
+networks:
+  testingnet:
+    driver: bridge

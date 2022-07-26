@@ -1,3 +1,5 @@
+cookies.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -7,7 +9,11 @@ __pycache__/
 .env
 
 # Distribution / packaging
+db/
+pytest-coverage.txt
 .Python
+requirements.txt
+requirements_dev.txt
 env/
 build/
 develop-eggs/
@@ -41,6 +47,8 @@ pfam*.sql.bz2
 tmp/
 data/
 wget-log
+backend/pfamserver/static
+backend/mysql
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -77,3 +85,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# database
+db/mysql/*
