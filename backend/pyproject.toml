@@ -41,6 +41,7 @@ PyMySQL = "^1.0.2"
 webargs = "^8.1.0"
 flask-restx = "^0.5.1"
 WTForms = "3.0.0a1"
+redis = "^4.3.4"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.0"
