@@ -16,7 +16,7 @@ UID:=1000:1000
 DC_BASE:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.yml"
 DC:=$(DC_BASE) --project-name=$(PROJECT_NAME)
 DC_DEV:=CURRENT_UID=$(UID) docker-compose -f "docker-compose.dev.yml"
-DOCKER:=docker run --rm -v "$(PWD)/backend:/work"
+DOCKER:=docker run --rm -v "$(PWD)/backend:/work" --network host
 DBASH:=$(DOCKER) bash:4.4
 SBASH:=docker run --rm -v "$(PWD)/db:/work" bash:4.4
 TABLES:=pfamA pfamseq uniprot pdb pdb_pfamA_reg uniprot_reg_full pfamA_reg_full_significant
@@ -35,7 +35,7 @@ dev-init:
 # PFAMSCAN and HMMER preparation
 
 hmmer:
-	$(DBASH) rm /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz
+	$(DBASH) mkdir -p /work/Pfam$(PFAM_VERSION) && rm -f /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz
 	$(DBASH) wget http://eddylab.org/software/hmmer/hmmer-$(HMMER_VERSION).tar.gz -P /work/Pfam$(PFAM_VERSION)
 	$(DBASH) tar xvzf /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION).tar.gz -C /work/Pfam$(PFAM_VERSION)
 	$(DOCKER) -w /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION) \
