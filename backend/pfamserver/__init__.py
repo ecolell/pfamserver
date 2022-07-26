@@ -74,10 +74,3 @@ def register_middlewares(app):
         from werkzeug.contrib.profiler import ProfilerMiddleware
 
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[20])
-
-
-def register_cli(app):
-    """Register CLI commands into app."""
-    from pfamserver.commands.db import db as db_command
-
-    app.cli.add_command(db_command)
