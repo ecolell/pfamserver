@@ -357,7 +357,7 @@ up: pre-flight
 	$(DC) up -d db
 	@sleep 3;
 
-	$(DC) up -d web nginx
+	$(DC) up -d redis-cache web nginx
 	# $(DC) scale web=4
 
 up-db-admin:
