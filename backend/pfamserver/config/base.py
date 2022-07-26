@@ -1,10 +1,6 @@
 import logging
 import os
 
-from environs import Env
-
-env = Env()
-
 
 class BaseConfig:
     # Serve bootstrap libs locally
