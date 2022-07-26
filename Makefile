@@ -57,7 +57,7 @@ preflight-stockholm: hmmer
 	$(DBASH) sed -i -E "s/(#=GF AC   [A-Z0-9]+)\\.(.+)/\\1\\n#=GF DC   Revision: \\2/g" /work/Pfam$(PFAM_VERSION)/Pfam-A.full
 
 
-hmm-index: #preflight-stockholm
+hmm-index: preflight-stockholm
 	$(DBASH) rm -f /work/Pfam$(PFAM_VERSION)/Pfam-A.full.ssi
 	$(DOCKER) \
 		gcc:4.9 /work/Pfam$(PFAM_VERSION)/hmmer-$(HMMER_VERSION)/easel/miniapps/esl-afetch --index /work/Pfam$(PFAM_VERSION)/Pfam-A.full
@@ -276,7 +276,7 @@ db-shrinked-download:
 	@$(GNUWGET) wget --save-cookies /work/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$(GOOGLE_DRIVE_ID)" -O-
 	@$(GNUWGET) wget --load-cookies /work/cookies.txt -c "https://docs.google.com/uc?export=download&confirm=t&id=$(GOOGLE_DRIVE_ID)" -O /work/pfam$(PFAM_VERSION).sql.bz2
 
-db-shrinked-setup: # db-shrinked-download
+db-shrinked-setup: db-shrinked-download
 	@echo Unziping and loading into database
 	@$(DBBASH) bzip2 -dk /work/pfam$(PFAM_VERSION).sql.bz2
 	@$(DBBASH) mv /work/pfam$(PFAM_VERSION).sql /work/db/pfam$(PFAM_VERSION).sql
@@ -291,9 +291,10 @@ docker-build-dev:
 	$(DC_DEV) --verbose --log-level DEBUG build web
 
 
-docker-build: # pre-flight
-	# $(MAKE) -C backend extract-requirements
+docker-build: pre-flight
+	$(MAKE) -C backend extract-requirements
 	$(DC) build web
+	$(DC_DEV) build web
 
 
 docker-upload:
@@ -312,7 +313,7 @@ pipeline-database-test:
 
 # Testing targets
 
-pipeline-backend-test: # docker-build-dev
+pipeline-backend-test: docker-build-dev
 	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
 	$(DC_DEV) run -u root -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s | tee pytest-coverage.txt
