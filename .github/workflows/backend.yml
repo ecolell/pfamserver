@@ -1,5 +1,9 @@
 name: backend
 on:
+  push:
+    branches:
+      - dev
+      - master
   pull_request:
     paths-ignore:
       - '**.md'
