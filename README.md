@@ -1,10 +1,7 @@
 # pfamserver
 
 A python service that expose an api to the pfam database.
-
-[![build status](https://wichi.no-ip.org/leloir/pfamserver/badges/dev/pipeline.svg)](https://wichi.no-ip.org/leloir/pfamserver/commits/dev)
-[![coverage report](https://wichi.no-ip.org/leloir/pfamserver/badges/dev/coverage.svg)](https://wichi.no-ip.org/leloir/pfamserver/commits/dev)
-[![Stories in Ready](https://badge.waffle.io/ecolell/pfamserver.png?label=ready&title=Ready)](https://waffle.io/ecolell/pfamserver)
+[![build status](https://github.com/github/docs/actions/workflows/backend.yml/badge.svg?branch=dev)](https://github.com/ecolell/pfamserver/commits/dev)
 
 
 ## Example
