@@ -1,7 +1,7 @@
 # pfamserver
 
 A python service that expose an api to the pfam database.
-[![build status](https://github.com/github/docs/actions/workflows/backend.yml/badge.svg?branch=dev)](https://github.com/ecolell/pfamserver/commits/dev)
+[![build status](https://github.com/ecolell/pfamserver/actions/workflows/backend.yml/badge.svg?branch=dev)](https://github.com/ecolell/pfamserver/commits/dev)
 
 
 ## Example
