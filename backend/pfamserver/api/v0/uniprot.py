@@ -18,7 +18,7 @@ class UniprotAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc("Obtain the uniprot information.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, uniprot):
         uniprot = uniprot_service.get_uniprot(uniprot)
         data = self.schema.dump(uniprot)
@@ -31,7 +31,7 @@ class UniprotPfamsAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc("Obtain a pfams list from a uniprot.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, uniprot):
         uniprot = uniprot_service.get_pfams_from_uniprot(uniprot)
         data = self.schema.dump(uniprot)
@@ -44,7 +44,7 @@ class SequenceDescriptionAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc("Obtain a pdb list from a sequence_description.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, uniprot_id, seq_start, seq_end):
         pdbs = pdb_service.get_pdbs_from_uniprot_pfam_a_reg(
             uniprot_id, seq_start, seq_end

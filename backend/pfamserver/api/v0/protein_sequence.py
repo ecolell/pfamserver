@@ -18,7 +18,7 @@ class ProteinSequenceAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc("Obtain a pfams list from a uniprot.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, sequence):
         sequence = sequence.upper().strip()
         output = sequence_service.get_pfams_from_sequence(sequence)

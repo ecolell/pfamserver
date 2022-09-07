@@ -9,7 +9,7 @@ ns = Namespace("version")
 class VersionAPI(Resource):
     @ns.response(200, "response")
     @ns.doc("Obtain the pfam database version.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self):
         data = {"version": version_service.version()}
         return data, 200
