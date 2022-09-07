@@ -1,10 +1,9 @@
 from base64 import b64encode
 from zlib import compress
 
-from flask import request
 from flask_restx import Namespace, Resource
 from pfamserver.api.v0 import schemas
-from pfamserver.extensions import cache
+from pfamserver.extensions import cache, make_cache_key
 from pfamserver.services import pfam_service
 from webargs.flaskparser import use_kwargs
 
@@ -17,19 +16,13 @@ def handle_root_exception(error):
     return {"message": error.message}, 400
 
 
-def make_cache_key(*args, **kwargs):
-    path = request.path
-    args = str(request.args.items())
-    return (path + args).encode("utf-8")
-
-
 @ns.route("/<pfam>")
 class PfamAAPI(Resource):
     schema = schemas.PfamSchema()
 
     @ns.response(200, "response")
     @ns.doc("Obtain the pfam information.")
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, pfam):
         pfam = pfam_service.get_pfam(pfam)
         data = self.schema.dump(pfam)
@@ -40,7 +33,7 @@ class PfamAAPI(Resource):
 class PfamASequenceDescriptionsAPI(Resource):
     @ns.response(200, "response")
     @ns.doc("Obtain a sequence_description list from a pfam.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     @use_kwargs(schemas.PfamAQuery, location="querystring")
     def get(self, pfam, with_pdb=True):
         sequence_descriptions = pfam_service.get_sequence_descriptions_from_pfam(
@@ -59,8 +52,8 @@ class PfamASequenceDescriptionsAPI(Resource):
 class PfamAStockholmAPI(Resource):
     @ns.response(200, "response")
     @ns.doc("Obtain a sequence_description list from a pfam.")
-    @cache.cached(timeout=3600, key_prefix=make_cache_key)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, pfam: str):
         stockholm = pfam_service.get_stockholm_from_pfam(pfam)
-        data = {"query": pfam, "output": b64encode(compress(stockholm)).decode("utf-8")}
+        data = {"query": pfam, "output": str(b64encode(compress(stockholm)).decode("utf-8"))}
         return data, 200

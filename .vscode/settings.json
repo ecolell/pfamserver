@@ -2,6 +2,8 @@
     // "python.linting.enabled": true,
     "python.pythonPath": "/home/eloy/.virtualenvs/pfamserver/bin/python",
     "python.unitTest.unittestEnabled": false,
+    "terminal.integrated.shell.linux": "/bin/zsh",
+    "terminal.integrated.fontFamily": "MesloLGS NF",
     "python.unitTest.nosetestsEnabled": false,
     "python.unitTest.pyTestEnabled": true,
     "python.unitTest.pyTestArgs": [

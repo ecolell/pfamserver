@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource
 from pfamserver.api.v0 import schemas
-from pfamserver.extensions import cache
+from pfamserver.extensions import cache, make_cache_key
 from pfamserver.services import sequence_service
 
 ns = Namespace("protein_sequences")
@@ -18,7 +18,7 @@ class ProteinSequenceAPI(Resource):
 
     @ns.response(200, "response")
     @ns.doc("Obtain a pfams list from a uniprot.")
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, make_cache_key=make_cache_key)
     def get(self, sequence):
         sequence = sequence.upper().strip()
         output = sequence_service.get_pfams_from_sequence(sequence)
