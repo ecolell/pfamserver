@@ -20,16 +20,18 @@ RUN cpanm -v Moose IPC::Run
 ENV PYTHONUNBUFFERED True
 RUN mkdir -p /home/pfamserver/stage/
 
+RUN pip install --upgrade pip==21.1.3
+COPY requirements.txt /home/pfamserver
+RUN pip install --no-cache-dir -r /home/pfamserver/requirements.txt
+
 WORKDIR /home/pfamserver/stage
 
-RUN pip install --upgrade pip==21.1.3
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+ENV FLASK_ENV SQLALCHEMY_DATABASE_URI NODE_ENV SERVER_NAME FLASK_APP PFAM_VERSION HMMER_VERSION
 
 FROM backend_base as backend_web
 
 CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 30 --keep-alive 30 --error-logfile=- --access-logfile=- --worker-class=gevent wsgi:app
 FROM backend_base as backend_dev
 
-COPY requirements_dev.txt ./
-RUN pip install --no-cache-dir -r requirements_dev.txt
+COPY requirements_dev.txt /home/pfamserver/
+RUN pip install --no-cache-dir -r /home/pfamserver/requirements_dev.txt
