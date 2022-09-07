@@ -7,7 +7,7 @@ services:
       args:
         PORT: 5000
       target: backend_web
-    command: gunicorn wsgi:app -R --error-logfile=- --access-logfile=- --reload --worker-class=gevent --bind=0.0.0.0:5000
+    command: gunicorn wsgi:app -R --error-logfile=- --access-logfile=- --reload --worker-class=gevent --chdir /home/pfamserver/stage --bind=0.0.0.0:5000
     restart: always
     networks:
       - intranet
