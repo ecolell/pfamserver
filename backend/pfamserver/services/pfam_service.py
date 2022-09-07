@@ -122,7 +122,7 @@ def get_stockholm_from_pfam(pfam: str):
     query = get_pfam_acc_from_pfam(pfam)
     query = query.options(Load(PfamA).load_only("pfamA_acc"))  # type: ignore
     pfamA_acc = query.one().pfamA_acc
-    fetch_call = f"./{PFAM_VERSION}/hmmer-{HMMER_VERSION}/esl-afetch"
+    fetch_call = f"./{PFAM_VERSION}/hmmer-{HMMER_VERSION}/easel/miniapps/esl-afetch"
     cmd = [
         fetch_call,
         f"./{PFAM_VERSION}/Pfam-A.full",
