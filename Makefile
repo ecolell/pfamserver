@@ -383,9 +383,9 @@ down-traefik:
 ps:
 	@(CURRENT_UID=$(UID) docker-compose -f "docker-compose.traefik.yml" ps)
 	@echo "\n"
-	@($(DC_BASE) --project-name=green ps)
+	@($(DC_BASE) --project-name=pfs-green ps)
 	@echo "\n"
-	@($(DC_BASE) --project-name=blue ps)
+	@($(DC_BASE) --project-name=pfs-blue ps)
 
 tlogs:
 	@(CURRENT_UID=$(UID) docker-compose -f "docker-compose.traefik.yml" logs --tail=3 -f)

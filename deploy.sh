@@ -1,13 +1,13 @@
 #!/bin/bash
-blue=$(docker ps -f name=blue -q)
-green=$(docker ps -f name=green -q)
+blue=$(docker ps -f name=pfs-blue -q)
+green=$(docker ps -f name=pfs-green -q)
 if test -z "$blue"
 then
-    ENV="blue"
-    OLD="green"
+    ENV="pfs-blue"
+    OLD="pfs-green"
 else
-    ENV="green"
-    OLD="blue"
+    ENV="pfs-green"
+    OLD="pfs-blue"
 fi
 
 echo "Starting "$ENV" cloud"
