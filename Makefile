@@ -316,6 +316,7 @@ pipeline-database-test:
 pipeline-backend-test: docker-build-dev
 	mkdir -p db/mysql_test backend/tmp
 	$(DC_DEV) up -d db
+	sleep 5
 	$(DC_DEV) run -u root -w "/home/pfamserver/stage" -e FLASK_APP=/home/pfamserver/stage -e FLASK_ENV=testing web py.test -s | tee pytest-coverage.txt
 	$(DC_DEV) down
 
