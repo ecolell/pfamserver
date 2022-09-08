@@ -8,7 +8,7 @@ curl -XPUT "http://localhost:8081/api/providers/rest" -d '{
           "web"
         ],
         "service": "nginx",
-        "rule": "Host(`localhost`) || Host(`pfamserver.leloir.org.ar`)"
+        "rule": "Host(`localhost`) || Host(`pfamserver.leloir.org.ar`) || Host(`pfamserver_traefik_1`) || HostRegexp(`.*`)"
       }
     },
     "services": {

@@ -12,6 +12,7 @@ services:
         restart: unless-stopped
         networks:
             - traefik_gate
+            - mistic_service_gate
         ports:
             - "5001:5001"
             - "8081:8081"
@@ -21,3 +22,6 @@ services:
 networks:
     traefik_gate:
         driver: bridge
+    mistic_service_gate:
+        external:
+            name: mistic_service_gate
