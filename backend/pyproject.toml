@@ -30,7 +30,7 @@ merry = "^0.3.0"
 python-dotenv = "^0.18.0"
 requests = {extras = ["security"], version = "^2.25.1"}
 SQLAlchemy = "1.3.24"
-Werkzeug = "0.16.0"
+Werkzeug = "2.2.3"
 future = "^0.18.2"
 greenlet = ">=0.4.17"
 gevent = ">=20.9"
